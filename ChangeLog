@@ -1,6 +1,6 @@
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>
 
-	* mixi.el (mixi-login): Return a error when `w3m-use-cookies' is nil.
+	* mixi.el (mixi-login): Return an error when `w3m-use-cookies' is nil.
 
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>
 

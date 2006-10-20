@@ -262,6 +262,10 @@ while `mixi' is waiting for a server's response."
 
 (defun mixi-login (&optional email password)
   "Login to Mixi."
+  (unless w3m-use-cookies
+    (error
+     (mixi-message
+      "Require to accept cookies.  Please set `w3m-use-cookies' to t.")))
   (let ((email (or email mixi-default-email
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password

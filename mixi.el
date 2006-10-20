@@ -1,4 +1,4 @@
-;; mixi.el --- API library for accessing to Mixi
+;; mixi.el --- API library for accessing to mixi
 
 ;; Copyright (C) 2005,2006 OHASHI Akira
 
@@ -102,16 +102,16 @@
 (eval-when-compile (require 'cl))
 
 (defgroup mixi nil
-  "API library for accessing to Mixi."
+  "API library for accessing to mixi."
   :group 'hypermedia)
 
 (defcustom mixi-url "http://mixi.jp"
-  "*The URL of Mixi."
+  "*The URL of mixi."
   :type 'string
   :group 'mixi)
 
 (defcustom mixi-coding-system 'euc-jp
-  "*Coding system for Mixi."
+  "*Coding system for mixi."
   :type 'coding-system
   :group 'mixi)
 
@@ -133,7 +133,7 @@
   :group 'mixi)
 
 (defcustom mixi-continuously-access-interval 3.0
-  "*Time interval between each Mixi access.
+  "*Time interval between each mixi access.
 Increase this value when unexpected error frequently occurs."
   :type 'number
   :group 'mixi)
@@ -220,7 +220,7 @@ while `mixi' is waiting for a server's response."
 
 ;; Utilities.
 (defmacro mixi-message (string)
-  `(concat "[Mixi] " ,string))
+  `(concat "[mixi] " ,string))
 
 (defconst mixi-message-adult-contents
   "このページから先はアダルト（成人向け）コンテンツが含まれています。<br>
@@ -259,7 +259,7 @@ while `mixi' is waiting for a server's response."
   "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-login (&optional email password)
-  "Login to Mixi."
+  "Login to mixi."
   (unless w3m-use-cookies
     (error
      (mixi-message

@@ -1,5 +1,14 @@
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi): Use `mixi' instead of `Mixi'.
+	(mixi-url): Ditto.
+	(mixi-coding-system): Ditto.
+	(mixi-continuously-access-interval): Ditto.
+	(mixi-message): Ditto.
+	(mixi-login): Ditto.
+
+2006-10-20  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-login): Tiny fix.
 	(mixi-accept-adult-contents): Fix docs.
 

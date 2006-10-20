@@ -1,5 +1,10 @@
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-login): Tiny fix.
+	(mixi-accept-adult-contents): Fix docs.
+
+2006-10-20  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-login): Return an error when `w3m-use-cookies' is nil.
 
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>

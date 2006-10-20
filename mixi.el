@@ -128,7 +128,7 @@
   :group 'mixi)
 
 (defcustom mixi-accept-adult-contents t
-  "*"
+  "*If non-nil, accept to access to the adult contents."
   :type 'boolean
   :group 'mixi)
 
@@ -209,8 +209,6 @@ Increase this value when unexpected error frequently occurs."
 		 (const :tag "Infinity" nil))
   :group 'mixi)
 
-;; FIXME: defcustom regexp.
-
 (defcustom mixi-verbose t
   "*Flag controls whether `mixi' should be verbose.
 If it is non-ni, the `w3m-verbose' variable will be bound to nil
@@ -270,12 +268,11 @@ while `mixi' is waiting for a server's response."
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
 		      (read-passwd (mixi-message "Login Password: ")))))
-    (let (buffer)
-      (setq buffer (mixi-retrieve "/login.pl"
-				  (concat "email=" email
-					  "&password=" password
-					  "&next_url=/home.pl"
-					  "&sticky=on")))
+    (let ((buffer (mixi-retrieve "/login.pl"
+				 (concat "email=" email
+					 "&password=" password
+					 "&next_url=/home.pl"
+					 "&sticky=on"))))
       (unless (string-match "url=/check\\.pl\\?n=" buffer)
 	(error (mixi-message "Cannot login")))
       (setq buffer (mixi-retrieve "/check.pl?n=home.pl"))
@@ -343,7 +340,6 @@ while `mixi' is waiting for a server's response."
     (buffer-string)))
 
 ;; Cache.
-;; FIXME: Is Caches saved to files?
 
 (defun mixi-cache-expired-p (object)
   "Whether a cache of OBJECT is expired."

@@ -1143,7 +1143,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-new-comment-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=[0-9]+\" class=\"new_link\">")
 
-(defvar mixi-new-community-max-pages nil)
+(defvar mixi-new-comment-max-pages nil)
 (defun mixi-get-new-comments ()
   "Get new comments."
   (let ((items (mixi-get-matched-items (mixi-new-comment-list-page)

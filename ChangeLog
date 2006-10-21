@@ -8,7 +8,7 @@
 	(mixi-community-max-pages): Ditto.
 	(mixi-topic-max-pages): Ditto.
 	(mixi-new-topic-max-pages): Ditto.
-	(mixi-new-community-max-pages): Ditto.
+	(mixi-new-comment-max-pages): Ditto.
 
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>
 

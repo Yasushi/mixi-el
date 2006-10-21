@@ -155,60 +155,6 @@ Increase this value when unexpected error frequently occurs."
   :type 'directory
   :group 'mixi)
 
-(defcustom mixi-friend-max-pages 10
-  "*Number of pages which is retrieved for friends."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-favorite-max-pages nil
-  "*Number of pages which is retrieved for favorites."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-log-max-pages 1
-  "*Number of pages which is retrieved for logs."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-diary-max-pages nil
-  "*Number of pages which is retrieved for diaries."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-new-diary-max-pages nil
-  "*Number of pages which is retrieved for new diaries."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-community-max-pages nil
-  "*Number of pages which is retrieved for communities."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-topic-max-pages nil
-  "*Number of pages which is retrieved for topics."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-new-comment-max-pages nil
-  "*Number of pages which is retrieved for new comments."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
-(defcustom mixi-new-topic-max-pages nil
-  "*Number of pages which is retrieved for new topics."
-  :type '(choice (integer :tag "Number of pages")
-		 (const :tag "Infinity" nil))
-  :group 'mixi)
-
 (defcustom mixi-verbose t
   "*Flag controls whether `mixi' should be verbose.
 If it is non-ni, the `w3m-verbose' variable will be bound to nil
@@ -487,6 +433,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-friend-list-nick-regexp
   "<td valign=middle>\\(.+\\)さん([0-9]+)<br />")
 
+(defvar mixi-friend-max-pages 10)
 (defun mixi-get-friends (&optional friend)
   "Get friends of FRIEND."
   (unless (or (null friend) (mixi-friend-p friend))
@@ -515,6 +462,7 @@ while `mixi' is waiting for a server's response."
   "<td BGCOLOR=#FDF9F2><font COLOR=#996600>名&nbsp;&nbsp;前</font></td>
 <td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.+\\)</td></tr>")
 
+(defvar mixi-favorite-max-pages nil)
 (defun mixi-get-favorites ()
   "Get favorites."
   (let ((ids (mixi-get-matched-items (mixi-favorite-list-page)
@@ -557,6 +505,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-log-list-regexp
   "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a><br>")
 
+(defvar mixi-log-max-pages 1)
 (defun mixi-get-logs ()
   "Get logs."
   (let ((items (mixi-get-matched-items (mixi-log-list-page)
@@ -693,6 +642,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-diary-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">")
 
+(defvar mixi-diary-max-pages nil)
 (defun mixi-get-diaries (&optional friend)
   "Get diaries of FRIEND."
   (unless (or (null friend) (mixi-friend-p friend))
@@ -710,6 +660,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-new-diary-list-regexp
   "<a class=\"new_link\" href=view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)>")
 
+(defvar mixi-new-diary-max-pages nil)
 (defun mixi-get-new-diaries ()
   "Get new diaries."
   (let ((items (mixi-get-matched-items (mixi-new-diary-list-page)
@@ -878,6 +829,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-community-list-name-regexp
   "<td valign=middle>\\(.+\\)([0-9]+)</td>")
 
+(defvar mixi-community-max-pages nil)
 (defun mixi-get-communities (&optional friend)
   "Get communities of FRIEND."
   (unless (or (null friend) (mixi-friend-p friend))
@@ -1035,6 +987,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-topic-list-regexp
   "<a href=view_bbs\\.pl\\?id=\\([0-9]+\\)")
 
+(defvar mixi-topic-max-pages nil)
 (defun mixi-get-topics (community)
   "Get topics of COMMUNITY."
   (unless (mixi-community-p community)
@@ -1052,6 +1005,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-new-topic-list-regexp
   "<a href=\"view_bbs\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
 
+(defvar mixi-new-topic-max-pages nil)
 (defun mixi-get-new-topics ()
   "Get new topics."
   (let ((items (mixi-get-matched-items (mixi-new-topic-list-page)
@@ -1189,6 +1143,7 @@ while `mixi' is waiting for a server's response."
 (defconst mixi-new-comment-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=[0-9]+\" class=\"new_link\">")
 
+(defvar mixi-new-community-max-pages nil)
 (defun mixi-get-new-comments ()
   "Get new comments."
   (let ((items (mixi-get-matched-items (mixi-new-comment-list-page)

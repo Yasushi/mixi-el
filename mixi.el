@@ -848,7 +848,7 @@ while `mixi' is waiting for a server's response."
 (defun mixi-make-community (id &optional name)
   "Return a community object."
   (mixi-make-cache id (cons 'mixi-community (vector nil id name nil nil nil
-						    nil))
+						    nil nil nil nil))
 		   mixi-community-cache))
 
 (defmacro mixi-community-p (community)
@@ -869,6 +869,13 @@ while `mixi' is waiting for a server's response."
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>管理人</font></td>\n<td>\n\n<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\n\\(.+\\)</a>")
 (defconst mixi-community-category-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>カテゴリ</font></td>\n<td>\\([^<]+\\)</td>")
+(defconst mixi-community-members-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>メンバー数</font></td>\n<td>\\([0-9]+\\)人</td></tr>")
+(defconst mixi-community-open-level-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>参加条件と<br>公開レベル</font></td>
+<td>\\(.+\\)</td></tr>")
+(defconst mixi-community-authority-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>トピック作成の権限</font></td>\n<td>\\(.+\\)</td></tr>")
 (defconst mixi-community-description-regexp
   "<td CLASS=h120>\\(.+\\)</td>")
 
@@ -901,8 +908,19 @@ while `mixi' is waiting for a server's response."
 	(if (string-match mixi-community-category-regexp buffer)
 	    (mixi-community-set-category community (match-string 1 buffer))
 	  (signal 'error (list 'cannot-find-category community)))
+	(if (string-match mixi-community-members-regexp buffer)
+	    (mixi-community-set-members
+	     community (string-to-number (match-string 1 buffer)))
+	  (signal 'error (list 'cannot-find-members community)))
+	(if (string-match mixi-community-open-level-regexp buffer)
+	    (mixi-community-set-open-level community (match-string 1 buffer))
+	  (signal 'error (list 'cannot-find-open-level community)))
+	(if (string-match mixi-community-authority-regexp buffer)
+	    (mixi-community-set-authority community (match-string 1 buffer))
+	  (signal 'error (list 'cannot-find-authority community)))
 	(if (string-match mixi-community-description-regexp buffer)
-	    (mixi-community-set-description community (match-string 1 buffer))
+	    (mixi-community-set-description
+	     community (mixi-remove-markup (match-string 1 buffer)))
 	  (signal 'error (list 'cannot-find-description community)))))
     (mixi-community-touch community)))
 
@@ -947,12 +965,33 @@ while `mixi' is waiting for a server's response."
   (mixi-community-realize community)
   (aref (cdr community) 5))
 
+(defun mixi-community-members (community)
+  "Return the members of COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (mixi-community-realize community)
+  (aref (cdr community) 6))
+
+(defun mixi-community-open-level (community)
+  "Return the open-level of COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (mixi-community-realize community)
+  (aref (cdr community) 7))
+
+(defun mixi-community-authority (community)
+  "Return the authority of COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (mixi-community-realize community)
+  (aref (cdr community) 8))
+
 (defun mixi-community-description (community)
   "Return the description of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (mixi-community-realize community)
-  (aref (cdr community) 6))
+  (aref (cdr community) 9))
 
 (defun mixi-community-touch (community)
   "Set the timestamp of COMMUNITY."
@@ -986,11 +1025,29 @@ while `mixi' is waiting for a server's response."
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (aset (cdr community) 5 category))
 
+(defun mixi-community-set-members (community members)
+  "Set the name of COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (aset (cdr community) 6 members))
+
+(defun mixi-community-set-open-level (community open-level)
+  "Set the name of COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (aset (cdr community) 7 open-level))
+
+(defun mixi-community-set-authority (community authority)
+  "Set the name of COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (aset (cdr community) 8 authority))
+
 (defun mixi-community-set-description (community description)
   "Set the name of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (aset (cdr community) 6 description))
+  (aset (cdr community) 9 description))
 
 (defmacro mixi-community-list-page (&optional friend)
   `(concat "/list_community.pl?page=%d"

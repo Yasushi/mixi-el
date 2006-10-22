@@ -1,5 +1,25 @@
 2006-10-22  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-make-community): New slot `members'.
+	(mixi-community-members): New accessor method.
+	(mixi-community-set-members): Ditto.
+	(mixi-community-members-regexp): New constant.
+	(mixi-community-realize): Use them.
+
+	* mixi.el (mixi-make-community): New slot `open level'.
+	(mixi-community-open-level): New accessor method.
+	(mixi-community-set-open-level): Ditto.
+	(mixi-community-open-level-regexp): New constant.
+	(mixi-community-realize): Use them.
+
+	* mixi.el (mixi-make-community): New slot `authority'.
+	(mixi-community-authority): New accessor method.
+	(mixi-community-set-authority): Ditto.
+	(mixi-community-authority-regexp): New constant.
+	(mixi-community-realize): Use them.
+
+2006-10-22  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-make-friend): New slot `sex'.
 	(mixi-friend-sex): New accessor method.
 	(mixi-friend-set-sex): Ditto.

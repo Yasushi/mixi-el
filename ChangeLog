@@ -1,3 +1,66 @@
+2006-10-22  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-make-friend): New slog `sex'.
+	(mixi-friend-sex): New accessor method.
+	(mixi-friend-set-sex): Ditto.
+	(mixi-friend-name-sex-regexp): Rename from `mixi-friend-name-regexp'.
+	(mixi-my-name-regexp): Abolish.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `address'.
+	(mixi-friend-address): New accessor method.
+	(mixi-friend-set-address): Ditto.
+	(mixi-friend-address-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `age'.
+	(mixi-friend-age): New accessor method.
+	(mixi-friend-set-age): Ditto.
+	(mixi-friend-age-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `birthday'.
+	(mixi-friend-birthday): New accessor method.
+	(mixi-friend-set-birthday): Ditto.
+	(mixi-friend-birthday-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `blood type'.
+	(mixi-friend-blood-type): New accessor method.
+	(mixi-friend-set-blood-type): Ditto.
+	(mixi-friend-blood-type-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `birthplace'.
+	(mixi-friend-birthplace): New accessor method.
+	(mixi-friend-set-birthplace): Ditto.
+	(mixi-friend-birthplace-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `hobby'.
+	(mixi-friend-hobby): New accessor method.
+	(mixi-friend-set-hobby): Ditto.
+	(mixi-friend-hobby-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `job'.
+	(mixi-friend-job): New accessor method.
+	(mixi-friend-set-job): Ditto.
+	(mixi-friend-job-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `organization'.
+	(mixi-friend-organization): New accessor method.
+	(mixi-friend-set-organization): Ditto.
+	(mixi-friend-organization-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
+	* mixi.el (mixi-make-friend): New slog `profile'.
+	(mixi-friend-profile): New accessor method.
+	(mixi-friend-set-profile): Ditto.
+	(mixi-friend-profile-regexp): New constant.
+	(mixi-friend-realize): Use them.
+
 2006-10-21  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-friend-max-pages): Abolish; Move to toplevel defvar.

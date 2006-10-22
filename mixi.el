@@ -333,7 +333,8 @@ while `mixi' is waiting for a server's response."
 (defvar mixi-friend-cache (make-hash-table :test 'equal))
 (defun mixi-make-friend (id &optional nick)
   "Return a friend object."
-  (mixi-make-cache id (cons 'mixi-friend (vector nil id nick nil))
+  (mixi-make-cache id (cons 'mixi-friend (vector nil id nick nil nil nil nil
+						 nil nil nil nil nil nil nil))
 		   mixi-friend-cache))
 
 (defun mixi-make-me ()
@@ -353,29 +354,71 @@ while `mixi' is waiting for a server's response."
 
 (defconst mixi-friend-nick-regexp
   "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>\n\\(.*\\)¤µ¤ó([0-9]+)")
-(defconst mixi-friend-name-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>Ì¾&nbsp;Á°</font></td>\n<td WIDTH=345>\\([^<]+\\)</td>")
-(defconst mixi-my-name-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>Ì¾ Á°</font></td>\n\n<td WIDTH=345>\\([^<]+\\)</td>")
+(defconst mixi-friend-name-sex-regexp
+  "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>Ì¾\\(&nbsp;\\| \\)Á°</font></td>\n+<td WIDTH=345>\\([^<]+\\) (\\([ÃË½÷]\\)À­)</td>")
+(defconst mixi-friend-address-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¸½½»½ê</font></td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+(defconst mixi-friend-age-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>Ç¯\\(&nbsp;\\| \\)Îð</font></td>\n<td>\\([0-9]+\\)ºÐ\\(\n.+\n\\)?</td></tr>")
+(defconst mixi-friend-birthday-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>ÃÂÀ¸Æü</font></td>\n<td>\\([0-9]+\\)·î\\([0-9]+\\)Æü\\(\n.+\n\\)?</td></tr>")
+(defconst mixi-friend-blood-type-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>·ì±Õ·¿</font></td>\n<td>\\([ABO]B?\\)·¿\\(\n\n\\)?</td></tr>")
+(defconst mixi-friend-birthplace-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>½Ð¿ÈÃÏ</font>\n?</td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+(defconst mixi-friend-hobby-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¼ñ\\(&nbsp;\\| \\)Ì£</font></td>\n<td>\\(.+\\)</td></tr>")
+(defconst mixi-friend-job-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¿¦\\(&nbsp;\\| \\)¶È</font></td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+(defconst mixi-friend-organization-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>½ê\\(&nbsp;\\| \\)Â°</font></td>\n<td[^>]*>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+(defconst mixi-friend-profile-regexp
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¼«¸Ê¾Ò²ð</font></td>\n<td CLASS=h120>\\(.+\\)</td></tr>")
 
 (defun mixi-friend-realize (friend)
   "Realize a FRIEND."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-friend-realize-p friend)
-    (let (name)
+    (let (buf)
       (with-mixi-retrieve (mixi-friend-page friend)
-	(if (string-match mixi-friend-nick-regexp buffer)
-	    (mixi-friend-set-nick friend (match-string 1 buffer))
-	  (signal 'error (list 'cannot-find-nick friend)))
-	(when (string-match mixi-friend-name-regexp buffer)
-	  (setq name (match-string 1 buffer))))
-      ;; For getting my name.
-      (unless name
+	(setq buf buffer))
+      (if (string-match mixi-friend-nick-regexp buf)
+	  (mixi-friend-set-nick friend (match-string 1 buf))
+	(signal 'error (list 'cannot-find-nick friend)))
+      ;; For getting my profile.
+      (unless (string-match mixi-friend-name-sex-regexp buf)
 	(with-mixi-retrieve "/show_profile.pl"
-	  (if (string-match mixi-my-name-regexp buffer)
-	      (setq name (match-string 1 buffer))
-	    (signal 'error (list 'cannot-find-name friend)))))
-      (mixi-friend-set-name friend name))
+	  (setq buf buffer)))
+      (if (string-match mixi-friend-name-sex-regexp buf)
+	  (progn
+	    (mixi-friend-set-name friend (match-string 2 buf))
+	    (mixi-friend-set-sex friend
+				 (if (string= (match-string 3 buf) "ÃË")
+				     'male 'female)))
+	(signal 'error (list 'cannot-find-name-or-sex friend)))
+      (when (string-match mixi-friend-address-regexp buf)
+	(mixi-friend-set-address friend (match-string 1 buf)))
+      (when (string-match mixi-friend-age-regexp buf)
+	(mixi-friend-set-age
+	 friend (string-to-number (match-string 2 buf))))
+      (when (string-match mixi-friend-birthday-regexp buf)
+	(mixi-friend-set-birthday
+	 friend (list (string-to-number (match-string 1 buf))
+		      (string-to-number (match-string 2 buf)))))
+      (when (string-match mixi-friend-blood-type-regexp buf)
+	(mixi-friend-set-blood-type friend (intern (match-string 1 buf))))
+      (when (string-match mixi-friend-birthplace-regexp buf)
+	(mixi-friend-set-birthplace friend (match-string 1 buf)))
+      (when (string-match mixi-friend-hobby-regexp buf)
+	(mixi-friend-set-hobby
+	 friend (split-string (match-string 2 buf) ", ")))
+      (when (string-match mixi-friend-job-regexp buf)
+	(mixi-friend-set-job friend (match-string 2 buf)))
+      (when (string-match mixi-friend-organization-regexp buf)
+	(mixi-friend-set-organization friend (match-string 2 buf)))
+      (when (string-match mixi-friend-profile-regexp buf)
+	(mixi-friend-set-profile
+	 friend (mixi-remove-markup (match-string 1 buf)))))
     (mixi-friend-touch friend)))
 
 (defun mixi-friend-realize-p (friend)
@@ -405,6 +448,76 @@ while `mixi' is waiting for a server's response."
   (mixi-friend-realize friend)
   (aref (cdr friend) 3))
 
+(defun mixi-friend-sex (friend)
+  "Return the sex of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 4))
+
+(defun mixi-friend-address (friend)
+  "Return the address of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 5))
+
+(defun mixi-friend-age (friend)
+  "Return the age of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 6))
+
+(defun mixi-friend-birthday (friend)
+  "Return the birthday of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 7))
+
+(defun mixi-friend-blood-type (friend)
+  "Return the blood type of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 8))
+
+(defun mixi-friend-birthplace (friend)
+  "Return the birthplace of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 9))
+
+(defun mixi-friend-hobby (friend)
+  "Return the hobby of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 10))
+
+(defun mixi-friend-job (friend)
+  "Return the job of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 11))
+
+(defun mixi-friend-organization (friend)
+  "Return the organization of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 12))
+
+(defun mixi-friend-profile (friend)
+  "Return the pforile of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (mixi-friend-realize friend)
+  (aref (cdr friend) 13))
+
 (defun mixi-friend-touch (friend)
   "Set the timestamp of FRIEND."
   (unless (mixi-friend-p friend)
@@ -422,6 +535,66 @@ while `mixi' is waiting for a server's response."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
   (aset (cdr friend) 3 name))
+
+(defun mixi-friend-set-sex (friend sex)
+  "Set the sex of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 4 sex))
+
+(defun mixi-friend-set-address (friend address)
+  "Set the address of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 5 address))
+
+(defun mixi-friend-set-age (friend age)
+  "Set the age of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 6 age))
+
+(defun mixi-friend-set-birthday (friend birthday)
+  "Set the birthday of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 7 birthday))
+
+(defun mixi-friend-set-blood-type (friend blood-type)
+  "Set the blood type of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 8 blood-type))
+
+(defun mixi-friend-set-birthplace (friend birthplace)
+  "Set the birthplace of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 9 birthplace))
+
+(defun mixi-friend-set-hobby (friend hobby)
+  "Set the hobby of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 10 hobby))
+
+(defun mixi-friend-set-job (friend job)
+  "Set the job of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 11 job))
+
+(defun mixi-friend-set-organization (friend organization)
+  "Set the organization of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 12 organization))
+
+(defun mixi-friend-set-profile (friend profile)
+  "Set the profile of FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (aset (cdr friend) 13 profile))
 
 (defmacro mixi-friend-list-page (&optional friend)
   `(concat "/list_friend.pl?page=%d"

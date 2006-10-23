@@ -98,7 +98,7 @@
 
 ;;; Code:
 
-(require 'w3m)
+(require 'url)
 (eval-when-compile (require 'cl))
 
 (defgroup mixi nil
@@ -132,7 +132,7 @@
   :type 'boolean
   :group 'mixi)
 
-(defcustom mixi-continuously-access-interval 3.0
+(defcustom mixi-continuously-access-interval 4.0
   "*Time interval between each mixi access.
 Increase this value when unexpected error frequently occurs."
   :type 'number
@@ -155,13 +155,6 @@ Increase this value when unexpected error frequently occurs."
   :type 'directory
   :group 'mixi)
 
-(defcustom mixi-verbose t
-  "*Flag controls whether `mixi' should be verbose.
-If it is non-ni, the `w3m-verbose' variable will be bound to nil
-while `mixi' is waiting for a server's response."
-  :type 'boolean
-  :group 'mixi)
-
 (defvar mixi-me nil)
 
 ;; Utilities.
@@ -180,36 +173,46 @@ while `mixi' is waiting for a server's response."
 受けられましたので、一時的に操作を停止させていただきます。申し訳ございま<br>
 せんが、しばらくの間お待ちください。")
 
+;; FIXME: Don't use `url-retrieve-synchronously'?
 (defun mixi-retrieve (url &optional post-data)
   "Retrieve the URL and return getted strings."
-  (let ((url (w3m-expand-url url mixi-url)))
-    (with-temp-buffer
-      (let ((w3m-verbose (if mixi-verbose nil w3m-verbose)))
-	(if (not (string= (w3m-retrieve url nil nil post-data) "text/html"))
-	    (error (mixi-message "Cannot retrieve"))
-	  (w3m-decode-buffer url)
-	  (let ((ret (buffer-substring-no-properties (point-min) (point-max))))
-	    (when (string-match mixi-message-adult-contents ret)
-	      (if mixi-accept-adult-contents
-		  (setq ret (mixi-retrieve url "submit=agree"))
-		(setq ret (mixi-retrieve (concat url "?")))))
-	    (when (string-match mixi-warning-continuously-accessing ret)
-	      (error (mixi-message "Continuously accessing")))
-	    (if (not (string-match mixi-message-continuously-accessing ret))
-		ret
-	      (message (mixi-message "Waiting for continuously accessing..."))
-	      (sit-for mixi-continuously-access-interval)
-	      (mixi-retrieve url post-data))))))))
+  (if post-data
+      (progn
+	(setq url-request-method "POST")
+	(setq url-request-data post-data))
+    (setq url-request-method "GET")
+    (setq url-request-data nil))
+  (let* ((url (url-expand-file-name url mixi-url))
+	 (buffer (url-retrieve-synchronously url))
+	 ret)
+    (unless (bufferp buffer)
+      (error (mixi-message "Cannot retrieve")))
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
+	(error (mixi-message "Cannot retrieve")))
+      (search-forward "\n\n")
+      (setq ret (mm-decode-coding-string
+		 (buffer-substring-no-properties (point) (point-max))
+		 mixi-coding-system))
+      (kill-buffer buffer))
+    (when (string-match mixi-message-adult-contents ret)
+      (if mixi-accept-adult-contents
+	  (setq ret (mixi-retrieve url "submit=agree"))
+	(setq ret (mixi-retrieve (concat url "?")))))
+    (when (string-match mixi-warning-continuously-accessing ret)
+      (error (mixi-message "Continuously accessing")))
+    (if (not (string-match mixi-message-continuously-accessing ret))
+	ret
+      (message (mixi-message "Waiting for continuously accessing..."))
+      (sit-for mixi-continuously-access-interval)
+      (mixi-retrieve url post-data))))
 
 (defconst mixi-my-id-regexp
   "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-login (&optional email password)
   "Login to mixi."
-  (unless w3m-use-cookies
-    (error
-     (mixi-message
-      "Require to accept cookies.  Please set `w3m-use-cookies' to t.")))
   (let ((email (or email mixi-default-email
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
@@ -266,6 +269,7 @@ while `mixi' is waiting for a server's response."
     ;; FIXME: Sort? Now order by newest.
     (reverse ids)))
 
+;; stolen (and modified) from shimbun.el
 (defun mixi-remove-markup (string)
   "Remove markups from STRING."
   (with-temp-buffer
@@ -282,7 +286,6 @@ while `mixi' is waiting for a server's response."
       (goto-char (point-min))
       (while (re-search-forward "" nil t)
 	(replace-match "\n" t t)))
-    (w3m-decode-entities)
     (buffer-string)))
 
 ;; Cache.
@@ -1385,27 +1388,6 @@ while `mixi' is waiting for a server's response."
 			    (nth 0 item))))
 		(mixi-get-comments diary)))
 	    items)))
-
-;;
-
-;; FIXME: Move to the class method.
-
-;; FIXME: When it got some results, this function doesn't work fine.
-(defun mixi-friend-to-id (friend)
-  (with-mixi-retrieve (concat "/search.pl?submit=main&nickname="
-			      (w3m-url-encode-string friend
-						     mixi-coding-system))
-    (when (string-match "show_friend\\.pl\\?id=\\([0-9]+\\)" buffer)
-      (string-to-number (match-string 1 buffer)))))
-
-;; FIXME: When it got some results, this function doesn't work fine.
-(defun mixi-community-to-id (community)
-  (with-mixi-retrieve (concat "/search_community.pl?sort="
-			      "&type=com&submit=main&keyword="
-			      (w3m-url-encode-string community
-						     mixi-coding-system))
-    (when (string-match "view_community\\.pl\\?id=\\([0-9]+\\)" buffer)
-      (string-to-number (match-string 1 buffer)))))
 
 (provide 'mixi)
 

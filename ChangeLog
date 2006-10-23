@@ -1,3 +1,13 @@
+2006-10-23  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el: Require `url' instead of `w3m'.
+	(mixi-retrieve): Follow the change above.
+	(mixi-login): Ditto.
+	(mixi-continuously-access-interval): Increase to 4.0.
+	(mixi-verbose): Abolish.
+	(mixi-friend-to-id): Ditto.
+	(mixi-community-to-id): Ditto.
+
 2006-10-22  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-make-community): New slot `members'.

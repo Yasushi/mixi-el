@@ -1,5 +1,15 @@
 2006-10-23  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-retrieve-function): New user option.
+	(mixi-retrieve): Abolish.
+	(mixi-w3-retrieve): New function.
+	(mixi-w3m-retrieve): Ditto.
+	(mixi-retrieve-1): Ditto.
+	(mixi-login): Follow the change above.
+	(with-mixi-retrieve): Ditto.
+
+2006-10-23  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el: Require `url' instead of `w3m'.
 	(mixi-retrieve): Follow the change above.
 	(mixi-login): Ditto.

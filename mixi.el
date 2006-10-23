@@ -98,8 +98,8 @@
 
 ;;; Code:
 
-(require 'url)
 (eval-when-compile (require 'cl))
+(autoload 'w3m-expand-url "w3m" nil t)
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -113,6 +113,16 @@
 (defcustom mixi-coding-system 'euc-jp
   "*Coding system for mixi."
   :type 'coding-system
+  :group 'mixi)
+
+(defcustom mixi-retrieve-function
+  (if (and (require 'url "url" t)
+	   (fboundp 'url-retrieve-synchronously))
+      'mixi-w3-retrieve 'mixi-w3m-retrieve)
+  "*The function for retrieving."
+  :type '(choice (const :tag "Using w3" mixi-w3-retrieve)
+		 (const :tag "Using w3m" mixi-w3m-retrieve)
+		 (function :format "Other function: %v\n" :size 0))
   :group 'mixi)
 
 (defcustom mixi-default-email nil
@@ -173,8 +183,20 @@ Increase this value when unexpected error frequently occurs."
 受けられましたので、一時的に操作を停止させていただきます。申し訳ございま<br>
 せんが、しばらくの間お待ちください。")
 
-;; FIXME: Don't use `url-retrieve-synchronously'?
-(defun mixi-retrieve (url &optional post-data)
+(defun mixi-retrieve-1 (buffer url &optional post-data)
+  (when (string-match mixi-message-adult-contents buffer)
+    (if mixi-accept-adult-contents
+	(setq buffer (funcall mixi-retrieve-function url "submit=agree"))
+      (setq buffer (funcall mixi-retrieve-function (concat url "?")))))
+  (when (string-match mixi-warning-continuously-accessing buffer)
+    (error (mixi-message "Continuously accessing")))
+  (if (not (string-match mixi-message-continuously-accessing buffer))
+      buffer
+    (message (mixi-message "Waiting for continuously accessing..."))
+    (sit-for mixi-continuously-access-interval)
+    (funcall mixi-retrieve-function url post-data)))
+
+(defun mixi-w3-retrieve (url &optional post-data)
   "Retrieve the URL and return getted strings."
   (if post-data
       (progn
@@ -189,57 +211,68 @@ Increase this value when unexpected error frequently occurs."
       (error (mixi-message "Cannot retrieve")))
     (with-current-buffer buffer
       (goto-char (point-min))
-      (unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
-	(error (mixi-message "Cannot retrieve")))
-      (search-forward "\n\n")
-      (setq ret (mm-decode-coding-string
-		 (buffer-substring-no-properties (point) (point-max))
-		 mixi-coding-system))
-      (kill-buffer buffer))
-    (when (string-match mixi-message-adult-contents ret)
-      (if mixi-accept-adult-contents
-	  (setq ret (mixi-retrieve url "submit=agree"))
-	(setq ret (mixi-retrieve (concat url "?")))))
-    (when (string-match mixi-warning-continuously-accessing ret)
-      (error (mixi-message "Continuously accessing")))
-    (if (not (string-match mixi-message-continuously-accessing ret))
-	ret
-      (message (mixi-message "Waiting for continuously accessing..."))
-      (sit-for mixi-continuously-access-interval)
-      (mixi-retrieve url post-data))))
+      (if (re-search-forward "HTTP/[0-9.]+ 302 Moved" nil t)
+	  (if (re-search-forward
+	       (concat "Location: " mixi-url "\\(.+\\)") nil t)
+	      (setq ret (mixi-w3-retrieve (match-string 1) post-data))
+	    (setq ret (mixi-w3-retrieve "/home.pl" post-data)))
+	(unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
+	  (error (mixi-message "Cannot retrieve")))
+	(search-forward "\n\n")
+	(setq ret (mm-decode-coding-string
+		   (buffer-substring-no-properties (point) (point-max))
+		   mixi-coding-system))
+	(kill-buffer buffer)
+	(setq ret (mixi-retrieve-1 ret url post-data))))
+    ret))
+
+(defun mixi-w3m-retrieve (url &optional post-data)
+  "Retrieve the URL and return getted strings."
+  (let ((url (w3m-expand-url url mixi-url)))
+    (with-temp-buffer
+      (if (not (string= (w3m-retrieve url nil nil post-data) "text/html"))
+	  (error (mixi-message "Cannot retrieve"))
+	(w3m-decode-buffer url)
+	(let ((ret (buffer-substring-no-properties (point-min) (point-max))))
+	  (mixi-retrieve-1 ret url post-data))))))
 
 (defconst mixi-my-id-regexp
   "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-login (&optional email password)
   "Login to mixi."
+  (when (and (eq mixi-retrieve-function 'mixi-w3m-retrieve)
+	     (not w3m-use-cookies))
+    (error
+     (mixi-message
+      "Require to accept cookies.  Please set `w3m-use-cookies' to t.")))
   (let ((email (or email mixi-default-email
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
 		      (read-passwd (mixi-message "Login Password: ")))))
-    (let ((buffer (mixi-retrieve "/login.pl"
-				 (concat "email=" email
-					 "&password=" password
-					 "&next_url=/home.pl"
-					 "&sticky=on"))))
+    (let ((buffer (funcall mixi-retrieve-function "/login.pl"
+			   (concat "email=" email
+				   "&password=" password
+				   "&next_url=/home.pl"
+				   "&sticky=on"))))
       (unless (string-match "url=/check\\.pl\\?n=" buffer)
 	(error (mixi-message "Cannot login")))
-      (setq buffer (mixi-retrieve "/check.pl?n=home.pl"))
+      (setq buffer (funcall mixi-retrieve-function "/check.pl?n=home.pl"))
       (if (string-match mixi-my-id-regexp buffer)
 	  (setq mixi-me (mixi-make-friend
 			 (string-to-number (match-string 1 buffer))))
 	(error (mixi-message "Cannot login"))))))
 
 (defun mixi-logout ()
-  (mixi-retrieve "/logout.pl"))
+  (funcall mixi-retrieve-function "/logout.pl"))
 
 (defmacro with-mixi-retrieve (url &rest body)
   `(let (buffer)
      (when ,url
-       (setq buffer (mixi-retrieve ,url))
+       (setq buffer (funcall mixi-retrieve-function ,url))
        (when (string-match "login.pl" buffer)
 	 (mixi-login)
-	 (setq buffer (mixi-retrieve ,url))))
+	 (setq buffer (funcall mixi-retrieve-function ,url))))
      ,@body))
 (put 'with-mixi-retrieve 'lisp-indent-function 'defun)
 

@@ -256,7 +256,11 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-curl-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
   (with-temp-buffer
+    (if (fboundp 'set-buffer-multibyte)
+	(set-buffer-multibyte nil))
     (let ((orig-mode (default-file-modes))
+	  (coding-system-for-read 'binary)
+	  (coding-system-for-write 'binary)
 	  process ret)
       (unwind-protect
 	  (progn
@@ -282,8 +286,7 @@ Increase this value when unexpected error frequently occurs."
       (unless (looking-at "HTTP/[0-9]+\\.[0-9]+ 200")
 	(error (mixi-message "Cannot retrieve")))
       (delete-region (point) (re-search-forward "\r?\n\r?\n"))
-      (setq ret (decode-coding-string (buffer-substring (point) (point-max))
-				      mixi-coding-system))
+      (setq ret (decode-coding-string (buffer-string) mixi-coding-system))
       (mixi-retrieve-1 ret url post-data))))
 
 (defconst mixi-my-id-regexp

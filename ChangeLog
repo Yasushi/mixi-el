@@ -1,5 +1,9 @@
 2006-10-23  Daiki Ueno  <ueno@unixuser.org>
 
+	* mixi.el (mixi-curl-retrieve): Make the temp buffer multibyte.
+
+2006-10-23  Daiki Ueno  <ueno@unixuser.org>
+
 	* mixi.el (mixi-curl-retrieve): New function.
 	(mixi-retrieve-function): Don't use NOERROR arg of require.
 

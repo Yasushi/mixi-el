@@ -98,8 +98,14 @@
 
 ;;; Code:
 
-(require 'url "url" t)
-(require 'w3m "w3m" t)
+(condition-case nil
+    (require 'url "url")
+  (error))
+
+(condition-case nil
+    (require 'w3m "w3m")
+  (error))
+
 (eval-when-compile (require 'cl))
 
 (defgroup mixi nil
@@ -117,12 +123,12 @@
   :group 'mixi)
 
 (defcustom mixi-retrieve-function
-  (if (and (require 'url "url" t)
-	   (fboundp 'url-retrieve-synchronously))
+  (if (fboundp 'url-retrieve-synchronously)
       'mixi-w3-retrieve 'mixi-w3m-retrieve)
   "*The function for retrieving."
   :type '(choice (const :tag "Using w3" mixi-w3-retrieve)
 		 (const :tag "Using w3m" mixi-w3m-retrieve)
+		 (const :tag "Using curl" mixi-curl-retrieve)
 		 (function :format "Other function: %v\n" :size 0))
   :group 'mixi)
 

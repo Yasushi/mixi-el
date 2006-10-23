@@ -1,5 +1,10 @@
 2006-10-23  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el: Try to require `url' and `w3m'.
+	(mixi-get-comments): Fix typo.
+
+2006-10-23  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-retrieve-function): New user option.
 	(mixi-retrieve): Abolish.
 	(mixi-w3-retrieve): New function.

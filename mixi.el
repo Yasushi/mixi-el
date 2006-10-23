@@ -98,8 +98,9 @@
 
 ;;; Code:
 
+(require 'url "url" t)
+(require 'w3m "w3m" t)
 (eval-when-compile (require 'cl))
-(autoload 'w3m-expand-url "w3m" nil t)
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1385,7 +1386,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-get-comments (parent)
   "Get comments of PARENT."
   (unless (mixi-object-p parent)
-    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+    (signal 'wrong-type-argument (list 'mixi-object-p parent)))
   (let* ((name (mixi-object-name parent))
 	 (list-page (intern (concat mixi-object-prefix name
 				    "-comment-list-page")))

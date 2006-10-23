@@ -126,6 +126,16 @@
 		 (function :format "Other function: %v\n" :size 0))
   :group 'mixi)
 
+(defcustom mixi-curl-program "curl"
+  "*The program name of `curl'."
+  :type 'file
+  :group 'mixi)
+
+(defcustom mixi-curl-cookie-file (expand-file-name "~/.mixi-cookies.txt")
+  "*The location of cookie file created by `curl'."
+  :type 'file
+  :group 'mixi)
+
 (defcustom mixi-default-email nil
   "*Default E-mail address that is used to login automatically."
   :type '(choice (string :tag "E-mail address")
@@ -236,6 +246,39 @@ Increase this value when unexpected error frequently occurs."
 	(w3m-decode-buffer url)
 	(let ((ret (buffer-substring-no-properties (point-min) (point-max))))
 	  (mixi-retrieve-1 ret url post-data))))))
+
+(defun mixi-curl-retrieve (url &optional post-data)
+  "Retrieve the URL and return getted strings."
+  (with-temp-buffer
+    (let ((orig-mode (default-file-modes))
+	  process ret)
+      (unwind-protect
+	  (progn
+	    (set-default-file-modes 448)
+	    (setq process
+		  (apply #'start-process "curl" (current-buffer)
+			 mixi-curl-program
+			 (append (if post-data '("-d" "@-"))
+				 (list "-i" "-L" "-s"
+				       "-b" mixi-curl-cookie-file
+				       "-c" mixi-curl-cookie-file
+				       (concat mixi-url url)))))
+	    (set-process-sentinel process #'ignore))
+	(set-default-file-modes orig-mode))
+      (when post-data
+	(process-send-string process (concat post-data "\n"))
+	(process-send-eof process))
+      (while (eq (process-status process) 'run)
+	(accept-process-output process 1))
+      (goto-char (point-min))
+      (while (looking-at "HTTP/[0-9]+\\.[0-9]+ [13][0-9][0-9]")
+	(delete-region (point) (re-search-forward "\r?\n\r?\n")))
+      (unless (looking-at "HTTP/[0-9]+\\.[0-9]+ 200")
+	(error (mixi-message "Cannot retrieve")))
+      (delete-region (point) (re-search-forward "\r?\n\r?\n"))
+      (setq ret (decode-coding-string (buffer-substring (point) (point-max))
+				      mixi-coding-system))
+      (mixi-retrieve-1 ret url post-data))))
 
 (defconst mixi-my-id-regexp
   "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")

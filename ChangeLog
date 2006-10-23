@@ -1,5 +1,9 @@
 2006-10-23  OHASHI Akira  <bg66@koka-in.org>
 
+	* (toplevel): Don't use the FILENAME argument of `require'.
+
+2006-10-23  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (with-mixi-decoded-time-value): New macro.
 	(mixi-encode-time-value): New function.
 	(mixi-time-less-p): Ditto.

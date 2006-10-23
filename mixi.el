@@ -61,7 +61,7 @@
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
 ;;
-;; Display newest 3 diaries including all comments like a mail format.
+;; Display newest 3 diaries including one comment like a mail format.
 ;; Comments are displayed like a reply mail.
 ;;
 ;; (let ((max-numbers 3)
@@ -99,11 +99,11 @@
 ;;; Code:
 
 (condition-case nil
-    (require 'url "url")
+    (require 'url)
   (error))
 
 (condition-case nil
-    (require 'w3m "w3m")
+    (require 'w3m)
   (error))
 
 (eval-when-compile (require 'cl))

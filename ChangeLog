@@ -1,3 +1,32 @@
+2006-10-23  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-get-friends): Change the FRIEND and the MAX-NUMBERS
+	argument to the ARGS argument.
+	(mixi-get-diaries): Ditto.
+	(mixi-get-communities): Ditto.
+
+	* mixi.el (mixi-get-matched-items): Change the MAX-PAGES argument to
+	MAX-NUMBERS.
+	(mixi-friend-max-pages): Abolish.
+	(mixi-favorite-max-pages): Ditto.
+	(mixi-log-max-pages): Ditto.
+	(mixi-diary-max-pages): Ditto.
+	(mixi-new-diary-max-pages): Ditto.
+	(mixi-community-max-pages): Ditto.
+	(mixi-topic-max-pages): Ditto.
+	(mixi-new-topic-max-pages): Ditto.
+	(mixi-new-comment-max-pages): Ditto.
+	(mixi-get-friends): Add the MAX-NUMBERS argument.
+	(mixi-get-favorites): Ditto.
+	(mixi-get-logs): Ditto.
+	(mixi-get-diaries): Ditto.
+	(mixi-get-new-diaries): Ditto.
+	(mixi-get-communities): Ditto.
+	(mixi-get-topics): Ditto.
+	(mixi-get-new-topics): Ditto.
+	(mixi-get-comments): Ditto.
+	(mixi-get-new-comments): Ditto.
+
 2006-10-23  Daiki Ueno  <ueno@unixuser.org>
 
 	* mixi.el (mixi-curl-retrieve): Make the temp buffer unibyte.

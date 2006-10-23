@@ -39,9 +39,9 @@
 
 ;; Example:
 ;;
-;; Display only the first page of new diaries like a mail format.
+;; Display newest 3 diaries like a mail format.
 ;;
-;; (let ((mixi-new-diary-max-pages 1)
+;; (let ((max-numbers 3)
 ;;       (buffer (generate-new-buffer "*temp*"))
 ;;       (format "%Y/%m/%d %H:%M"))
 ;;   (pop-to-buffer buffer)
@@ -56,15 +56,15 @@
 ;; 		    "Subject: " subject "\n"
 ;; 		    "Date: " date "\n\n"
 ;; 		    body "\n\n")))
-;; 	(mixi-get-new-diaries))
+;; 	(mixi-get-new-diaries max-numbers))
 ;;   (set-buffer-modified-p nil)
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
 ;;
-;; Display only the first page of new diaries including all comments like a
-;; mail format.  Comments are displayed like a reply mail.
+;; Display newest 3 diaries including all comments like a mail format.
+;; Comments are displayed like a reply mail.
 ;;
-;; (let ((mixi-new-diary-max-pages 1)
+;; (let ((max-numbers 3)
 ;;       (buffer (generate-new-buffer "*temp*"))
 ;;       (format "%Y/%m/%d %H:%M"))
 ;;   (pop-to-buffer buffer)
@@ -91,7 +91,7 @@
 ;; 			      "Date: " date "\n\n"
 ;; 			      body "\n\n")))
 ;; 		  (mixi-get-comments diary))))
-;; 	(mixi-get-new-diaries))
+;; 	(mixi-get-new-diaries max-numbers))
 ;;   (set-buffer-modified-p nil)
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
@@ -328,15 +328,16 @@ Increase this value when unexpected error frequently occurs."
      ,@body))
 (put 'with-mixi-retrieve 'lisp-indent-function 'defun)
 
-(defun mixi-get-matched-items (url max-pages regexp)
+(defun mixi-get-matched-items (url max-numbers regexp)
   "Get matched items to REGEXP in URL."
   (let ((page 1)
 	ids)
     (catch 'end
-      (while (or (null max-pages) (<= page max-pages))
+      (while (or (null max-numbers) (< (length ids) max-numbers))
 	(with-mixi-retrieve (format url page)
 	  (let ((pos 0))
-	    (while (string-match regexp buffer pos)
+	    (while (and (string-match regexp buffer pos)
+			(< (length ids) max-numbers))
 	      (let ((num 1)
 		    list)
 		(while (match-string num buffer)
@@ -688,24 +689,30 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-friend-list-nick-regexp
   "<td valign=middle>\\(.+\\)さん([0-9]+)<br />")
 
-(defvar mixi-friend-max-pages 10)
-(defun mixi-get-friends (&optional friend)
+(defun mixi-get-friends (&rest args)
   "Get friends of FRIEND."
-  (unless (or (null friend) (mixi-friend-p friend))
-    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (let ((ids (mixi-get-matched-items (mixi-friend-list-page friend)
-				     mixi-friend-max-pages
-				     mixi-friend-list-id-regexp))
-	(nicks (mixi-get-matched-items (mixi-friend-list-page friend)
-				       mixi-friend-max-pages
-				       mixi-friend-list-nick-regexp)))
-    (let ((index 0)
-	  ret)
-      (while (< index (length ids))
-	(setq ret (cons (mixi-make-friend (nth 0 (nth index ids))
-					  (nth 0 (nth index nicks))) ret))
-	(incf index))
-      (reverse ret))))
+  (when (> (length args) 2)
+    (signal 'wrong-number-of-arguments (list 'mixi-get-friends (length args))))
+  (let ((friend (nth 0 args))
+	(max-numbers (nth 1 args)))
+    (when (or (not (mixi-friend-p friend)) (mixi-friend-p max-numbers))
+      (setq friend (nth 1 args))
+      (setq max-numbers (nth 0 args)))
+    (unless (or (null friend) (mixi-friend-p friend))
+      (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+    (let ((ids (mixi-get-matched-items (mixi-friend-list-page friend)
+				       max-numbers
+				       mixi-friend-list-id-regexp))
+	  (nicks (mixi-get-matched-items (mixi-friend-list-page friend)
+					 max-numbers
+					 mixi-friend-list-nick-regexp)))
+      (let ((index 0)
+	    ret)
+	(while (< index (length ids))
+	  (setq ret (cons (mixi-make-friend (nth 0 (nth index ids))
+					    (nth 0 (nth index nicks))) ret))
+	  (incf index))
+	(reverse ret)))))
 
 ;; Favorite.
 (defmacro mixi-favorite-list-page ()
@@ -717,14 +724,13 @@ Increase this value when unexpected error frequently occurs."
   "<td BGCOLOR=#FDF9F2><font COLOR=#996600>名&nbsp;&nbsp;前</font></td>
 <td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.+\\)</td></tr>")
 
-(defvar mixi-favorite-max-pages nil)
-(defun mixi-get-favorites ()
+(defun mixi-get-favorites (&optional max-numbers)
   "Get favorites."
   (let ((ids (mixi-get-matched-items (mixi-favorite-list-page)
-				     mixi-favorite-max-pages
+				     max-numbers
 				     mixi-favorite-list-id-regexp))
 	(nicks (mixi-get-matched-items (mixi-favorite-list-page)
-				       mixi-favorite-max-pages
+				       max-numbers
 				       mixi-favorite-list-nick-regexp)))
     (let ((index 0)
 	  ret)
@@ -760,11 +766,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-log-list-regexp
   "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a><br>")
 
-(defvar mixi-log-max-pages 1)
-(defun mixi-get-logs ()
+(defun mixi-get-logs (&optional max-numbers)
   "Get logs."
   (let ((items (mixi-get-matched-items (mixi-log-list-page)
-				       mixi-log-max-pages
+				       max-numbers
 				       mixi-log-list-regexp)))
     (mapcar (lambda (item)
 	      (mixi-make-log (mixi-make-friend (nth 5 item) (nth 6 item))
@@ -898,17 +903,23 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">")
 
-(defvar mixi-diary-max-pages nil)
-(defun mixi-get-diaries (&optional friend)
+(defun mixi-get-diaries (&rest args)
   "Get diaries of FRIEND."
-  (unless (or (null friend) (mixi-friend-p friend))
-    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (let ((items (mixi-get-matched-items (mixi-diary-list-page friend)
-				       mixi-diary-max-pages
-				       mixi-diary-list-regexp)))
-    (mapcar (lambda (item)
-	      (mixi-make-diary friend (nth 0 item)))
-	    items)))
+  (when (> (length args) 2)
+    (signal 'wrong-number-of-arguments (list 'mixi-get-friends (length args))))
+  (let ((friend (nth 0 args))
+	(max-numbers (nth 1 args)))
+    (when (or (not (mixi-friend-p friend)) (mixi-friend-p max-numbers))
+      (setq friend (nth 1 args))
+      (setq max-numbers (nth 0 args)))
+    (unless (or (null friend) (mixi-friend-p friend))
+      (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+    (let ((items (mixi-get-matched-items (mixi-diary-list-page friend)
+					 max-numbers
+					 mixi-diary-list-regexp)))
+      (mapcar (lambda (item)
+		(mixi-make-diary friend (nth 0 item)))
+	      items))))
 
 (defmacro mixi-new-diary-list-page ()
   `(concat "/new_friend_diary.pl?page=%d"))
@@ -916,11 +927,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-new-diary-list-regexp
   "<a class=\"new_link\" href=view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)>")
 
-(defvar mixi-new-diary-max-pages nil)
-(defun mixi-get-new-diaries ()
+(defun mixi-get-new-diaries (&optional max-numbers)
   "Get new diaries."
   (let ((items (mixi-get-matched-items (mixi-new-diary-list-page)
-				       mixi-new-diary-max-pages
+				       max-numbers
 				       mixi-new-diary-list-regexp)))
     (mapcar (lambda (item)
 	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
@@ -1139,24 +1149,30 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-list-name-regexp
   "<td valign=middle>\\(.+\\)([0-9]+)</td>")
 
-(defvar mixi-community-max-pages nil)
-(defun mixi-get-communities (&optional friend)
+(defun mixi-get-communities (&rest args)
   "Get communities of FRIEND."
-  (unless (or (null friend) (mixi-friend-p friend))
-    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (let ((ids (mixi-get-matched-items (mixi-community-list-page friend)
-				     mixi-community-max-pages
-				     mixi-community-list-id-regexp))
-	(names (mixi-get-matched-items (mixi-community-list-page friend)
-				     mixi-community-max-pages
-				     mixi-community-list-name-regexp)))
-    (let ((index 0)
-	  ret)
-      (while (< index (length ids))
-	(setq ret (cons (mixi-make-community (nth 0 (nth index ids))
-					     (nth 0 (nth index names))) ret))
-	(incf index))
-      (reverse ret))))
+  (when (> (length args) 2)
+    (signal 'wrong-number-of-arguments (list 'mixi-get-friends (length args))))
+  (let ((friend (nth 0 args))
+	(max-numbers (nth 1 args)))
+    (when (or (not (mixi-friend-p friend)) (mixi-friend-p max-numbers))
+      (setq friend (nth 1 args))
+      (setq max-numbers (nth 0 args)))
+    (unless (or (null friend) (mixi-friend-p friend))
+      (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+    (let ((ids (mixi-get-matched-items (mixi-community-list-page friend)
+				       max-numbers
+				       mixi-community-list-id-regexp))
+	  (names (mixi-get-matched-items (mixi-community-list-page friend)
+					 max-numbers
+					 mixi-community-list-name-regexp)))
+      (let ((index 0)
+	    ret)
+	(while (< index (length ids))
+	  (setq ret (cons (mixi-make-community (nth 0 (nth index ids))
+					       (nth 0 (nth index names))) ret))
+	  (incf index))
+	(reverse ret)))))
 
 ;; Topic object.
 (defvar mixi-topic-cache (make-hash-table :test 'equal))
@@ -1295,13 +1311,12 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-topic-list-regexp
   "<a href=view_bbs\\.pl\\?id=\\([0-9]+\\)")
 
-(defvar mixi-topic-max-pages nil)
-(defun mixi-get-topics (community)
+(defun mixi-get-topics (community &optional max-numbers)
   "Get topics of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (let ((items (mixi-get-matched-items (mixi-topic-list-page community)
-				       mixi-topic-max-pages
+				       max-numbers
 				       mixi-topic-list-regexp)))
     (mapcar (lambda (item)
 	      (mixi-make-topic community (nth 0 item)))
@@ -1313,11 +1328,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-new-topic-list-regexp
   "<a href=\"view_bbs\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
 
-(defvar mixi-new-topic-max-pages nil)
-(defun mixi-get-new-topics ()
+(defun mixi-get-new-topics (&optional max-numbers)
   "Get new topics."
   (let ((items (mixi-get-matched-items (mixi-new-topic-list-page)
-				       mixi-new-topic-max-pages
+				       max-numbers
 				       mixi-new-topic-list-regexp)))
     (mapcar (lambda (item)
 	      (mixi-make-topic (mixi-make-community (nth 1 item))
@@ -1422,7 +1436,7 @@ Increase this value when unexpected error frequently occurs."
 </td>
 </tr>")
 
-(defun mixi-get-comments (parent)
+(defun mixi-get-comments (parent &optional max-numbers)
   "Get comments of PARENT."
   (unless (mixi-object-p parent)
     (signal 'wrong-type-argument (list 'mixi-object-p parent)))
@@ -1431,7 +1445,11 @@ Increase this value when unexpected error frequently occurs."
 				    "-comment-list-page")))
 	 (regexp (eval (intern (concat mixi-object-prefix name
 				       "-comment-list-regexp")))))
-    (let ((items (mixi-get-matched-items (funcall list-page parent) 1 regexp)))
+    (let ((items (mixi-get-matched-items
+		  (funcall list-page parent)
+		  ;; FIXME: Use `max-numbers' instead of 1.
+		  1
+		  regexp)))
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
 					   (nth 6 item) (nth 7 item))
@@ -1451,11 +1469,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-new-comment-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=[0-9]+\" class=\"new_link\">")
 
-(defvar mixi-new-comment-max-pages nil)
-(defun mixi-get-new-comments ()
+(defun mixi-get-new-comments (&optional max-numbers)
   "Get new comments."
   (let ((items (mixi-get-matched-items (mixi-new-comment-list-page)
-				       mixi-new-comment-max-pages
+				       max-numbers
 				       mixi-new-comment-list-regexp)))
     (mapcar (lambda (item)
 	      (let ((diary (mixi-make-diary

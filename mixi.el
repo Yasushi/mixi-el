@@ -260,8 +260,7 @@ Increase this value when unexpected error frequently occurs."
 	(error (mixi-message "Cannot login")))
       (setq buffer (funcall mixi-retrieve-function "/check.pl?n=home.pl"))
       (if (string-match mixi-my-id-regexp buffer)
-	  (setq mixi-me (mixi-make-friend
-			 (string-to-number (match-string 1 buffer))))
+	  (setq mixi-me (mixi-make-friend (match-string 1 buffer)))
 	(error (mixi-message "Cannot login"))))))
 
 (defun mixi-logout ()
@@ -289,14 +288,10 @@ Increase this value when unexpected error frequently occurs."
 	      (let ((num 1)
 		    list)
 		(while (match-string num buffer)
-		  (let ((string (match-string num buffer)))
-		    (save-match-data
-		      (when (string-match "^[0-9]+$" string)
-			(setq string (string-to-number string))))
-		    (setq list (cons string list)))
+		  (setq list (cons (match-string num buffer) list))
 		  (incf num))
-	      (setq ids (cons (reverse list) ids))
-	      (setq pos (match-end (1- num)))))
+		(setq ids (cons (reverse list) ids))
+		(setq pos (match-end (1- num)))))
 	    (when (eq pos 0)
 	      (throw 'end ids))))
 	(incf page)))
@@ -378,8 +373,7 @@ Increase this value when unexpected error frequently occurs."
   (unless mixi-me
     (with-mixi-retrieve "/home.pl"
       (if (string-match mixi-my-id-regexp buffer)
-	  (setq mixi-me
-		(mixi-make-friend (string-to-number (match-string 1 buffer))))
+	  (setq mixi-me (mixi-make-friend (match-string 1 buffer)))
 	(signal 'error (list 'who-am-i)))))
   mixi-me)
 
@@ -387,7 +381,7 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,friend) 'mixi-friend))
 
 (defmacro mixi-friend-page (friend)
-  `(concat "/show_friend.pl?id=" (number-to-string (mixi-friend-id ,friend))))
+  `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
   "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>\n\\(.*\\)さん([0-9]+)")
@@ -635,8 +629,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-friend-list-page (&optional friend)
   `(concat "/list_friend.pl?page=%d"
-	   (when ,friend (concat "&id=" (number-to-string
-					 (mixi-friend-id ,friend))))))
+	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-friend-list-id-regexp
   "<a href=show_friend\\.pl\\?id=\\([0-9]+\\)")
@@ -723,9 +716,12 @@ Increase this value when unexpected error frequently occurs."
 				       mixi-log-list-regexp)))
     (mapcar (lambda (item)
 	      (mixi-make-log (mixi-make-friend (nth 5 item) (nth 6 item))
-			     (encode-time 0 (nth 4 item) (nth 3 item)
-					  (nth 2 item) (nth 1 item)
-					  (nth 0 item))))
+			     (encode-time 0
+					  (string-to-number (nth 4 item))
+					  (string-to-number (nth 3 item))
+					  (string-to-number (nth 2 item))
+					  (string-to-number (nth 1 item))
+					  (string-to-number (nth 0 item)))))
 	    items)))
 
 ;; Diary object.
@@ -741,9 +737,8 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,diary) 'mixi-diary))
 
 (defmacro mixi-diary-page (diary)
-  `(concat "/view_diary.pl?id=" (number-to-string (mixi-diary-id ,diary))
-	   "&owner_id=" (number-to-string (mixi-friend-id
-					   (mixi-diary-owner ,diary)))))
+  `(concat "/view_diary.pl?id=" (mixi-diary-id ,diary)
+	   "&owner_id=" (mixi-friend-id (mixi-diary-owner ,diary))))
 
 ;; FIXME: Remove `さん'.
 (defconst mixi-diary-owner-nick-regexp
@@ -846,8 +841,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-diary-list-page (&optional friend)
   `(concat "/list_diary.pl?page=%d"
-	   (when ,friend (concat "&id=" (number-to-string
-					 (mixi-friend-id ,friend))))))
+	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-diary-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">")
@@ -892,8 +886,7 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,community) 'mixi-community))
 
 (defmacro mixi-community-page (community)
-  `(concat "/view_community.pl?id=" (number-to-string
-				     (mixi-community-id ,community))))
+  `(concat "/view_community.pl?id=" (mixi-community-id ,community)))
 
 (defconst mixi-community-nodata-regexp
   "^データがありません")
@@ -938,9 +931,8 @@ Increase this value when unexpected error frequently occurs."
 	    (if (string= (match-string 1 buffer) "home.pl")
 		(mixi-community-set-owner community (mixi-make-me))
 	      (mixi-community-set-owner
-	       community (mixi-make-friend
-			  (string-to-number (match-string 2 buffer))
-			  (match-string 3 buffer))))
+	       community (mixi-make-friend (match-string 2 buffer)
+					   (match-string 3 buffer))))
 	  (signal 'error (list 'cannot-find-owner community)))
 	(if (string-match mixi-community-category-regexp buffer)
 	    (mixi-community-set-category community (match-string 1 buffer))
@@ -1088,8 +1080,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-community-list-page (&optional friend)
   `(concat "/list_community.pl?page=%d"
-	   (when ,friend (concat "&id=" (number-to-string
-					 (mixi-friend-id ,friend))))))
+	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-community-list-id-regexp
   "<a href=view_community\\.pl\\?id=\\([0-9]+\\)")
@@ -1127,9 +1118,8 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,topic) 'mixi-topic))
 
 (defmacro mixi-topic-page (topic)
-  `(concat "/view_bbs.pl?id=" (number-to-string (mixi-topic-id ,topic))
-	   "&comm_id=" (number-to-string
-			(mixi-community-id (mixi-topic-community ,topic)))))
+  `(concat "/view_bbs.pl?id=" (mixi-topic-id ,topic)
+	   "&comm_id=" (mixi-community-id (mixi-topic-community ,topic))))
 
 (defconst mixi-topic-time-regexp
   "<td rowspan=\"3\" width=\"110\" bgcolor=\"#ffd8b0\" align=\"center\" valign=\"top\" nowrap>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>")
@@ -1159,9 +1149,8 @@ Increase this value when unexpected error frequently occurs."
 	(signal 'error (list 'cannot-find-title topic)))
       (if (string-match mixi-topic-owner-regexp buffer)
 	  (mixi-topic-set-owner topic
-				(mixi-make-friend
-				 (string-to-number (match-string 1 buffer))
-				 (match-string 2 buffer)))
+				(mixi-make-friend (match-string 1 buffer)
+						  (match-string 2 buffer)))
 	(signal 'error (list 'cannot-find-owner topic)))
       (if (string-match mixi-topic-content-regexp buffer)
 	  (mixi-topic-set-content topic (mixi-remove-markup
@@ -1249,7 +1238,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-topic-list-page (community)
   `(concat "/list_bbs.pl?page=%d"
-	   "&id=" (number-to-string (mixi-community-id ,community))))
+	   "&id=" (mixi-community-id ,community)))
 
 (defconst mixi-topic-list-regexp
   "<a href=view_bbs\\.pl\\?id=\\([0-9]+\\)")
@@ -1317,9 +1306,8 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-diary-comment-list-page (diary)
   (concat "/view_diary.pl?page=all"
-	  "&id=" (number-to-string (mixi-diary-id diary))
-	  "&owner_id=" (number-to-string
-			(mixi-friend-id (mixi-diary-owner diary)))))
+	  "&id=" (mixi-diary-id diary)
+	  "&owner_id=" (mixi-friend-id (mixi-diary-owner diary))))
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-diary-comment-list-regexp
@@ -1350,9 +1338,8 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-topic-comment-list-page (topic)
   (concat "/view_bbs.pl?page=all"
-	  "&id=" (number-to-string (mixi-topic-id topic))
-	  "&comm_id=" (number-to-string
-			(mixi-community-id (mixi-topic-community topic)))))
+	  "&id=" (mixi-topic-id topic)
+	  "&comm_id=" (mixi-community-id (mixi-topic-community topic))))
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-topic-comment-list-regexp
@@ -1396,11 +1383,13 @@ Increase this value when unexpected error frequently occurs."
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
 					   (nth 6 item) (nth 7 item))
-				   (encode-time 0 (nth 4 item)
-						(nth 3 item)
-						(nth 2 item)
-						(nth 1 item)
-						(nth 0 item))
+				   (encode-time
+				    0
+				    (string-to-number (nth 4 item))
+				    (string-to-number (nth 3 item))
+				    (string-to-number (nth 2 item))
+				    (string-to-number (nth 1 item))
+				    (string-to-number (nth 0 item)))
 				   (mixi-remove-markup (nth 8 item))))
 	      items))))
 

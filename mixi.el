@@ -372,15 +372,104 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Cache.
 
+;; stolen from time-date.el
+(defmacro with-mixi-decoded-time-value (varlist &rest body)
+  "Decode a time value and bind it according to VARLIST, then eval BODY.
+
+The value of the last form in BODY is returned.
+
+Each element of the list VARLIST is a list of the form
+\(HIGH-SYMBOL LOW-SYMBOL MICRO-SYMBOL [TYPE-SYMBOL] TIME-VALUE).
+The time value TIME-VALUE is decoded and the result it bound to
+the symbols HIGH-SYMBOL, LOW-SYMBOL and MICRO-SYMBOL.
+
+The optional TYPE-SYMBOL is bound to the type of the time value.
+Type 0 is the cons cell (HIGH . LOW), type 1 is the list (HIGH
+LOW), and type 3 is the list (HIGH LOW MICRO)."
+  (declare (indent 1)
+	   (debug ((&rest (symbolp symbolp symbolp &or [symbolp form] form))
+		   body)))
+  (if varlist
+      (let* ((elt (pop varlist))
+	     (high (pop elt))
+	     (low (pop elt))
+	     (micro (pop elt))
+	     (type (unless (eq (length elt) 1)
+		     (pop elt)))
+	     (time-value (car elt))
+	     (gensym (make-symbol "time")))
+	`(let* ,(append `((,gensym ,time-value)
+			  (,high (pop ,gensym))
+			  ,low ,micro)
+			(when type `(,type)))
+	   (if (consp ,gensym)
+	       (progn
+		 (setq ,low (pop ,gensym))
+		 (if ,gensym
+		     ,(append `(setq ,micro (car ,gensym))
+			      (when type `(,type 2)))
+		   ,(append `(setq ,micro 0)
+			    (when type `(,type 1)))))
+	     ,(append `(setq ,low ,gensym ,micro 0)
+		      (when type `(,type 0))))
+	   (with-mixi-decoded-time-value ,varlist ,@body)))
+    `(progn ,@body)))
+(put 'with-mixi-decoded-time-value 'lisp-indent-function 'defun)
+
+;; stolen from time-date.el
+(defun mixi-encode-time-value (high low micro type)
+  "Encode HIGH, LOW, and MICRO into a time value of type TYPE.
+Type 0 is the cons cell (HIGH . LOW), type 1 is the list (HIGH LOW),
+and type 3 is the list (HIGH LOW MICRO)."
+  (cond
+   ((eq type 0) (cons high low))
+   ((eq type 1) (list high low))
+   ((eq type 2) (list high low micro))))
+
+;; stolen from time-date.el
+(defun mixi-time-less-p (t1 t2)
+  "Say whether time value T1 is less than time value T2."
+  (with-mixi-decoded-time-value ((high1 low1 micro1 t1)
+				 (high2 low2 micro2 t2))
+    (or (< high1 high2)
+	(and (= high1 high2)
+	     (or (< low1 low2)
+		 (and (= low1 low2)
+		      (< micro1 micro2)))))))
+
+;; stolen from time-date.el
+(defun mixi-time-add (t1 t2)
+  "Add two time values.  One should represent a time difference."
+  (with-mixi-decoded-time-value ((high low micro type t1)
+				 (high2 low2 micro2 type2 t2))
+    (setq high (+ high high2)
+	  low (+ low low2)
+	  micro (+ micro micro2)
+	  type (max type type2))
+    (when (>= micro 1000000)
+      (setq low (1+ low)
+	    micro (- micro 1000000)))
+    (when (>= low 65536)
+      (setq high (1+ high)
+	    low (- low 65536)))
+    (mixi-encode-time-value high low micro type)))
+
+;; stolen from time-date.el
+(defun mixi-seconds-to-time (seconds)
+  "Convert SECONDS (a floating point number) to a time value."
+  (list (floor seconds 65536)
+	(floor (mod seconds 65536))
+	(floor (* (- seconds (ffloor seconds)) 1000000))))
+
 (defun mixi-cache-expired-p (object)
   "Whether a cache of OBJECT is expired."
   ;; FIXME: Use method instead of `(aref (cdr object) 0)'.
   (let ((timestamp (aref (cdr object) 0)))
     (unless (or (null mixi-cache-expires)
 		 (null timestamp))
-      (time-less-p (time-add timestamp
-			     (seconds-to-time mixi-cache-expires))
-		   (current-time)))))
+      (mixi-time-less-p
+       (mixi-time-add timestamp (mixi-seconds-to-time mixi-cache-expires))
+       (current-time)))))
 
 (defun mixi-make-cache (key value table)
   "Make a cache object and return it."

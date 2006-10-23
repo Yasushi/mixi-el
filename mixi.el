@@ -214,7 +214,7 @@ Increase this value when unexpected error frequently occurs."
     (funcall mixi-retrieve-function url post-data)))
 
 (defun mixi-w3-retrieve (url &optional post-data)
-  "Retrieve the URL and return getted strings."
+  "Retrieve the URL and return gotten strings."
   (if post-data
       (progn
 	(setq url-request-method "POST")
@@ -244,7 +244,7 @@ Increase this value when unexpected error frequently occurs."
     ret))
 
 (defun mixi-w3m-retrieve (url &optional post-data)
-  "Retrieve the URL and return getted strings."
+  "Retrieve the URL and return gotten strings."
   (let ((url (w3m-expand-url url mixi-url)))
     (with-temp-buffer
       (if (not (string= (w3m-retrieve url nil nil post-data) "text/html"))
@@ -254,7 +254,7 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-retrieve-1 ret url post-data))))))
 
 (defun mixi-curl-retrieve (url &optional post-data)
-  "Retrieve the URL and return getted strings."
+  "Retrieve the URL and return gotten strings."
   (with-temp-buffer
     (let ((orig-mode (default-file-modes))
 	  process ret)

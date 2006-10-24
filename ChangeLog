@@ -1,5 +1,28 @@
 2006-10-24  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-object-timestamp): New accessor method.
+	(mixi-cache-expired-p): Use it.
+	(mixi-object-realize-p): New alias.
+	(mixi-object-set-timestamp): New accessor method.
+	(mixi-object-touch): New macro.
+	(mixi-friend-realize-p): Abolish.
+	(mixi-friend-touch): Ditto.
+	(mixi-diary-realize-p): Ditto.
+	(mixi-diary-touch): Ditto.
+	(mixi-community-realize-p): Ditto.
+	(mixi-community-touch): Ditto.
+	(mixi-topic-realize-p): Ditto.
+	(mixi-topic-touch): Ditto.
+	(mixi-message-realize-p): Ditto.
+	(mixi-message-touch): Ditto.
+	(mixi-friend-realize): Follow the change above.
+	(mixi-diary-realize): Ditto.
+	(mixi-community-realize): Ditto.
+	(mixi-topic-realize): Ditto.
+	(mixi-message-realize): Ditto.
+
+2006-10-24  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-message-cache): New variable.
 	(mixi-make-message): New function.
 	(mixi-message-p): New macro.

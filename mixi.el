@@ -394,8 +394,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-cache-expired-p (object)
   "Whether a cache of OBJECT is expired."
-  ;; FIXME: Use method instead of `(aref (cdr object) 0)'.
-  (let ((timestamp (aref (cdr object) 0)))
+  (let ((timestamp (mixi-object-timestamp object)))
     (unless (or (null mixi-cache-expires)
 		 (null timestamp))
       (mixi-time-less-p
@@ -426,6 +425,13 @@ Increase this value when unexpected error frequently occurs."
   (let ((class (mixi-object-class object)))
     (substring (symbol-name class) (length mixi-object-prefix))))
 
+(defun mixi-object-timestamp (object)
+  "Return the timestamp of OJBECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (aref (cdr object) 0))
+(defalias 'mixi-object-realize-p 'mixi-object-timestamp)
+
 (defun mixi-object-id (object)
   "Return the id of OBJECT."
   (unless (mixi-object-p object)
@@ -433,6 +439,15 @@ Increase this value when unexpected error frequently occurs."
   (let ((func (intern (concat mixi-object-prefix
 			      (mixi-object-name object) "-id"))))
     (funcall func object)))
+
+(defun mixi-object-set-timestamp (object timestamp)
+  "Set the timestamp of OBJECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (aset (cdr object) 0 timestamp))
+
+(defmacro mixi-object-touch (object)
+  `(mixi-object-set-timestamp ,object (current-time)))
 
 ;; Friend object.
 (defvar mixi-friend-cache (make-hash-table :test 'equal))
@@ -482,7 +497,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-friend-realize (friend)
   "Realize a FRIEND."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-friend-realize-p friend)
+  (unless (mixi-object-realize-p friend)
     (let (buf)
       (with-mixi-retrieve (mixi-friend-page friend)
 	(setq buf buffer))
@@ -523,13 +538,7 @@ Increase this value when unexpected error frequently occurs."
       (when (string-match mixi-friend-profile-regexp buf)
 	(mixi-friend-set-profile
 	 friend (mixi-remove-markup (match-string 1 buf)))))
-    (mixi-friend-touch friend)))
-
-(defun mixi-friend-realize-p (friend)
-  "Return the timestamp of FRIEND."
-  (unless (mixi-friend-p friend)
-    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (aref (cdr friend) 0))
+    (mixi-object-touch friend)))
 
 (defun mixi-friend-id (friend)
   "Return the id of FRIEND."
@@ -621,12 +630,6 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
   (mixi-friend-realize friend)
   (aref (cdr friend) 13))
-
-(defun mixi-friend-touch (friend)
-  "Set the timestamp of FRIEND."
-  (unless (mixi-friend-p friend)
-    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (aset (cdr friend) 0 (current-time)))
 
 (defun mixi-friend-set-nick (friend nick)
   "Set the nick of FRIEND."
@@ -830,7 +833,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-diary-realize (diary)
   "Realize a DIARY."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-diary-realize-p diary)
+  (unless (mixi-object-realize-p diary)
     (with-mixi-retrieve (mixi-diary-page diary)
       (if (string-match mixi-diary-owner-nick-regexp buffer)
 	  (mixi-friend-set-nick (mixi-diary-owner diary)
@@ -851,13 +854,7 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-diary-set-content diary (mixi-remove-markup
 					 (match-string 1 buffer)))
 	(signal 'error (list 'cannot-find-content diary))))
-    (mixi-diary-touch diary)))
-
-(defun mixi-diary-realize-p (diary)
-  "Return the timestamp of DIARY."
-  (unless (mixi-diary-p diary)
-    (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (aref (cdr diary) 0))
+    (mixi-object-touch diary)))
 
 (defun mixi-diary-owner (diary)
   "Return the owner of DIARY."
@@ -891,12 +888,6 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
   (mixi-diary-realize diary)
   (aref (cdr diary) 5))
-
-(defun mixi-diary-touch (diary)
-  "Set the timestamp of DIARY."
-  (unless (mixi-diary-p diary)
-    (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (aset (cdr diary) 0 (current-time)))
 
 (defun mixi-diary-set-time (diary time)
   "Set the time of DIARY."
@@ -994,7 +985,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-community-realize (community)
   "Realize a COMMUNITY."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-community-realize-p community)
+  (unless (mixi-object-realize-p community)
     (with-mixi-retrieve (mixi-community-page community)
       (if (string-match mixi-community-nodata-regexp buffer)
 	  ;; FIXME: Set all members?
@@ -1033,13 +1024,7 @@ Increase this value when unexpected error frequently occurs."
 	    (mixi-community-set-description
 	     community (mixi-remove-markup (match-string 1 buffer)))
 	  (signal 'error (list 'cannot-find-description community)))))
-    (mixi-community-touch community)))
-
-(defun mixi-community-realize-p (community)
-  "Return the timestamp of COMMUNITY."
-  (unless (mixi-community-p community)
-    (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (aref (cdr community) 0))
+    (mixi-object-touch community)))
 
 (defun mixi-community-id (community)
   "Return the id of COMMUNITY."
@@ -1103,12 +1088,6 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (mixi-community-realize community)
   (aref (cdr community) 9))
-
-(defun mixi-community-touch (community)
-  "Set the timestamp of COMMUNITY."
-  (unless (mixi-community-p community)
-    (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (aset (cdr community) 0 (current-time)))
 
 (defun mixi-community-set-name (community name)
   "Set the name of COMMUNITY."
@@ -1222,7 +1201,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-topic-realize (topic)
   "Realize a TOPIC."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-topic-realize-p topic)
+  (unless (mixi-object-realize-p topic)
     (with-mixi-retrieve (mixi-topic-page topic)
       (if (string-match mixi-topic-time-regexp buffer)
 	  (mixi-topic-set-time
@@ -1244,13 +1223,7 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-topic-set-content topic (mixi-remove-markup
 					 (match-string 2 buffer)))
 	(signal 'error (list 'cannot-find-content topic))))
-    (mixi-topic-touch topic)))
-
-(defun mixi-topic-realize-p (topic)
-  "Return the timestamp of TOPIC."
-  (unless (mixi-topic-p topic)
-    (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (aref (cdr topic) 0))
+    (mixi-object-touch topic)))
 
 (defun mixi-topic-community (topic)
   "Return the community of TOPIC."
@@ -1291,12 +1264,6 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (mixi-topic-realize topic)
   (aref (cdr topic) 6))
-
-(defun mixi-topic-touch (topic)
-  "Set the timestamp of TOPIC."
-  (unless (mixi-topic-p topic)
-    (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (aset (cdr topic) 0 (current-time)))
 
 (defun mixi-topic-set-time (topic time)
   "Set the time of TOPIC."
@@ -1525,7 +1492,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-message-realize (message)
   "Realize a MESSAGE."
-  (unless (mixi-message-realize-p message)
+  (unless (mixi-object-realize-p message)
     (with-mixi-retrieve (mixi-message-page message)
       (if (string-match mixi-message-owner-regexp buffer)
 	  (mixi-message-set-owner message
@@ -1547,13 +1514,7 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-message-set-content message (mixi-remove-markup
 					     (match-string 1 buffer)))
 	(signal 'error (list 'cannot-find-content message))))
-    (mixi-message-touch message)))
-
-(defun mixi-message-realize-p (message)
-  "Return the timestamp of MESSAGE."
-  (unless (mixi-message-p message)
-    (signal 'wrong-type-argument (list 'mixi-message-p message)))
-  (aref (cdr message) 0))
+    (mixi-object-touch message)))
 
 (defun mixi-message-id (message)
   "Return the id of MESSAGE."
@@ -1594,12 +1555,6 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-message-p message)))
   (mixi-message-realize message)
   (aref (cdr message) 6))
-
-(defun mixi-message-touch (message)
-  "Set the timestamp of MESSAGE."
-  (unless (mixi-message-p message)
-    (signal 'wrong-type-argument (list 'mixi-message-p message)))
-  (aset (cdr message) 0 (current-time)))
 
 (defun mixi-message-set-owner (message owner)
   "Set the owner of MESSAGE."

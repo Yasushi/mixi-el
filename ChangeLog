@@ -5,7 +5,7 @@
 	(mixi-message-p): New macro.
 	(mixi-message-page): Ditto.
 	(mixi-message-owner-regexp): New constant.
-	(mixi-message-subject-regexp): Ditto.
+	(mixi-message-title-regexp): Ditto.
 	(mixi-message-time-regexp): Ditto.
 	(mixi-message-content-regexp): Ditto.
 	(mixi-message-realize): New function.

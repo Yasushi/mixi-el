@@ -337,7 +337,7 @@ Increase this value when unexpected error frequently occurs."
 	(with-mixi-retrieve (format url page)
 	  (let ((pos 0))
 	    (while (and (string-match regexp buffer pos)
-			(< (length ids) max-numbers))
+			(or (null max-numbers) (< (length ids) max-numbers)))
 	      (let ((num 1)
 		    list)
 		(while (match-string num buffer)

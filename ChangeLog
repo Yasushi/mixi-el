@@ -1,3 +1,10 @@
+2006-10-24  Daiki Ueno  <ueno@unixuser.org>
+
+	* mixi.el (with-mixi-decoded-time-value): Abolished.
+	(mixi-encode-time-value): Abolished.
+	(mixi-time-less-p): Simplified.
+	(mixi-time-add): Simplified.
+
 2006-10-24  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (with-mixi-retrieve): Put `edebug-form-spec'.

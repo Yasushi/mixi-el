@@ -1,5 +1,10 @@
 2006-10-24  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (with-mixi-retrieve): Put `edebug-form-spec'.
+	(with-mixi-decoded-time-value): Ditto.
+
+2006-10-24  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-get-matched-items): Fix when MAX-NUMBERS is nil.
 
 2006-10-24  OHASHI Akira  <bg66@koka-in.org>

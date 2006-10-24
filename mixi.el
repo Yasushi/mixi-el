@@ -327,6 +327,7 @@ Increase this value when unexpected error frequently occurs."
 	 (setq buffer (funcall mixi-retrieve-function ,url))))
      ,@body))
 (put 'with-mixi-retrieve 'lisp-indent-function 'defun)
+(put 'with-mixi-retrieve 'edebug-form-spec '(form body))
 
 (defun mixi-get-matched-items (url max-numbers regexp)
   "Get matched items to REGEXP in URL."
@@ -417,6 +418,7 @@ LOW), and type 3 is the list (HIGH LOW MICRO)."
 	   (with-mixi-decoded-time-value ,varlist ,@body)))
     `(progn ,@body)))
 (put 'with-mixi-decoded-time-value 'lisp-indent-function 'defun)
+(put 'with-mixi-decoded-time-value 'edebug-form-spec '(form body))
 
 ;; stolen from time-date.el
 (defun mixi-encode-time-value (high low micro type)

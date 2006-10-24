@@ -61,7 +61,7 @@
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
 ;;
-;; Display newest 3 diaries including one comment like a mail format.
+;; Display newest 3 diaries including newest 3 comments like a mail format.
 ;; Comments are displayed like a reply mail.
 ;;
 ;; (let ((max-numbers 3)
@@ -90,7 +90,7 @@
 ;; 			      "Subject: " subject "\n"
 ;; 			      "Date: " date "\n\n"
 ;; 			      body "\n\n")))
-;; 		  (mixi-get-comments diary))))
+;; 		  (mixi-get-comments diary max-numbers))))
 ;; 	(mixi-get-new-diaries max-numbers))
 ;;   (set-buffer-modified-p nil)
 ;;   (setq buffer-read-only t)
@@ -343,6 +343,8 @@ Increase this value when unexpected error frequently occurs."
 		(while (match-string num buffer)
 		  (setq list (cons (match-string num buffer) list))
 		  (incf num))
+		(when (member (reverse list) ids)
+		  (throw 'end ids))
 		(setq ids (cons (reverse list) ids))
 		(setq pos (match-end (1- num)))))
 	    (when (eq pos 0)
@@ -1460,7 +1462,7 @@ and type 3 is the list (HIGH LOW MICRO)."
   (aref (cdr comment) 3))
 
 (defun mixi-diary-comment-list-page (diary)
-  (concat "/view_diary.pl?page=all"
+  (concat "/view_diary.pl?page=%d"
 	  "&id=" (mixi-diary-id diary)
 	  "&owner_id=" (mixi-friend-id (mixi-diary-owner diary))))
 
@@ -1492,7 +1494,7 @@ and type 3 is the list (HIGH LOW MICRO)."
 </td></tr></table>")
 
 (defun mixi-topic-comment-list-page (topic)
-  (concat "/view_bbs.pl?page=all"
+  (concat "/view_bbs.pl?page=%d"
 	  "&id=" (mixi-topic-id topic)
 	  "&comm_id=" (mixi-community-id (mixi-topic-community topic))))
 
@@ -1535,10 +1537,7 @@ and type 3 is the list (HIGH LOW MICRO)."
 	 (regexp (eval (intern (concat mixi-object-prefix name
 				       "-comment-list-regexp")))))
     (let ((items (mixi-get-matched-items
-		  (funcall list-page parent)
-		  ;; FIXME: Use `max-numbers' instead of 1.
-		  1
-		  regexp)))
+		  (funcall list-page parent) max-numbers regexp)))
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
 					   (nth 6 item) (nth 7 item))

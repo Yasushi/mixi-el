@@ -1,3 +1,11 @@
+2006-10-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-comment-list-page): Use `%d' instead of `all'
+	for page parameter.
+	(mixi-topic-comment-list-page): Ditto.
+	(mixi-get-comments): Use `max-numbers' instead of 1.
+	(mixi-get-matched-items): Exit when the same items got already.
+
 2006-10-23  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (toplevel): Don't use the FILENAME argument of `require'.

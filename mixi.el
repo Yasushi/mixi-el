@@ -389,9 +389,8 @@ Increase this value when unexpected error frequently occurs."
 ;; stolen from time-date.el
 (defun mixi-seconds-to-time (seconds)
   "Convert SECONDS (a floating point number) to a time value."
-  (list (floor seconds 65536)
-	(floor (mod seconds 65536))
-	(floor (* (- seconds (ffloor seconds)) 1000000))))
+  (cons (floor seconds 65536)
+	(floor (mod seconds 65536))))
 
 (defun mixi-cache-expired-p (object)
   "Whether a cache of OBJECT is expired."

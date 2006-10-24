@@ -1,3 +1,30 @@
+2006-10-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-message-cache): New variable.
+	(mixi-make-message): New function.
+	(mixi-message-p): New macro.
+	(mixi-message-page): Ditto.
+	(mixi-message-owner-regexp): New constant.
+	(mixi-message-subject-regexp): Ditto.
+	(mixi-message-time-regexp): Ditto.
+	(mixi-message-content-regexp): Ditto.
+	(mixi-message-realize): New function.
+	(mixi-message-realize-p): New accessor method.
+	(mixi-message-id): Ditto.
+	(mixi-message-box): Ditto.
+	(mixi-message-owner): Ditto.
+	(mixi-message-title): Ditto.
+	(mixi-message-time): Ditto.
+	(mixi-message-content): Ditto.
+	(mixi-message-touch): Ditto.
+	(mixi-message-set-owner): Ditto.
+	(mixi-message-set-title): Ditto.
+	(mixi-message-set-time): Ditto.
+	(mixi-message-set-content): Ditto.
+	(mixi-message-list-page): New macro.
+	(mixi-message-list-regexp): New constant.
+	(mixi-get-messages): New function.
+
 2006-10-24  Daiki Ueno  <ueno@unixuser.org>
 
 	* mixi.el (with-mixi-decoded-time-value): Abolished.

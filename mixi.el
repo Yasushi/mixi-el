@@ -1498,6 +1498,157 @@ Increase this value when unexpected error frequently occurs."
 		(mixi-get-comments diary)))
 	    items)))
 
+;; Message object.
+(defvar mixi-message-cache (make-hash-table :test 'equal))
+(defun mixi-make-message (id box)
+  "Return a message object."
+  (mixi-make-cache (list id box)
+		   (cons 'mixi-message (vector nil id box nil nil nil nil))
+		   mixi-message-cache))
+
+(defmacro mixi-message-p (message)
+  `(eq (mixi-object-class ,message) 'mixi-message))
+
+(defmacro mixi-message-page (message)
+  `(concat "/view_message.pl?id=" (mixi-message-id ,message)
+	   "&box=" (mixi-message-box ,message)))
+
+(defconst mixi-message-owner-regexp
+  "<font COLOR=#996600>差出人</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>")
+(defconst mixi-message-title-regexp
+  "<font COLOR=#996600>件　名</font>&nbsp;:&nbsp;\\(.+\\)
+</td>")
+(defconst mixi-message-time-regexp
+  "<font COLOR=#996600>日　付</font>&nbsp;:&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分&nbsp;&nbsp;")
+(defconst mixi-message-content-regexp
+  "<tr><td CLASS=h120>\\(.+\\)</td></tr>")
+
+(defun mixi-message-realize (message)
+  "Realize a MESSAGE."
+  (unless (mixi-message-realize-p message)
+    (with-mixi-retrieve (mixi-message-page message)
+      (if (string-match mixi-message-owner-regexp buffer)
+	  (mixi-message-set-owner message
+				  (mixi-make-friend (match-string 1 buffer)
+						    (match-string 2 buffer)))
+	(signal 'error (list 'cannot-find-owner message)))
+      (if (string-match mixi-message-title-regexp buffer)
+	  (mixi-message-set-title message (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-title message)))
+      (if (string-match mixi-message-time-regexp buffer)
+	  (mixi-message-set-time
+	   message (encode-time 0 (string-to-number (match-string 5 buffer))
+				(string-to-number (match-string 4 buffer))
+				(string-to-number (match-string 3 buffer))
+				(string-to-number (match-string 2 buffer))
+				(string-to-number (match-string 1 buffer))))
+	(signal 'error (list 'cannot-find-time message)))
+      (if (string-match mixi-message-content-regexp buffer)
+	  (mixi-message-set-content message (mixi-remove-markup
+					     (match-string 1 buffer)))
+	(signal 'error (list 'cannot-find-content message))))
+    (mixi-message-touch message)))
+
+(defun mixi-message-realize-p (message)
+  "Return the timestamp of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aref (cdr message) 0))
+
+(defun mixi-message-id (message)
+  "Return the id of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aref (cdr message) 1))
+
+(defun mixi-message-box (message)
+  "Return the box of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aref (cdr message) 2))
+
+(defun mixi-message-owner (message)
+  "Return the owner of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (mixi-message-realize message)
+  (aref (cdr message) 3))
+
+(defun mixi-message-title (message)
+  "Return the title of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (mixi-message-realize message)
+  (aref (cdr message) 4))
+
+(defun mixi-message-time (message)
+  "Return the date of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (mixi-message-realize message)
+  (aref (cdr message) 5))
+
+(defun mixi-message-content (message)
+  "Return the content of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (mixi-message-realize message)
+  (aref (cdr message) 6))
+
+(defun mixi-message-touch (message)
+  "Set the timestamp of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aset (cdr message) 0 (current-time)))
+
+(defun mixi-message-set-owner (message owner)
+  "Set the owner of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aset (cdr message) 3 owner))
+
+(defun mixi-message-set-title (message title)
+  "Set the title of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aset (cdr message) 4 title))
+
+(defun mixi-message-set-time (message time)
+  "Set the date of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aset (cdr message) 5 time))
+
+(defun mixi-message-set-content (message content)
+  "Set the content of MESSAGE."
+  (unless (mixi-message-p message)
+    (signal 'wrong-type-argument (list 'mixi-message-p message)))
+  (aset (cdr message) 6 content))
+
+(defmacro mixi-message-list-page (&optional box)
+  `(concat "/list_message.pl?page=%d"
+	   (when ,box (concat "&box=" ,box))))
+
+(defconst mixi-message-list-regexp
+  "<td><a HREF=\"view_message\\.pl\\?id=\\(.+\\)&box=\\(.+\\)\">")
+
+(defun mixi-get-messages (&rest args)
+  "Get messages."
+  (when (> (length args) 2)
+    (signal 'wrong-number-of-arguments (list 'mixi-get-messages
+					     (length args))))
+  (let ((box (nth 0 args))
+	(max-numbers (nth 1 args)))
+    (when (or (not (stringp box)) (stringp max-numbers))
+      (setq box (nth 1 args))
+      (setq max-numbers (nth 0 args)))
+    (let ((items (mixi-get-matched-items (mixi-message-list-page box)
+					 max-numbers
+					 mixi-message-list-regexp)))
+      (mapcar (lambda (item)
+		(mixi-make-message (nth 0 item) (nth 1 item)))
+	      items))))
+
 (provide 'mixi)
 
 ;;; mixi.el ends here

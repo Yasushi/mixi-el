@@ -36,6 +36,7 @@
 ;;  * mixi-get-new-topics
 ;;  * mixi-get-comments
 ;;  * mixi-get-new-comments
+;;  * mixi-get-messages
 
 ;; Example:
 ;;

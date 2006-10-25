@@ -1,3 +1,8 @@
+2006-10-25  Daiki Ueno  <ueno@unixuser.org>
+
+	* mixi.el (mixi-time-less-p): Normalize encoded time.
+	(mixi-time-add): Ditto.
+
 2006-10-24  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-object-timestamp): New accessor method.

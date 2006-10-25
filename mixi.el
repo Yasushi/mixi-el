@@ -115,6 +115,16 @@
   :type 'coding-system
   :group 'mixi)
 
+(defcustom mixi-curl-program "curl"
+  "*The program name of `curl'."
+  :type 'file
+  :group 'mixi)
+
+(defcustom mixi-curl-cookie-file (expand-file-name "~/.mixi-cookies.txt")
+  "*The location of cookie file created by `curl'."
+  :type 'file
+  :group 'mixi)
+
 (defcustom mixi-retrieve-function
   (or (condition-case nil
 	  (progn
@@ -136,16 +146,6 @@
 		(const :tag "Using w3m" mixi-w3m-retrieve)
 		(const :tag "Using curl" mixi-curl-retrieve)
 		(function :format "Other function: %v\n" :size 0))
-  :group 'mixi)
-
-(defcustom mixi-curl-program "curl"
-  "*The program name of `curl'."
-  :type 'file
-  :group 'mixi)
-
-(defcustom mixi-curl-cookie-file (expand-file-name "~/.mixi-cookies.txt")
-  "*The location of cookie file created by `curl'."
-  :type 'file
   :group 'mixi)
 
 (defcustom mixi-default-email nil

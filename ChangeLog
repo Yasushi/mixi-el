@@ -1,5 +1,10 @@
 2006-10-25  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-cache-expires): Add new constant.
+	(mixi-cache-expired-p): Follow the change above.
+
+2006-10-25  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-retrieve-function): Use `radio' instead of `choice'.
 	(mixi-default-email): Ditto.
 	(mixi-default-password): Ditto.

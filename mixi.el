@@ -169,7 +169,8 @@ Increase this value when unexpected error frequently occurs."
 (defcustom mixi-cache-expires 3600
   "*Seconds for expiration of a cached object."
   :type '(radio (integer :tag "Expired seconds")
-		(const :tag "Don't expire" nil))
+		(const :tag "Don't expire" nil)
+		(const :tag "Don't cache" t))
   :group 'mixi)
 
 ;; FIXME: Not implemented.
@@ -406,9 +407,11 @@ Increase this value when unexpected error frequently occurs."
   (let ((timestamp (mixi-object-timestamp object)))
     (unless (or (null mixi-cache-expires)
 		 (null timestamp))
-      (mixi-time-less-p
-       (mixi-time-add timestamp (mixi-seconds-to-time mixi-cache-expires))
-       (current-time)))))
+      (if (numberp mixi-cache-expires)
+	  (mixi-time-less-p
+	   (mixi-time-add timestamp (mixi-seconds-to-time mixi-cache-expires))
+	   (current-time))
+	t))))
 
 (defun mixi-make-cache (key value table)
   "Make a cache object and return it."

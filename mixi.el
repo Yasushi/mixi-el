@@ -99,14 +99,6 @@
 
 ;;; Code:
 
-(condition-case nil
-    (require 'url)
-  (error))
-
-(condition-case nil
-    (require 'w3m)
-  (error))
-
 (eval-when-compile (require 'cl))
 
 (defgroup mixi nil
@@ -124,8 +116,21 @@
   :group 'mixi)
 
 (defcustom mixi-retrieve-function
-  (if (fboundp 'url-retrieve-synchronously)
-      'mixi-w3-retrieve 'mixi-w3m-retrieve)
+  (or (condition-case nil
+	  (progn
+	    (require 'url)
+	    (if (fboundp 'url-retrieve-synchronously)
+		'mixi-w3-retrieve))
+	(error))
+      (condition-case nil
+	  (progn
+	    (require 'w3m)
+	    'mixi-w3m-retrieve)
+	(error))
+      (if (and (fboundp 'executable-find)
+	       (executable-find mixi-curl-program))
+	  'mixi-curl-retrieve)
+      (error "Can't set `mixi-retrieve-function'"))
   "*The function for retrieving."
   :type '(radio (const :tag "Using w3" mixi-w3-retrieve)
 		(const :tag "Using w3m" mixi-w3m-retrieve)

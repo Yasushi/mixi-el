@@ -384,7 +384,7 @@ Increase this value when unexpected error frequently occurs."
     (setq t2 (cons (car t2) (car (cdr t2)))))
   (or (< (car t1) (car t2))
       (and (= (car t1) (car t2))
-	   (< (nth 1 t1) (nth 1 t2)))))
+	   (< (cdr t1) (cdr t2)))))
 
 (defun mixi-time-add (t1 t2)
   "Add two time values.  One should represent a time difference."

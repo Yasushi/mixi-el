@@ -127,10 +127,10 @@
   (if (fboundp 'url-retrieve-synchronously)
       'mixi-w3-retrieve 'mixi-w3m-retrieve)
   "*The function for retrieving."
-  :type '(choice (const :tag "Using w3" mixi-w3-retrieve)
-		 (const :tag "Using w3m" mixi-w3m-retrieve)
-		 (const :tag "Using curl" mixi-curl-retrieve)
-		 (function :format "Other function: %v\n" :size 0))
+  :type '(radio (const :tag "Using w3" mixi-w3-retrieve)
+		(const :tag "Using w3m" mixi-w3m-retrieve)
+		(const :tag "Using curl" mixi-curl-retrieve)
+		(function :format "Other function: %v\n" :size 0))
   :group 'mixi)
 
 (defcustom mixi-curl-program "curl"
@@ -145,14 +145,14 @@
 
 (defcustom mixi-default-email nil
   "*Default E-mail address that is used to login automatically."
-  :type '(choice (string :tag "E-mail address")
-		 (const :tag "Asked when it is necessary" nil))
+  :type '(radio (string :tag "E-mail address")
+		(const :tag "Asked when it is necessary" nil))
   :group 'mixi)
 
 (defcustom mixi-default-password nil
   "*Default password that is used to login automatically."
-  :type '(choice (string :tag "Password")
-		 (const :tag "Asked when it is necessary" nil))
+  :type '(radio (string :tag "Password")
+		(const :tag "Asked when it is necessary" nil))
   :group 'mixi)
 
 (defcustom mixi-accept-adult-contents t
@@ -168,8 +168,8 @@ Increase this value when unexpected error frequently occurs."
 
 (defcustom mixi-cache-expires 3600
   "*Seconds for expiration of a cached object."
-  :type '(choice (integer :tag "Expired seconds")
-		 (const :tag "Don't expire" nil))
+  :type '(radio (integer :tag "Expired seconds")
+		(const :tag "Don't expire" nil))
   :group 'mixi)
 
 ;; FIXME: Not implemented.

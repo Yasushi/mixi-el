@@ -37,6 +37,7 @@
 ;;  * mixi-get-comments
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
+;;  * mixi-get-introductions
 
 ;; Example:
 ;;
@@ -365,7 +366,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-remove-markup (string)
   "Remove markups from STRING."
   (with-temp-buffer
-    (insert string)
+    (insert (or string ""))
     (save-excursion
       (goto-char (point-min))
       (while (search-forward "<!--" nil t)
@@ -934,7 +935,8 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-get-diaries (&rest args)
   "Get diaries of FRIEND."
   (when (> (length args) 2)
-    (signal 'wrong-number-of-arguments (list 'mixi-get-friends (length args))))
+    (signal 'wrong-number-of-arguments
+	    (list 'mixi-get-diaries (length args))))
   (let ((friend (nth 0 args))
 	(max-numbers (nth 1 args)))
     (when (or (not (mixi-friend-p friend)) (mixi-friend-p max-numbers))
@@ -1168,7 +1170,8 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-get-communities (&rest args)
   "Get communities of FRIEND."
   (when (> (length args) 2)
-    (signal 'wrong-number-of-arguments (list 'mixi-get-friends (length args))))
+    (signal 'wrong-number-of-arguments
+	    (list 'mixi-get-communities (length args))))
   (let ((friend (nth 0 args))
 	(max-numbers (nth 1 args)))
     (when (or (not (mixi-friend-p friend)) (mixi-friend-p max-numbers))
@@ -1607,8 +1610,8 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-get-messages (&rest args)
   "Get messages."
   (when (> (length args) 2)
-    (signal 'wrong-number-of-arguments (list 'mixi-get-messages
-					     (length args))))
+    (signal 'wrong-number-of-arguments
+	    (list 'mixi-get-messages (length args))))
   (let ((box (nth 0 args))
 	(max-numbers (nth 1 args)))
     (when (or (not (stringp box)) (stringp max-numbers))
@@ -1619,6 +1622,101 @@ Increase this value when unexpected error frequently occurs."
 					 mixi-message-list-regexp)))
       (mapcar (lambda (item)
 		(mixi-make-message (nth 0 item) (nth 1 item)))
+	      items))))
+
+;; Introduction object.
+(defun mixi-make-introduction (parent owner content)
+  "Return a introduction object."
+  (cons 'mixi-introduction (vector parent owner content)))
+
+(defmacro mixi-introduction-p (introduction)
+  `(eq (mixi-object-class ,introduction) 'mixi-introduction))
+
+(defun mixi-introduction-parent (introduction)
+  "Return the parent of INTRODUCTION."
+  (unless (mixi-introduction-p introduction)
+    (signal 'wrong-type-argument (list 'mixi-introduction-p introduction)))
+  (aref (cdr introduction) 0))
+
+(defun mixi-introduction-owner (introduction)
+  "Return the owner of INTRODUCTION."
+  (unless (mixi-introduction-p introduction)
+    (signal 'wrong-type-argument (list 'mixi-introduction-p introduction)))
+  (aref (cdr introduction) 1))
+
+(defun mixi-introduction-content (introduction)
+  "Return the content of INTRODUCTION."
+  (unless (mixi-introduction-p introduction)
+    (signal 'wrong-type-argument (list 'mixi-introduction-p introduction)))
+  (aref (cdr introduction) 3))
+
+(defmacro mixi-introduction-list-page (&optional friend)
+  `(concat "/show_intro.pl?page=%d"
+	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
+
+(defconst mixi-introduction-list-regexp
+  "<tr bgcolor=#FFFFFF>
+<td WIDTH=150 background=http://img\\.mixi\\.jp/img/bg_line\\.gif align=\"center\"><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\"><img src=\".+\" border=0><br>
+\\(.+\\)</td></a>
+
+<td WIDTH=480>
+\\(´Ø·¸¡§.+<br>
+
+
+\\(\\(.\\|\n<br>\\)+\\)\\|
+\\(\\(.\\|\n<br>\\)+\\)\\)
+
+
+
+
+</td>
+</tr>")
+(defconst mixi-my-introduction-list-regexp
+  "<tr bgcolor=#FFFFFF>
+<td WIDTH=150 background=http://img\\.mixi\\.jp/img/bg_line\\.gif align=\"center\"><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\"><img src=\".+\" border=0><br>
+\\(.+\\)</td></a>
+
+
+<td WIDTH=480>
+\\(´Ø·¸¡§.+<br>
+
+
+\\(\\(.\\|\n<br>\\)+\\)\\|
+\\(\\(.\\|\n<br>\\)+\\)\\)
+
+
+<br>
+<a href=\"edit_intro\\.pl\\?id=\\1&type=edit\">¤³¤ÎÍ§¿Í¤ò¾Ò²ð¤¹¤ë</a>
+
+
+<BR>
+<a href=\"delete_intro\\.pl\\?id=\\1\">ºï½ü</a>
+
+</td>
+</tr>")
+
+(defun mixi-get-introductions (&rest args)
+  "Get introductions."
+  (when (> (length args) 2)
+    (signal 'wrong-number-of-arguments
+	    (list 'mixi-get-introduction (length args))))
+  (let ((friend (nth 0 args))
+	(max-numbers (nth 1 args)))
+    (when (or (not (mixi-friend-p friend)) (mixi-friend-p max-numbers))
+      (setq friend (nth 1 args))
+      (setq max-numbers (nth 0 args)))
+    (unless (or (null friend) (mixi-friend-p friend))
+      (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+    (let* ((regexp (if friend mixi-introduction-list-regexp
+		     mixi-my-introduction-list-regexp))
+	   (items (mixi-get-matched-items (mixi-introduction-list-page friend)
+					  max-numbers
+					  regexp)))
+      (mapcar (lambda (item)
+		(mixi-make-introduction (or friend (mixi-make-me))
+					(mixi-make-friend (nth 0 item)
+							  (nth 1 item))
+					(mixi-remove-markup (nth 2 item))))
 	      items))))
 
 (provide 'mixi)

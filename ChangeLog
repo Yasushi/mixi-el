@@ -1,3 +1,17 @@
+2006-10-25  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-remove-markup): When STRING is nil, insert a null
+	string.
+	(mixi-make-introduction): New function.
+	(mixi-introduction-p): New macro.
+	(mixi-introduction-parent): New accessor method.
+	(mixi-introduction-owner): Ditto.
+	(mixi-introduction-content): Ditto.
+	(mixi-introduction-list-page): New macro.
+	(mixi-introduction-list-regexp): New regexp.
+	(mixi-my-introduction-list-regexp): Ditto.
+	(mixi-get-introductions): New function.
+
 2006-10-25  Daiki Ueno  <ueno@unixuser.org>
 
 	* mixi.el (mixi-retrieve-function): Try to select
@@ -49,7 +63,7 @@
 	(mixi-make-message): New function.
 	(mixi-message-p): New macro.
 	(mixi-message-page): Ditto.
-	(mixi-message-owner-regexp): New constant.
+	(mixi-message-owner-regexp): New regexp.
 	(mixi-message-title-regexp): Ditto.
 	(mixi-message-time-regexp): Ditto.
 	(mixi-message-content-regexp): Ditto.
@@ -67,7 +81,7 @@
 	(mixi-message-set-time): Ditto.
 	(mixi-message-set-content): Ditto.
 	(mixi-message-list-page): New macro.
-	(mixi-message-list-regexp): New constant.
+	(mixi-message-list-regexp): New regexp.
 	(mixi-get-messages): New function.
 
 2006-10-24  Daiki Ueno  <ueno@unixuser.org>
@@ -196,19 +210,19 @@
 	* mixi.el (mixi-make-community): New slot `members'.
 	(mixi-community-members): New accessor method.
 	(mixi-community-set-members): Ditto.
-	(mixi-community-members-regexp): New constant.
+	(mixi-community-members-regexp): New regexp.
 	(mixi-community-realize): Use them.
 
 	* mixi.el (mixi-make-community): New slot `open level'.
 	(mixi-community-open-level): New accessor method.
 	(mixi-community-set-open-level): Ditto.
-	(mixi-community-open-level-regexp): New constant.
+	(mixi-community-open-level-regexp): New regexp.
 	(mixi-community-realize): Use them.
 
 	* mixi.el (mixi-make-community): New slot `authority'.
 	(mixi-community-authority): New accessor method.
 	(mixi-community-set-authority): Ditto.
-	(mixi-community-authority-regexp): New constant.
+	(mixi-community-authority-regexp): New regexp.
 	(mixi-community-realize): Use them.
 
 2006-10-22  OHASHI Akira  <bg66@koka-in.org>
@@ -223,55 +237,55 @@
 	* mixi.el (mixi-make-friend): New slot `address'.
 	(mixi-friend-address): New accessor method.
 	(mixi-friend-set-address): Ditto.
-	(mixi-friend-address-regexp): New constant.
+	(mixi-friend-address-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `age'.
 	(mixi-friend-age): New accessor method.
 	(mixi-friend-set-age): Ditto.
-	(mixi-friend-age-regexp): New constant.
+	(mixi-friend-age-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `birthday'.
 	(mixi-friend-birthday): New accessor method.
 	(mixi-friend-set-birthday): Ditto.
-	(mixi-friend-birthday-regexp): New constant.
+	(mixi-friend-birthday-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `blood type'.
 	(mixi-friend-blood-type): New accessor method.
 	(mixi-friend-set-blood-type): Ditto.
-	(mixi-friend-blood-type-regexp): New constant.
+	(mixi-friend-blood-type-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `birthplace'.
 	(mixi-friend-birthplace): New accessor method.
 	(mixi-friend-set-birthplace): Ditto.
-	(mixi-friend-birthplace-regexp): New constant.
+	(mixi-friend-birthplace-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `hobby'.
 	(mixi-friend-hobby): New accessor method.
 	(mixi-friend-set-hobby): Ditto.
-	(mixi-friend-hobby-regexp): New constant.
+	(mixi-friend-hobby-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `job'.
 	(mixi-friend-job): New accessor method.
 	(mixi-friend-set-job): Ditto.
-	(mixi-friend-job-regexp): New constant.
+	(mixi-friend-job-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `organization'.
 	(mixi-friend-organization): New accessor method.
 	(mixi-friend-set-organization): Ditto.
-	(mixi-friend-organization-regexp): New constant.
+	(mixi-friend-organization-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 	* mixi.el (mixi-make-friend): New slot `profile'.
 	(mixi-friend-profile): New accessor method.
 	(mixi-friend-set-profile): Ditto.
-	(mixi-friend-profile-regexp): New constant.
+	(mixi-friend-profile-regexp): New regexp.
 	(mixi-friend-realize): Use them.
 
 2006-10-21  OHASHI Akira  <bg66@koka-in.org>

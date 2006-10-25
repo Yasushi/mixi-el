@@ -379,9 +379,9 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-time-less-p (t1 t2)
   "Say whether time value T1 is less than time value T2."
   (unless (numberp (cdr t1))
-    (setq t1 (cons (car t1) (cdr t1))))
+    (setq t1 (cons (car t1) (car (cdr t1)))))
   (unless (numberp (cdr t2))
-    (setq t2 (cons (car t2) (cdr t2))))
+    (setq t2 (cons (car t2) (car (cdr t2)))))
   (or (< (car t1) (car t2))
       (and (= (car t1) (car t2))
 	   (< (nth 1 t1) (nth 1 t2)))))
@@ -389,9 +389,9 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-time-add (t1 t2)
   "Add two time values.  One should represent a time difference."
   (unless (numberp (cdr t1))
-    (setq t1 (cons (car t1) (cdr t1))))
+    (setq t1 (cons (car t1) (car (cdr t1)))))
   (unless (numberp (cdr t2))
-    (setq t2 (cons (car t2) (cdr t2))))
+    (setq t2 (cons (car t2) (car (cdr t2)))))
   (let ((low (+ (cdr t1) (cdr t2))))
     (cons (+ (car t1) (car t2) (lsh low -16)) low)))
 

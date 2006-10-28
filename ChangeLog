@@ -1,3 +1,10 @@
+2006-10-28  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-message-box-list): New constant.
+	(mixi-message-box-p): New macro.
+	(mixi-message-box-name): New function.
+	(mixi-get-messages): Use them.
+
 2006-10-25  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-remove-markup): When STRING is nil, insert a null

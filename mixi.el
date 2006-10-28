@@ -1486,6 +1486,18 @@ Increase this value when unexpected error frequently occurs."
 	    items)))
 
 ;; Message object.
+(defconst mixi-message-box-list '(inbox outbox savebox thrash)) ; thrash?
+
+(defmacro mixi-message-box-p (box)
+  `(when (memq ,box mixi-message-box-list)
+     t))
+
+(defun mixi-message-box-name (box)
+  "Return the name of BOX."
+  (unless (mixi-message-box-p box)
+    (signal 'wrong-type-argument (list 'mixi-message-box-p box)))
+  (symbol-name box))
+
 (defvar mixi-message-cache (make-hash-table :test 'equal))
 (defun mixi-make-message (id box)
   "Return a message object."
@@ -1614,12 +1626,15 @@ Increase this value when unexpected error frequently occurs."
 	    (list 'mixi-get-messages (length args))))
   (let ((box (nth 0 args))
 	(max-numbers (nth 1 args)))
-    (when (or (not (stringp box)) (stringp max-numbers))
+    (when (or (not (mixi-message-box-p box))
+	      (mixi-message-box-p max-numbers))
       (setq box (nth 1 args))
       (setq max-numbers (nth 0 args)))
-    (let ((items (mixi-get-matched-items (mixi-message-list-page box)
-					 max-numbers
-					 mixi-message-list-regexp)))
+    (let ((items (mixi-get-matched-items
+		  (mixi-message-list-page
+		   (when box (mixi-message-box-name box)))
+		  max-numbers
+		  mixi-message-list-regexp)))
       (mapcar (lambda (item)
 		(mixi-make-message (nth 0 item) (nth 1 item)))
 	      items))))

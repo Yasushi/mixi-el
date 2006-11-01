@@ -1,3 +1,9 @@
+2006-11-01  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-comment-list-regexp): Fix regexp.
+	(mixi-topic-comment-list-regexp): Ditto.
+	(mixi-get-comments): Follow the change above.
+
 2006-10-28  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-message-box-list): New constant.

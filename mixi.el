@@ -1395,7 +1395,9 @@ Increase this value when unexpected error frequently occurs."
 <td>
 <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>
 
-</td>
+\\(<font color=\"#f2ddb7\">|</font> <a href=[^>]+>削除</a>
+
+\\|\\)</td>
 </tr>
 </table>
 </td>
@@ -1420,15 +1422,15 @@ Increase this value when unexpected error frequently occurs."
 <td rowspan=\"2\" width=\"110\" bgcolor=\"#f2ddb7\" align=\"center\" nowrap>
 \\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
 \\([0-9]+\\):\\([0-9]+\\)<br>
-\\(</td>\\)
-<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#f8a448\">
-<b>&nbsp;&nbsp;[0-9]+</b>:</font>&nbsp;
-
-<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>
-
-
-
 </td>
+<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#f8a448\">
+<b>[^<]+</b>:</font>&nbsp;
+\\(
+\\|\\)<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>
+
+\\(
+
+\\|\\)</td>
 </tr>
 <tr>
 <td bgcolor=\"#ffffff\" align=\"center\">
@@ -1464,7 +1466,7 @@ Increase this value when unexpected error frequently occurs."
 				    (string-to-number (nth 2 item))
 				    (string-to-number (nth 1 item))
 				    (string-to-number (nth 0 item)))
-				   (mixi-remove-markup (nth 8 item))))
+				   (mixi-remove-markup (nth 9 item))))
 	      items))))
 
 (defmacro mixi-new-comment-list-page ()

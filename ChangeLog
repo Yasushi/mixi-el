@@ -1,3 +1,10 @@
+2006-11-06  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-expand-url): New macro.
+	(mixi-w3-retrieve): Use it.
+	(mixi-w3m-retrieve): Ditto.
+	(mixi-curl-retrieve): Ditto.
+
 2006-11-01  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-comment-list-regexp): Fix regexp.

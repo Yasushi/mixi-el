@@ -221,6 +221,9 @@ Increase this value when unexpected error frequently occurs."
     (sit-for mixi-continuously-access-interval)
     (funcall mixi-retrieve-function url post-data)))
 
+(defmacro mixi-expand-url (url)
+  `(concat mixi-url ,url))
+
 (defun mixi-w3-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
   (if post-data
@@ -229,7 +232,7 @@ Increase this value when unexpected error frequently occurs."
 	(setq url-request-data post-data))
     (setq url-request-method "GET")
     (setq url-request-data nil))
-  (let* ((url (url-expand-file-name url mixi-url))
+  (let* ((url (mixi-expand-url url))
 	 (buffer (url-retrieve-synchronously url))
 	 ret)
     (unless (bufferp buffer)
@@ -253,7 +256,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-w3m-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
-  (let ((url (w3m-expand-url url mixi-url)))
+  (let ((url (mixi-expand-url url)))
     (with-temp-buffer
       (if (not (string= (w3m-retrieve url nil nil post-data) "text/html"))
 	  (error (mixi-message "Cannot retrieve"))
@@ -280,7 +283,7 @@ Increase this value when unexpected error frequently occurs."
 				 (list "-i" "-L" "-s"
 				       "-b" mixi-curl-cookie-file
 				       "-c" mixi-curl-cookie-file
-				       (concat mixi-url url)))))
+				       (mixi-expand-url url)))))
 	    (set-process-sentinel process #'ignore))
 	(set-default-file-modes orig-mode))
       (when post-data

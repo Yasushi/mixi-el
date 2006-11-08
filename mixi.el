@@ -382,6 +382,7 @@ Increase this value when unexpected error frequently occurs."
       (goto-char (point-min))
       (while (re-search-forward "" nil t)
 	(replace-match "\n" t t)))
+    ;; FIXME: Decode entities.
     (buffer-string)))
 
 ;; Cache.
@@ -461,6 +462,14 @@ Increase this value when unexpected error frequently occurs."
 			      (mixi-object-name object) "-id"))))
     (funcall func object)))
 
+(defun mixi-object-content (object)
+  "Return the content of OBJECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-content"))))
+    (funcall func object)))
+
 (defun mixi-object-set-timestamp (object timestamp)
   "Set the timestamp of OBJECT."
   (unless (mixi-object-p object)
@@ -469,6 +478,19 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-object-touch (object)
   `(mixi-object-set-timestamp ,object (current-time)))
+
+(defconst mixi-object-url-regexp
+  "/\\(show\\|view\\)_\\([a-z]+\\)\\.pl")
+
+(defun mixi-make-object-from-url (url)
+  "Return a mixi object from URL."
+  (when (string-match mixi-object-url-regexp url)
+    (let ((name (match-string 2 url)))
+      (when (string= name "bbs")
+	(setq name "topic"))
+      (let ((func (intern (concat mixi-object-prefix "make-" name
+				  "-from-url"))))
+	(funcall func url)))))
 
 ;; Friend object.
 (defvar mixi-friend-cache (make-hash-table :test 'equal))
@@ -479,12 +501,22 @@ Increase this value when unexpected error frequently occurs."
 		   mixi-friend-cache))
 
 (defun mixi-make-me ()
+  "Return a my object."
   (unless mixi-me
     (with-mixi-retrieve "/home.pl"
       (if (string-match mixi-my-id-regexp buffer)
 	  (setq mixi-me (mixi-make-friend (match-string 1 buffer)))
 	(signal 'error (list 'who-am-i)))))
   mixi-me)
+
+(defconst mixi-friend-url-regexp
+  "/show_friend\\.pl\\?id=\\([0-9]+\\)")
+
+(defun mixi-make-friend-from-url (url)
+  "Return a friend object from URL."
+  (when (string-match mixi-friend-url-regexp url)
+    (let ((id (match-string 1 url)))
+      (mixi-make-friend id))))
 
 (defmacro mixi-friend-p (friend)
   `(eq (mixi-object-class ,friend) 'mixi-friend))
@@ -834,6 +866,16 @@ Increase this value when unexpected error frequently occurs."
 		     (cons 'mixi-diary (vector nil owner id nil nil nil))
 		     mixi-diary-cache)))
 
+(defconst mixi-diary-url-regexp
+  "/view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)")
+
+(defun mixi-make-diary-from-url (url)
+  "Return a diary object from URL."
+  (when (string-match mixi-diary-url-regexp url)
+    (let ((id (match-string 1 url))
+	  (owner-id (match-string 2 url)))
+      (mixi-make-diary (mixi-make-friend owner-id) id))))
+
 (defmacro mixi-diary-p (diary)
   `(eq (mixi-object-class ,diary) 'mixi-diary))
 
@@ -977,12 +1019,22 @@ Increase this value when unexpected error frequently occurs."
 						    nil nil nil nil))
 		   mixi-community-cache))
 
+(defconst mixi-community-url-regexp
+  "/view_community\\.pl\\?id=\\([0-9]+\\)")
+
+(defun mixi-make-community-from-url (url)
+  "Return a community object from URL."
+  (when (string-match mixi-community-url-regexp url)
+    (let ((id (match-string 1 url)))
+      (mixi-make-community id))))
+
 (defmacro mixi-community-p (community)
   `(eq (mixi-object-class ,community) 'mixi-community))
 
 (defmacro mixi-community-page (community)
   `(concat "/view_community.pl?id=" (mixi-community-id ,community)))
 
+;; FIXME: Not community specific.
 (defconst mixi-community-nodata-regexp
   "^データがありません")
 (defconst mixi-community-name-regexp
@@ -1203,6 +1255,16 @@ Increase this value when unexpected error frequently occurs."
   (mixi-make-cache (list (mixi-community-id community) id)
 		   (cons 'mixi-topic (vector nil community id nil nil nil nil))
 		   mixi-topic-cache))
+
+(defconst mixi-topic-url-regexp
+  "/view_bbs\\.pl\\?id=\\([0-9]+\\)\\(&comment_count=[0-9]+\\)?&comm_id=\\([0-9]+\\)")
+
+(defun mixi-make-topic-from-url (url)
+  "Return a topic object from URL."
+  (when (string-match mixi-topic-url-regexp url)
+    (let ((id (match-string 1 url))
+	  (community-id (match-string 3 url)))
+      (mixi-make-topic (mixi-make-community community-id) id))))
 
 (defmacro mixi-topic-p (topic)
   `(eq (mixi-object-class ,topic) 'mixi-topic))
@@ -1509,6 +1571,16 @@ Increase this value when unexpected error frequently occurs."
   (mixi-make-cache (list id box)
 		   (cons 'mixi-message (vector nil id box nil nil nil nil))
 		   mixi-message-cache))
+
+(defconst mixi-message-url-regexp
+  "/view_message\\.pl\\?id=\\([a-z0-9]+\\)&box=\\([a-z]+\\)")
+
+(defun mixi-make-message-from-url (url)
+  "Return a message object from URL."
+  (when (string-match mixi-message-url-regexp url)
+    (let ((id (match-string 1 url))
+	  (box (match-string 2 url)))
+      (mixi-make-message id box))))
 
 (defmacro mixi-message-p (message)
   `(eq (mixi-object-class ,message) 'mixi-message))

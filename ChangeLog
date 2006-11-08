@@ -1,3 +1,19 @@
+2006-11-08  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-object-url-regexp): New regexp.
+	(mixi-friend-url-regexp): Ditto.
+	(mixi-diary-url-regexp): Ditto.
+	(mixi-topic-url-regexp): Ditto.
+	(mixi-message-url-regexp): Ditto.
+	(mixi-community-url-regexp): Ditto.
+	(mixi-object-content): New function.
+	(mixi-make-object-from-url): Ditto.
+	(mixi-make-friend-from-url): Ditto.
+	(mixi-make-diary-from-url): Ditto.
+	(mixi-make-community-from-url): Ditto.
+	(mixi-make-topic-from-url): Ditto.
+	(mixi-make-message-from-url): Ditto.
+
 2006-11-06  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-expand-url): New macro.

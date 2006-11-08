@@ -1,5 +1,15 @@
 2006-11-08  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-friend-realize): Don't remove markup.
+	(mixi-diary-realize): Ditto.
+	(mixi-community-realize): Ditto.
+	(mixi-topic-realize): Ditto.
+	(mixi-get-comments): Ditto.
+	(mixi-message-realize): Ditto.
+	(mixi-get-introductions): Ditto.
+
+2006-11-08  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-object-url-regexp): New regexp.
 	(mixi-friend-url-regexp): Ditto.
 	(mixi-diary-url-regexp): Ditto.

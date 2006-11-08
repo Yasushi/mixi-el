@@ -38,6 +38,10 @@
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
 ;;  * mixi-get-introductions
+;; 
+;; Utilities:
+;;
+;;  * mixi-remove-markup
 
 ;; Example:
 ;;
@@ -53,7 +57,7 @@
 ;; 		;; retrieval.
 ;; 		(from (mixi-friend-nick (mixi-diary-owner diary)))
 ;; 		(date (format-time-string format (mixi-diary-time diary)))
-;; 		(body (mixi-diary-content diary)))
+;; 		(body (mixi-remove-markup (mixi-diary-content diary))))
 ;; 	    (insert "From: " from "\n"
 ;; 		    "Subject: " subject "\n"
 ;; 		    "Date: " date "\n\n"
@@ -76,7 +80,7 @@
 ;;  		;; retrieval.
 ;;  		(from (mixi-friend-nick (mixi-diary-owner diary)))
 ;; 		(date (format-time-string format (mixi-diary-time diary)))
-;; 		(body (mixi-diary-content diary)))
+;; 		(body (mixi-remove-markup (mixi-diary-content diary))))
 ;; 	    (insert "From: " from "\n"
 ;; 		    "Subject: " subject "\n"
 ;; 		    "Date: " date "\n\n"
@@ -87,7 +91,8 @@
 ;; 			  (subject (concat "Re: " subject))
 ;; 			  (date (format-time-string
 ;; 				 format (mixi-comment-time comment)))
-;; 			  (body (mixi-comment-content comment)))
+;; 			  (body (mixi-remove-markup
+;; 				 (mixi-comment-content comment))))
 ;; 		      (insert "From: " from "\n"
 ;; 			      "Subject: " subject "\n"
 ;; 			      "Date: " date "\n\n"
@@ -589,8 +594,7 @@ Increase this value when unexpected error frequently occurs."
       (when (string-match mixi-friend-organization-regexp buf)
 	(mixi-friend-set-organization friend (match-string 2 buf)))
       (when (string-match mixi-friend-profile-regexp buf)
-	(mixi-friend-set-profile
-	 friend (mixi-remove-markup (match-string 1 buf)))))
+	(mixi-friend-set-profile friend (match-string 1 buf))))
     (mixi-object-touch friend)))
 
 (defun mixi-friend-id (friend)
@@ -914,8 +918,7 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-diary-set-title diary (match-string 1 buffer))
 	(signal 'error (list 'cannot-find-title diary)))
       (if (string-match mixi-diary-content-regexp buffer)
-	  (mixi-diary-set-content diary (mixi-remove-markup
-					 (match-string 1 buffer)))
+	  (mixi-diary-set-content diary (match-string 1 buffer))
 	(signal 'error (list 'cannot-find-content diary))))
     (mixi-object-touch diary)))
 
@@ -1095,8 +1098,7 @@ Increase this value when unexpected error frequently occurs."
 	    (mixi-community-set-authority community (match-string 1 buffer))
 	  (signal 'error (list 'cannot-find-authority community)))
 	(if (string-match mixi-community-description-regexp buffer)
-	    (mixi-community-set-description
-	     community (mixi-remove-markup (match-string 1 buffer)))
+	    (mixi-community-set-description community (match-string 1 buffer))
 	  (signal 'error (list 'cannot-find-description community)))))
     (mixi-object-touch community)))
 
@@ -1305,8 +1307,7 @@ Increase this value when unexpected error frequently occurs."
 						  (match-string 2 buffer)))
 	(signal 'error (list 'cannot-find-owner topic)))
       (if (string-match mixi-topic-content-regexp buffer)
-	  (mixi-topic-set-content topic (mixi-remove-markup
-					 (match-string 2 buffer)))
+	  (mixi-topic-set-content topic (match-string 2 buffer))
 	(signal 'error (list 'cannot-find-content topic))))
     (mixi-object-touch topic)))
 
@@ -1531,7 +1532,7 @@ Increase this value when unexpected error frequently occurs."
 				    (string-to-number (nth 2 item))
 				    (string-to-number (nth 1 item))
 				    (string-to-number (nth 0 item)))
-				   (mixi-remove-markup (nth 9 item))))
+				   (nth 9 item)))
 	      items))))
 
 (defmacro mixi-new-comment-list-page ()
@@ -1620,8 +1621,7 @@ Increase this value when unexpected error frequently occurs."
 				(string-to-number (match-string 1 buffer))))
 	(signal 'error (list 'cannot-find-time message)))
       (if (string-match mixi-message-content-regexp buffer)
-	  (mixi-message-set-content message (mixi-remove-markup
-					     (match-string 1 buffer)))
+	  (mixi-message-set-content message (match-string 1 buffer))
 	(signal 'error (list 'cannot-find-content message))))
     (mixi-object-touch message)))
 
@@ -1808,7 +1808,7 @@ Increase this value when unexpected error frequently occurs."
 		(mixi-make-introduction (or friend (mixi-make-me))
 					(mixi-make-friend (nth 0 item)
 							  (nth 1 item))
-					(mixi-remove-markup (nth 2 item))))
+					(nth 2 item)))
 	      items))))
 
 (provide 'mixi)

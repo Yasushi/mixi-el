@@ -459,12 +459,36 @@ Increase this value when unexpected error frequently occurs."
   (aref (cdr object) 0))
 (defalias 'mixi-object-realize-p 'mixi-object-timestamp)
 
+(defun mixi-object-owner (object)
+  "Return the owner of OBJECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-owner"))))
+    (funcall func object)))
+
 (defun mixi-object-id (object)
   "Return the id of OBJECT."
   (unless (mixi-object-p object)
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
   (let ((func (intern (concat mixi-object-prefix
 			      (mixi-object-name object) "-id"))))
+    (funcall func object)))
+
+(defun mixi-object-time (object)
+  "Return the time of OBJECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-time"))))
+    (funcall func object)))
+
+(defun mixi-object-title (object)
+  "Return the title of OBJECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-title"))))
     (funcall func object)))
 
 (defun mixi-object-content (object)

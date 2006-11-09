@@ -1,5 +1,11 @@
 2006-11-09  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-object-owner): New accessor method.
+	(mixi-object-time): Ditto.
+	(mixi-object-title): Ditto.
+
+2006-11-09  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-make-friend-from-url): Support my object.
 	(mixi-make-object-from-url): Ditto.
 
@@ -21,13 +27,13 @@
 	(mixi-topic-url-regexp): Ditto.
 	(mixi-message-url-regexp): Ditto.
 	(mixi-community-url-regexp): Ditto.
-	(mixi-object-content): New function.
-	(mixi-make-object-from-url): Ditto.
+	(mixi-make-object-from-url): New function.
 	(mixi-make-friend-from-url): Ditto.
 	(mixi-make-diary-from-url): Ditto.
 	(mixi-make-community-from-url): Ditto.
 	(mixi-make-topic-from-url): Ditto.
 	(mixi-make-message-from-url): Ditto.
+	(mixi-object-content): New accessor method.
 
 2006-11-06  OHASHI Akira  <bg66@koka-in.org>
 

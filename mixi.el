@@ -519,9 +519,11 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-make-friend-from-url (url)
   "Return a friend object from URL."
-  (when (string-match mixi-friend-url-regexp url)
-    (let ((id (match-string 1 url)))
-      (mixi-make-friend id))))
+  (if (string-match mixi-friend-url-regexp url)
+      (let ((id (match-string 1 url)))
+	(mixi-make-friend id))
+    (when (string-match "/home\\.pl" url)
+      (mixi-make-me))))
 
 (defmacro mixi-friend-p (friend)
   `(eq (mixi-object-class ,friend) 'mixi-friend))

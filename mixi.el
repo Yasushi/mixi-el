@@ -489,13 +489,15 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-make-object-from-url (url)
   "Return a mixi object from URL."
-  (when (string-match mixi-object-url-regexp url)
-    (let ((name (match-string 2 url)))
-      (when (string= name "bbs")
-	(setq name "topic"))
-      (let ((func (intern (concat mixi-object-prefix "make-" name
-				  "-from-url"))))
-	(funcall func url)))))
+  (if (string-match mixi-object-url-regexp url)
+      (let ((name (match-string 2 url)))
+	(when (string= name "bbs")
+	  (setq name "topic"))
+	(let ((func (intern (concat mixi-object-prefix "make-" name
+				    "-from-url"))))
+	  (funcall func url)))
+    (when (string-match "/home\\.pl" url)
+      (mixi-make-friend-from-url url))))
 
 ;; Friend object.
 (defvar mixi-friend-cache (make-hash-table :test 'equal))

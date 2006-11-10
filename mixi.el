@@ -872,7 +872,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_log.pl"))
 
 (defconst mixi-log-list-regexp
-  "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a><br>")
+  "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a><br>")
 
 (defun mixi-get-logs (&optional max-numbers)
   "Get logs."
@@ -1074,7 +1074,7 @@ Increase this value when unexpected error frequently occurs."
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>開設日</font></td>\n<td>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
 ;; FIXME: Care when the owner has seceded.
 (defconst mixi-community-owner-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>管理人</font></td>\n<td>\n\n<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\n\\(.+\\)</a>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>管理人</font></td>\n<td>\n\n<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\n\\(.*\\)</a>")
 (defconst mixi-community-category-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>カテゴリ</font></td>\n<td>\\([^<]+\\)</td>")
 (defconst mixi-community-members-regexp
@@ -1309,9 +1309,9 @@ Increase this value when unexpected error frequently occurs."
   "<td bgcolor=\"#fff4e0\">&nbsp;\\([^<]+\\)</td>")
 ;; FIXME: Remove `さん'.
 (defconst mixi-topic-owner-regexp
-  "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)\\(さん\\)?</a>")
+  "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(さん\\)?</a>")
 (defconst mixi-topic-content-regexp
-  "<td class=\"h120\"><table><tr>\\(.+\\)?</tr></table>\\(.+\\)</td>")
+  "<td class=\"h120\"><table><tr>\\(.+\\)?\n?</tr></table>\\(.+\\)</td>")
 
 (defun mixi-topic-realize (topic)
   "Realize a TOPIC."
@@ -1487,7 +1487,7 @@ Increase this value when unexpected error frequently occurs."
 <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"410\">
 <tr>
 <td>
-<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>
+<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
 
 \\(<font color=\"#f2ddb7\">|</font> <a href=[^>]+>削除</a>
 
@@ -1520,7 +1520,7 @@ Increase this value when unexpected error frequently occurs."
 <td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#f8a448\">
 <b>[^<]+</b>:</font>&nbsp;
 \\(
-\\|\\)<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>
+\\|\\)<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
 
 \\(
 
@@ -1619,7 +1619,7 @@ Increase this value when unexpected error frequently occurs."
 	   "&box=" (mixi-message-box ,message)))
 
 (defconst mixi-message-owner-regexp
-  "<font COLOR=#996600>差出人</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\)</a>")
+  "<font COLOR=#996600>差出人</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
 (defconst mixi-message-title-regexp
   "<font COLOR=#996600>件　名</font>&nbsp;:&nbsp;\\(.+\\)
 </td>")
@@ -1777,7 +1777,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-introduction-list-regexp
   "<tr bgcolor=#FFFFFF>
 <td WIDTH=150 background=http://img\\.mixi\\.jp/img/bg_line\\.gif align=\"center\"><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\"><img src=\".+\" border=0><br>
-\\(.+\\)</td></a>
+\\(.*\\)</td></a>
 
 <td WIDTH=480>
 \\(関係：.+<br>
@@ -1794,7 +1794,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-my-introduction-list-regexp
   "<tr bgcolor=#FFFFFF>
 <td WIDTH=150 background=http://img\\.mixi\\.jp/img/bg_line\\.gif align=\"center\"><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\"><img src=\".+\" border=0><br>
-\\(.+\\)</td></a>
+\\(.*\\)</td></a>
 
 
 <td WIDTH=480>

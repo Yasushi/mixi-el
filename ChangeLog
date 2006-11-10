@@ -1,3 +1,15 @@
+2006-11-10  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-log-list-regexp): Fix regexp.
+	(mixi-community-owner-regexp): Ditto.
+	(mixi-topic-owner-regexp): Ditto.
+	(mixi-topic-content-regexp): Ditto.
+	(mixi-diary-comment-list-regexp): Ditto.
+	(mixi-topic-comment-list-regexp): Ditto.
+	(mixi-message-owner-regexp): Ditto.
+	(mixi-introduction-list-regexp): Ditto.
+	(mixi-my-introduction-list-regexp): Ditto.
+
 2006-11-09  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-object-owner): New accessor method.

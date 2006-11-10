@@ -136,7 +136,6 @@ FUNCTION is the function for getting articles."
 					 &optional range)
   (let ((url-or-function (cdr (assoc (shimbun-current-group-internal shimbun)
 				     shimbun-mixi-group-alist)))
-	;; FIXME: Magic number.
 	(range (when (integerp range) (* range shimbun-mixi-page-articles)))
 	objects)
     (if (stringp url-or-function)

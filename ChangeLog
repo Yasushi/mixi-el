@@ -1,5 +1,9 @@
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-expand-url): Don't expand twice.
+
+2006-11-10  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-log-list-regexp): Fix regexp.
 	(mixi-community-owner-regexp): Ditto.
 	(mixi-topic-owner-regexp): Ditto.

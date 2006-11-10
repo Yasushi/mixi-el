@@ -227,7 +227,9 @@ Increase this value when unexpected error frequently occurs."
     (funcall mixi-retrieve-function url post-data)))
 
 (defmacro mixi-expand-url (url)
-  `(concat mixi-url ,url))
+  `(if (string-match (concat "^" mixi-url) ,url)
+       ,url
+     (concat mixi-url ,url)))
 
 (defun mixi-w3-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."

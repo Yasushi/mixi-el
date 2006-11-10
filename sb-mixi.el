@@ -34,6 +34,7 @@
 (defcustom shimbun-mixi-group-alist '(("new-diaries" . mixi-get-new-diaries)
 				      ("new-comments" . mixi-get-new-comments)
 				      ("new-topics" . mixi-get-new-topics)
+				      ("messages" . mixi-get-messages)
 				      ("my-diaries" . "/home.pl"))
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
@@ -49,6 +50,7 @@ FUNCTION is the function for getting articles."
 			      (const :tag "New diaries" mixi-get-new-diaries)
 			      (const :tag "New comments" mixi-get-new-comments)
 			      (const :tag "New topics" mixi-get-new-topics)
+			      (const :tag "Messages" mixi-get-messages)
 			      (function :tag "Other function")))))
 
 (defcustom shimbun-mixi-page-articles 10
@@ -101,7 +103,9 @@ FUNCTION is the function for getting articles."
 	   (mixi-expand-url (mixi-topic-page object)))
 	  ((eq class 'mixi-comment)
 	   (concat (shimbun-mixi-make-xref (mixi-comment-parent object))
-		   "#comment")))))
+		   "#comment"))
+	  ((eq class 'mixi-message)
+	   (mixi-expand-url (mixi-message-page object))))))
 
 (defun shimbun-mixi-get-headers (shimbun objects &optional range)
   (when objects

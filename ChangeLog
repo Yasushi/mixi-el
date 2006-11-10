@@ -1,5 +1,9 @@
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-get-new-comments): Return diaries instead of comments.
+
+2006-11-10  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el: (shimbun-mixi-group-alist): Add `messages' to default
 	value.
 	(shimbun-mixi-make-xref): Follow the change above.

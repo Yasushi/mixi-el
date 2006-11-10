@@ -1577,10 +1577,8 @@ Increase this value when unexpected error frequently occurs."
 				       max-numbers
 				       mixi-new-comment-list-regexp)))
     (mapcar (lambda (item)
-	      (let ((diary (mixi-make-diary
-			    (mixi-make-friend (nth 1 item))
-			    (nth 0 item))))
-		(mixi-get-comments diary)))
+	      ;; FIXME: Return comments?
+	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
 	    items)))
 
 ;; Message object.

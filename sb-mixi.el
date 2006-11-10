@@ -103,33 +103,39 @@ FUNCTION is the function for getting articles."
 	   (concat (shimbun-mixi-make-xref (mixi-comment-parent object))
 		   "#comment")))))
 
-(defun shimbun-mixi-get-headers (objects &optional range)
+(defun shimbun-mixi-get-headers (shimbun objects &optional range)
   (when objects
     (let (headers)
-      (mapc (lambda (object)
-	      (when (mixi-object-p object)
-		(let ((class (mixi-object-class object)))
-		  (push
-		   (shimbun-create-header
-		    0
-		    (shimbun-mixi-make-subject object)
-		    (shimbun-mixi-make-from object)
-		    (shimbun-mixi-make-date object)
-		    (shimbun-mixi-make-message-id object)
-		    (if (eq class 'mixi-comment)
-			(shimbun-mixi-make-message-id
-			 (mixi-comment-parent object))
-		      "")
-		    0 0
-		    (shimbun-mixi-make-xref object))
-		   headers)
-		  (when (or (eq class 'mixi-diary)
-			    (eq class 'mixi-topic))
-		    (let ((comments (mixi-get-comments object range)))
-		      (mapc (lambda (header)
-			      (push header headers))
-			    (shimbun-mixi-get-headers comments)))))))
-	    objects)
+      (catch 'stop
+	(mapc (lambda (object)
+		(when (mixi-object-p object)
+		  (let ((class (mixi-object-class object))
+			(id (shimbun-mixi-make-message-id object)))
+		    (when (and (eq class 'mixi-comment)
+			       (shimbun-search-id shimbun id))
+		      (throw 'stop nil))
+		    (push
+		     (shimbun-create-header
+		      0
+		      (shimbun-mixi-make-subject object)
+		      (shimbun-mixi-make-from object)
+		      (shimbun-mixi-make-date object)
+		      id
+		      (if (eq class 'mixi-comment)
+			  (shimbun-mixi-make-message-id
+			   (mixi-comment-parent object))
+			"")
+		      0 0
+		      (shimbun-mixi-make-xref object))
+		     headers)
+		    (when (or (eq class 'mixi-diary)
+			      (eq class 'mixi-topic))
+		      (let ((comments (mixi-get-comments object range)))
+			(mapc (lambda (header)
+				(push header headers))
+			      (shimbun-mixi-get-headers shimbun
+							comments)))))))
+	      objects))
       headers)))
 
 (luna-define-method shimbun-get-headers ((shimbun shimbun-mixi)
@@ -151,7 +157,7 @@ FUNCTION is the function for getting articles."
 				  " is not supported yet.")))))
       (when (fboundp url-or-function)
 	(setq objects (funcall url-or-function range))))
-    (shimbun-sort-headers (shimbun-mixi-get-headers objects range))))
+    (shimbun-sort-headers (shimbun-mixi-get-headers shimbun objects range))))
 
 (defun shimbun-comment-article (url header)
   (let ((parent (mixi-make-object-from-url url))

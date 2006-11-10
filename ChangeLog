@@ -1,5 +1,11 @@
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el: (shimbun-mixi-get-headers): Stop getting comment's
+	headers when it was already shown.
+	(shimbun-get-headers): Follow the change above.
+
+2006-11-10  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el: New file.
 
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>

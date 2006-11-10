@@ -4,13 +4,13 @@
 
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>
 
-	* sb-mixi.el: (shimbun-mixi-group-alist): Add `messages' to default
+	* sb-mixi.el (shimbun-mixi-group-alist): Add `messages' to default
 	value.
 	(shimbun-mixi-make-xref): Follow the change above.
 
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>
 
-	* sb-mixi.el: (shimbun-mixi-get-headers): Stop getting comment's
+	* sb-mixi.el (shimbun-mixi-get-headers): Stop getting comment's
 	headers when it was already shown.
 	(shimbun-get-headers): Follow the change above.
 

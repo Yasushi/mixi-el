@@ -33,7 +33,7 @@
 
 (defcustom shimbun-mixi-group-alist '(("new-diaries" . mixi-get-new-diaries)
 				      ("new-comments" . mixi-get-new-comments)
-				      ("new-topics" . mixi-get-new-topics)
+;				      ("new-topics" . mixi-get-new-topics)
 				      ("messages" . mixi-get-messages)
 				      ("my-diaries" . "/home.pl"))
   "*An alist of mixi shimbun group definition.

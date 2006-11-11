@@ -1313,7 +1313,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-topic-owner-regexp
   "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(さん\\)?</a>")
 (defconst mixi-topic-content-regexp
-  "<td class=\"h120\"><table><tr>\\(.+\\)?\n?</tr></table>\\(.+\\)</td>")
+  "<td class=\"h120\"><table><tr>\\(.+\\)?\n?\\(.+\\)?\n?\\(.+\\)?\n?</tr></table>\\(.+\\)</td>")
 
 (defun mixi-topic-realize (topic)
   "Realize a TOPIC."
@@ -1337,7 +1337,7 @@ Increase this value when unexpected error frequently occurs."
 						  (match-string 2 buffer)))
 	(signal 'error (list 'cannot-find-owner topic)))
       (if (string-match mixi-topic-content-regexp buffer)
-	  (mixi-topic-set-content topic (match-string 2 buffer))
+	  (mixi-topic-set-content topic (match-string 4 buffer))
 	(signal 'error (list 'cannot-find-content topic))))
     (mixi-object-touch topic)))
 
@@ -1488,7 +1488,7 @@ Increase this value when unexpected error frequently occurs."
 <td ALIGN=center BGCOLOR=#FDF9F2 WIDTH=430>
 <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"410\">
 <tr>
-<td>
+\\(<td>\\)
 <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
 
 \\(<font color=\"#f2ddb7\">|</font> <a href=[^>]+>削除</a>
@@ -1518,13 +1518,14 @@ Increase this value when unexpected error frequently occurs."
 <td rowspan=\"2\" width=\"110\" bgcolor=\"#f2ddb7\" align=\"center\" nowrap>
 \\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
 \\([0-9]+\\):\\([0-9]+\\)<br>
-</td>
+\\(<input type=\"checkbox\" name=\"comment_id\" value=\".+\">
+\\|\\)</td>
 <td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#f8a448\">
 <b>[^<]+</b>:</font>&nbsp;
 \\(
-\\|\\)<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
+\\|\\) *<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
 
-\\(
+?\\(
 
 \\|\\)</td>
 </tr>
@@ -1554,7 +1555,7 @@ Increase this value when unexpected error frequently occurs."
 		  (funcall list-page parent) max-numbers regexp)))
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
-					   (nth 6 item) (nth 7 item))
+					   (nth 7 item) (nth 8 item))
 				   (encode-time
 				    0
 				    (string-to-number (nth 4 item))
@@ -1562,7 +1563,7 @@ Increase this value when unexpected error frequently occurs."
 				    (string-to-number (nth 2 item))
 				    (string-to-number (nth 1 item))
 				    (string-to-number (nth 0 item)))
-				   (nth 9 item)))
+				   (nth 10 item)))
 	      items))))
 
 (defmacro mixi-new-comment-list-page ()

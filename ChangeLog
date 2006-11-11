@@ -1,5 +1,13 @@
 2006-11-11  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-topic-content-regexp): Fix regexp.
+	(mixi-topic-realize): Follow the change above.
+	(mixi-topic-comment-list-regexp): Fix regexp.
+	(mixi-diary-comment-list-regexp): Follow the change above.
+	(mixi-get-comments): Ditto.
+
+2006-11-11  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-topic-comment-list-page): Use `all' instead of '%d'.
 
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>

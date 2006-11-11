@@ -1,3 +1,7 @@
+2006-11-11  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-topic-comment-list-page): Use `all' instead of '%d'.
+
 2006-11-10  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-get-new-comments): Return diaries instead of comments.

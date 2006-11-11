@@ -1508,7 +1508,7 @@ Increase this value when unexpected error frequently occurs."
 </td></tr></table>")
 
 (defun mixi-topic-comment-list-page (topic)
-  (concat "/view_bbs.pl?page=%d"
+  (concat "/view_bbs.pl?page=all"
 	  "&id=" (mixi-topic-id topic)
 	  "&comm_id=" (mixi-community-id (mixi-topic-community topic))))
 

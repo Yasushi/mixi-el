@@ -1,3 +1,8 @@
+2006-11-20  OHASHI Akira  <bg66@koka-in.org>
+
+	* sb-mixi.el (shimbun-mixi-get-comment-p): New user option.
+	(shimbun-mixi-get-headers): Use it.
+
 2006-11-11  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-topic-content-regexp): Fix regexp.

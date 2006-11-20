@@ -58,6 +58,11 @@ FUNCTION is the function for getting articles."
   :group 'shimbun
   :type 'integer)
 
+(defcustom shimbun-mixi-get-comment-p t
+  "*If non-nil, get diaries or topics together with its comments."
+  :group 'shimbun
+  :type 'boolean)
+
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
   (mapcar 'car shimbun-mixi-group-alist))
 
@@ -132,8 +137,9 @@ FUNCTION is the function for getting articles."
 		      0 0
 		      (shimbun-mixi-make-xref object))
 		     headers)
-		    (when (or (eq class 'mixi-diary)
-			      (eq class 'mixi-topic))
+		    (when (and shimbun-mixi-get-comment-p
+			       (or (eq class 'mixi-diary)
+				   (eq class 'mixi-topic)))
 		      (let ((comments (mixi-get-comments object range)))
 			(mapc (lambda (header)
 				(push header headers))

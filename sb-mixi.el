@@ -165,8 +165,7 @@ FUNCTION is the function for getting articles."
 		 (setq objects (mixi-get-comments object range)))
 		(t (error (concat (symbol-name class)
 				  " is not supported yet.")))))
-      (when (fboundp url-or-function)
-	(setq objects (funcall url-or-function range))))
+      (setq objects (funcall url-or-function range)))
     (shimbun-sort-headers (shimbun-mixi-get-headers shimbun objects range))))
 
 (defun shimbun-comment-article (url header)

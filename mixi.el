@@ -1621,12 +1621,11 @@ Increase this value when unexpected error frequently occurs."
 	   "&box=" (mixi-message-box ,message)))
 
 (defconst mixi-message-owner-regexp
-  "<font COLOR=#996600>差出人</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
+  "<font COLOR=#996600>\\(差出人\\|宛&nbsp;先\\)</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(</a>\\|</td>\\)")
 (defconst mixi-message-title-regexp
-  "<font COLOR=#996600>件　名</font>&nbsp;:&nbsp;\\(.+\\)
-</td>")
+"<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.+\\)\n?</td>")
 (defconst mixi-message-time-regexp
-  "<font COLOR=#996600>日　付</font>&nbsp;:&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分&nbsp;&nbsp;")
+"<font COLOR=#996600>日\\(　\\|&nbsp;\\)付</font>&nbsp;:&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分&nbsp;&nbsp;")
 (defconst mixi-message-content-regexp
   "<tr><td CLASS=h120>\\(.+\\)</td></tr>")
 
@@ -1636,19 +1635,19 @@ Increase this value when unexpected error frequently occurs."
     (with-mixi-retrieve (mixi-message-page message)
       (if (string-match mixi-message-owner-regexp buffer)
 	  (mixi-message-set-owner message
-				  (mixi-make-friend (match-string 1 buffer)
-						    (match-string 2 buffer)))
+				  (mixi-make-friend (match-string 2 buffer)
+						    (match-string 3 buffer)))
 	(signal 'error (list 'cannot-find-owner message)))
       (if (string-match mixi-message-title-regexp buffer)
-	  (mixi-message-set-title message (match-string 1 buffer))
+	  (mixi-message-set-title message (match-string 2 buffer))
 	(signal 'error (list 'cannot-find-title message)))
       (if (string-match mixi-message-time-regexp buffer)
 	  (mixi-message-set-time
-	   message (encode-time 0 (string-to-number (match-string 5 buffer))
+	   message (encode-time 0 (string-to-number (match-string 6 buffer))
+				(string-to-number (match-string 5 buffer))
 				(string-to-number (match-string 4 buffer))
 				(string-to-number (match-string 3 buffer))
-				(string-to-number (match-string 2 buffer))
-				(string-to-number (match-string 1 buffer))))
+				(string-to-number (match-string 2 buffer))))
 	(signal 'error (list 'cannot-find-time message)))
       (if (string-match mixi-message-content-regexp buffer)
 	  (mixi-message-set-content message (match-string 1 buffer))

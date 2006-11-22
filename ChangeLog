@@ -1,5 +1,12 @@
 2006-11-22  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-message-owner-regexp): Fix regexp.
+	(mixi-message-title-regexp): Ditto.
+	(mixi-message-time-regexp): Ditto.
+	(mixi-message-realize): Follow the change above.
+
+2006-11-22  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-log-list-regexp): Fix regexp.
 
 2006-11-22  OHASHI Akira  <bg66@koka-in.org>

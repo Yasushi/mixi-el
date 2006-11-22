@@ -1,5 +1,9 @@
 2006-11-22  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-log-list-regexp): Fix regexp.
+
+2006-11-22  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-comment-article): Simplify.
 
 2006-11-22  KAMO Tomoyuki  <kto2038@yahoo.co.jp>

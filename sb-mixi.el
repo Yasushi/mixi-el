@@ -172,19 +172,14 @@ FUNCTION is the function for getting articles."
 (defun shimbun-comment-article (url header)
   (let ((parent (mixi-make-object-from-url url))
 	(date (shimbun-header-date header))
-	(from (shimbun-header-from header)))
+	(message-id (shimbun-header-id header)))
     (catch 'found
       (mapc (lambda (comment)
-	      (let ((nick (mixi-friend-nick (mixi-comment-owner comment)))
-		    (time (shimbun-mixi-make-date comment))
-		    nick2)
-		;; FIXME: How tricky it is.
-		(when (string-match "\\(.+\\)¤µ¤ó$" nick)
-		  (setq nick2 (match-string 1 nick)))
-		(when (and
-		       (or (string= (shimbun-mime-encode-string nick) from)
-			   (string= (shimbun-mime-encode-string nick2) from))
-		       (string= time date))
+	      (let ((id (mixi-friend-id (mixi-comment-owner comment)))
+		    (time (shimbun-mixi-make-date comment)))
+		(when (and (string= time date)
+			   (string-match (concat "^<[0-9]+\\." id "@")
+					 message-id))
 		  ;; FIXME: Concat parent's information?
 		  (throw 'found (mixi-comment-content comment)))))
 	    ;; FIXME: Limit range?

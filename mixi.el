@@ -254,7 +254,7 @@ Increase this value when unexpected error frequently occurs."
 	(unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
 	  (error (mixi-message "Cannot retrieve")))
 	(search-forward "\n\n")
-	(setq ret (mm-decode-coding-string
+	(setq ret (decode-coding-string
 		   (buffer-substring-no-properties (point) (point-max))
 		   mixi-coding-system))
 	(kill-buffer buffer)

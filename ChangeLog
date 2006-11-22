@@ -1,5 +1,10 @@
 2006-11-22  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-w3-retrieve): Use `decode-coding-string' instead of
+	`mm-decode-coding-string'.
+
+2006-11-22  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-get-headers): Simplify.
 
 2006-11-22  OHASHI Akira  <bg66@koka-in.org>

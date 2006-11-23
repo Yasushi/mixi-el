@@ -136,7 +136,7 @@
 	  (progn
 	    (require 'url)
 	    (if (fboundp 'url-retrieve-synchronously)
-		'mixi-w3-retrieve))
+		'mixi-url-retrieve))
 	(error))
       (condition-case nil
 	  (progn
@@ -148,7 +148,7 @@
 	  'mixi-curl-retrieve)
       (error "Can't set `mixi-retrieve-function'"))
   "*The function for retrieving."
-  :type '(radio (const :tag "Using w3" mixi-w3-retrieve)
+  :type '(radio (const :tag "Using url" mixi-url-retrieve)
 		(const :tag "Using w3m" mixi-w3m-retrieve)
 		(const :tag "Using curl" mixi-curl-retrieve)
 		(function :format "Other function: %v\n" :size 0))
@@ -231,7 +231,7 @@ Increase this value when unexpected error frequently occurs."
        ,url
      (concat mixi-url ,url)))
 
-(defun mixi-w3-retrieve (url &optional post-data)
+(defun mixi-url-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
   (if post-data
       (progn
@@ -249,8 +249,8 @@ Increase this value when unexpected error frequently occurs."
       (if (re-search-forward "HTTP/[0-9.]+ 302 Moved" nil t)
 	  (if (re-search-forward
 	       (concat "Location: " mixi-url "\\(.+\\)") nil t)
-	      (setq ret (mixi-w3-retrieve (match-string 1) post-data))
-	    (setq ret (mixi-w3-retrieve "/home.pl" post-data)))
+	      (setq ret (mixi-url-retrieve (match-string 1) post-data))
+	    (setq ret (mixi-url-retrieve "/home.pl" post-data)))
 	(unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
 	  (error (mixi-message "Cannot retrieve")))
 	(search-forward "\n\n")

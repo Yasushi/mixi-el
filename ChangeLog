@@ -1,3 +1,8 @@
+2006-11-23  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-url-retrieve): Rename from `mixi-w3-retrieve'.
+	(mixi-retrieve-function): Follow the change above.
+
 2006-11-22  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-w3-retrieve): Use `decode-coding-string' instead of

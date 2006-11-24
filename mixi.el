@@ -213,18 +213,21 @@ Increase this value when unexpected error frequently occurs."
 受けられましたので、一時的に操作を停止させていただきます。申し訳ございま<br>
 せんが、しばらくの間お待ちください。")
 
+(defmacro mixi-retrieve (url &optional post-data)
+  `(funcall mixi-retrieve-function ,url ,post-data))
+
 (defun mixi-retrieve-1 (buffer url &optional post-data)
   (when (string-match mixi-message-adult-contents buffer)
     (if mixi-accept-adult-contents
-	(setq buffer (funcall mixi-retrieve-function url "submit=agree"))
-      (setq buffer (funcall mixi-retrieve-function (concat url "?")))))
+	(setq buffer (mixi-retrieve url "submit=agree"))
+      (setq buffer (mixi-retrieve (concat url "?")))))
   (when (string-match mixi-warning-continuously-accessing buffer)
     (error (mixi-message "Continuously accessing")))
   (if (not (string-match mixi-message-continuously-accessing buffer))
       buffer
     (message (mixi-message "Waiting for continuously accessing..."))
     (sit-for mixi-continuously-access-interval)
-    (funcall mixi-retrieve-function url post-data)))
+    (mixi-retrieve url post-data)))
 
 (defmacro mixi-expand-url (url)
   `(if (string-match (concat "^" mixi-url) ,url)
@@ -321,28 +324,28 @@ Increase this value when unexpected error frequently occurs."
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
 		      (read-passwd (mixi-message "Login Password: ")))))
-    (let ((buffer (funcall mixi-retrieve-function "/login.pl"
-			   (concat "email=" email
-				   "&password=" password
-				   "&next_url=/home.pl"
-				   "&sticky=on"))))
+    (let ((buffer (mixi-retrieve "/login.pl"
+				 (concat "email=" email
+					 "&password=" password
+					 "&next_url=/home.pl"
+					 "&sticky=on"))))
       (unless (string-match "url=/check\\.pl\\?n=" buffer)
 	(error (mixi-message "Cannot login")))
-      (setq buffer (funcall mixi-retrieve-function "/check.pl?n=home.pl"))
+      (setq buffer (mixi-retrieve "/check.pl?n=home.pl"))
       (if (string-match mixi-my-id-regexp buffer)
 	  (setq mixi-me (mixi-make-friend (match-string 1 buffer)))
 	(error (mixi-message "Cannot login"))))))
 
 (defun mixi-logout ()
-  (funcall mixi-retrieve-function "/logout.pl"))
+  (mixi-retrieve "/logout.pl"))
 
 (defmacro with-mixi-retrieve (url &rest body)
   `(let (buffer)
      (when ,url
-       (setq buffer (funcall mixi-retrieve-function ,url))
+       (setq buffer (mixi-retrieve ,url))
        (when (string-match "login.pl" buffer)
 	 (mixi-login)
-	 (setq buffer (funcall mixi-retrieve-function ,url))))
+	 (setq buffer (mixi-retrieve ,url))))
      ,@body))
 (put 'with-mixi-retrieve 'lisp-indent-function 'defun)
 (put 'with-mixi-retrieve 'edebug-form-spec '(form body))

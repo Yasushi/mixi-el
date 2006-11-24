@@ -1,3 +1,11 @@
+2006-11-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-retrieve): New macro.
+	(mixi-retrieve-1): Use it.
+	(mixi-login): Ditto.
+	(mixi-logout): Ditto.
+	(with-mixi-retrieve): Ditto.
+
 2006-11-23  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-url-retrieve): Rename from `mixi-w3-retrieve'.

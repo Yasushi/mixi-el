@@ -120,9 +120,6 @@ FUNCTION is the function for getting articles."
 		(when (mixi-object-p object)
 		  (let ((class (mixi-object-class object))
 			(id (shimbun-mixi-make-message-id object)))
-		    (when (and (eq class 'mixi-comment)
-			       (shimbun-search-id shimbun id))
-		      (throw 'stop nil))
 		    (push
 		     (shimbun-create-header
 		      0

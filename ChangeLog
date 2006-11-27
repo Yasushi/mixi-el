@@ -1,5 +1,10 @@
 2006-11-27  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-get-headers): Don't quit even if there are
+	comments which have already gotten.
+
+2006-11-27  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-topic-content-regexp): Fix regexp.
 	(mixi-topic-realize): Follow the change above.
 

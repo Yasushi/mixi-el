@@ -1317,7 +1317,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-topic-owner-regexp
   "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(¤µ¤ó\\)?</a>")
 (defconst mixi-topic-content-regexp
-  "<td class=\"h120\"><table><tr>\\(.+\\)?\n?\\(.+\\)?\n?\\(.+\\)?\n?</tr></table>\\(.+\\)</td>")
+  "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\"><table><tr>\\(<td width=\"130\" height=\"140\" align=\"center\" valign=\"middle\"><a href=\"javascript:void(0)\" onClick=\"MM_openBrWindow('show_bbs_picture\\.pl\\?id=[0-9]+&number=[0-9]+','pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')\"><img src=\"http://ic[0-9]+\\.mixi\\.jp/[^.]+\\.jpg\" border=\"0\"></a></td>\n\\)*</tr></table>\\(.+\\)</td></tr></table>")
 
 (defun mixi-topic-realize (topic)
   "Realize a TOPIC."
@@ -1341,7 +1341,7 @@ Increase this value when unexpected error frequently occurs."
 						  (match-string 2 buffer)))
 	(signal 'error (list 'cannot-find-owner topic)))
       (if (string-match mixi-topic-content-regexp buffer)
-	  (mixi-topic-set-content topic (match-string 4 buffer))
+	  (mixi-topic-set-content topic (match-string 2 buffer))
 	(signal 'error (list 'cannot-find-content topic))))
     (mixi-object-touch topic)))
 

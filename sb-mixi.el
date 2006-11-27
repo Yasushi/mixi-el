@@ -53,6 +53,7 @@ FUNCTION is the function for getting articles."
 			      (const :tag "Messages" mixi-get-messages)
 			      (function :tag "Other function")))))
 
+;; FIXME: Don't use this user option.
 (defcustom shimbun-mixi-page-articles 10
   "*How many articles are there in one page."
   :group 'shimbun
@@ -178,7 +179,6 @@ FUNCTION is the function for getting articles."
 					 message-id))
 		  ;; FIXME: Concat parent's information?
 		  (throw 'found (mixi-comment-content comment)))))
-	    ;; FIXME: Limit range?
 	    (mixi-get-comments parent)))))
 
 (luna-define-method shimbun-article ((shimbun shimbun-mixi)

@@ -1,5 +1,61 @@
 2006-11-27  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-event-cache): New variable.
+	(mixi-make-event): New function.
+	(mixi-event-url-regexp): New constant.
+	(mixi-make-event-from-url): New function.
+	(mixi-event-p): New macro.
+	(mixi-event-page): Ditto.
+	(mixi-event-time-regexp): New regexp.
+	(mixi-event-title-regexp): Ditto.
+	(mixi-event-owner-regexp): Ditto.
+	(mixi-event-date-regexp): Ditto.
+	(mixi-event-place-regexp): Ditto.
+	(mixi-event-detail-regexp): Ditto.
+	(mixi-event-limit-regexp): Ditto.
+	(mixi-event-members-regexp): Ditto.
+	(mixi-event-realize): New function.
+	(mixi-event-community): New accessor method.
+	(mixi-event-id): Ditto.
+	(mixi-event-time): Ditto.
+	(mixi-event-title): Ditto.
+	(mixi-event-owner): Ditto.
+	(mixi-event-date): Ditto.
+	(mixi-event-place): Ditto.
+	(mixi-event-detail): Ditto.
+	(mixi-event-limit): Ditto.
+	(mixi-event-members): Ditto.
+	(mixi-event-set-time): Ditto.
+	(mixi-event-set-title): Ditto.
+	(mixi-event-set-owner): Ditto.
+	(mixi-event-set-date): Ditto.
+	(mixi-event-set-place): Ditto.
+	(mixi-event-set-detail): Ditto.
+	(mixi-event-set-limit): Ditto.
+	(mixi-event-set-members): Ditto.
+	(mixi-bbs-list-page): Rename from `mixi-topic-list-page'.
+	(mixi-bbs-list-regexp): Rename from `mixi-topic-list-regexp'.
+	(mixi-get-bbses): Rename from `mixi-get-topics'.
+	(mixi-new-bbs-list-page): Rename from `mixi-new-topic-list-page'.
+	(mixi-new-bbs-list-regexp): Rename from `mixi-new-topic-list-regexp'.
+	(mixi-get-new-bbses): Rename from `mixi-get-new-topics'.
+	(mixi-bbs-list-regexp): Follow the change above.
+	(mixi-get-bbses): Ditto.
+	(mixi-new-bbs-list-regexp): Ditto.
+	(mixi-get-new-bbses): Ditto.
+	(mixi-event-comment-list-page): New function.
+	(mixi-event-comment-list-regexp): New constant.
+
+	* sb-mixi.el (shimbun-mixi-group-alist): Follow the change above.
+	(shimbun-mixi-make-subject): Ditto.
+	(shimbun-mixi-make-xref): Ditto.
+	(shimbun-mixi-get-headers): Ditto.
+	(shimbun-get-headers): Ditto.
+	(shimbun-mixi-make-body): New function.
+	(shimbun-article): Follow the change above.
+
+2006-11-27  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi-get-headers): Don't quit even if there are
 	comments which have already gotten.
 

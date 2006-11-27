@@ -32,8 +32,8 @@
 ;;  * mixi-get-diaries
 ;;  * mixi-get-new-diaries
 ;;  * mixi-get-communities
-;;  * mixi-get-topics
-;;  * mixi-get-new-topics
+;;  * mixi-get-bbses
+;;  * mixi-get-new-bbses
 ;;  * mixi-get-comments
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
@@ -1411,38 +1411,262 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (aset (cdr topic) 6 content))
 
-(defmacro mixi-topic-list-page (community)
+;; Event object.
+(defvar mixi-event-cache (make-hash-table :test 'equal))
+(defun mixi-make-event (community id)
+  "Return a event object."
+  (mixi-make-cache (list (mixi-community-id community) id)
+		   (cons 'mixi-event (vector nil community id nil nil nil nil
+					     nil nil nil nil))
+		   mixi-event-cache))
+
+(defconst mixi-event-url-regexp
+  "/view_event\\.pl\\?id=\\([0-9]+\\)\\(&comment_count=[0-9]+\\)?&comm_id=\\([0-9]+\\)")
+
+(defun mixi-make-event-from-url (url)
+  "Return a event object from URL."
+  (when (string-match mixi-event-url-regexp url)
+    (let ((id (match-string 1 url))
+	  (community-id (match-string 3 url)))
+      (mixi-make-event (mixi-make-community community-id) id))))
+
+(defmacro mixi-event-p (event)
+  `(eq (mixi-object-class ,event) 'mixi-event))
+
+(defmacro mixi-event-page (event)
+  `(concat "/view_event.pl?id=" (mixi-event-id ,event)
+	   "&comm_id=" (mixi-community-id (mixi-event-community ,event))))
+
+(defconst mixi-event-time-regexp
+  "<td ROWSPAN=11 BGCOLOR=#FFD8B0 ALIGN=center VALIGN=top WIDTH=110>
+\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
+\\([0-9]+\\):\\([0-9]+\\)</td>")
+(defconst mixi-event-title-regexp
+  "<td bgcolor=#FFF4E0 width=410>&nbsp;\\([^<]+\\)</td>")
+(defconst mixi-event-owner-regexp
+  "<td BGCOLOR=#FDF9F2>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
+(defconst mixi-event-date-regexp
+  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>開催日時</td>
+<td BGCOLOR=#FFFFFF>
+&nbsp;\\(.+\\)
+</td>")
+(defconst mixi-event-place-regexp
+  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>開催場所</td>
+<td BGCOLOR=#FFFFFF>
+&nbsp;\\(.+\\)
+</td>")
+(defconst mixi-event-detail-regexp
+  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>詳細</td>
+<td BGCOLOR=#FFFFFF><table BORDER=0 CELLSPACING=0 CELLPADDING=5><tr><td CLASS=h120>\\(.+\\)</td></tr></table></td>")
+(defconst mixi-event-limit-regexp
+  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>募集期限</td>
+<td BGCOLOR=#FFFFFF>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+(defconst mixi-event-members-regexp
+  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>参加者</td>
+<td BGCOLOR=#FFFFFF>
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=100%>
+<tr>
+<td>&nbsp;\\(.+\\)</td>")
+
+(defun mixi-event-realize (event)
+  "Realize a EVENT."
+  ;; FIXME: Check a expiration of cache?
+  (unless (mixi-object-realize-p event)
+    (with-mixi-retrieve (mixi-event-page event)
+      (if (string-match mixi-event-time-regexp buffer)
+	  (mixi-event-set-time
+	   event (encode-time 0 (string-to-number (match-string 5 buffer))
+			      (string-to-number (match-string 4 buffer))
+			      (string-to-number (match-string 3 buffer))
+			      (string-to-number (match-string 2 buffer))
+			      (string-to-number (match-string 1 buffer))))
+	(signal 'error (list 'cannot-find-time event)))
+      (if (string-match mixi-event-title-regexp buffer)
+	  (mixi-event-set-title event (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-title event)))
+      (if (string-match mixi-event-owner-regexp buffer)
+	  (mixi-event-set-owner event
+				(mixi-make-friend (match-string 1 buffer)
+						  (match-string 2 buffer)))
+	(signal 'error (list 'cannot-find-owner event)))
+      (if (string-match mixi-event-date-regexp buffer)
+	  (mixi-event-set-date event (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-date event)))
+      (if (string-match mixi-event-place-regexp buffer)
+	  (mixi-event-set-place event (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-place event)))
+      (if (string-match mixi-event-detail-regexp buffer)
+	  (mixi-event-set-detail event (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-detail event)))
+      (when (string-match mixi-event-limit-regexp buffer)
+	(mixi-event-set-limit
+	 event (encode-time 0 0 0 (string-to-number (match-string 3 buffer))
+			    (string-to-number (match-string 2 buffer))
+			    (string-to-number (match-string 1 buffer)))))
+      (if (string-match mixi-event-members-regexp buffer)
+	  (mixi-event-set-members event (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-members event))))
+    (mixi-object-touch event)))
+
+(defun mixi-event-community (event)
+  "Return the community of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aref (cdr event) 1))
+
+(defun mixi-event-id (event)
+  "Return the id of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aref (cdr event) 2))
+
+(defun mixi-event-time (event)
+  "Return the time of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 3))
+
+(defun mixi-event-title (event)
+  "Return the title of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 4))
+
+(defun mixi-event-owner (event)
+  "Return the owner of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 5))
+
+(defun mixi-event-date (event)
+  "Return the date of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 6))
+
+(defun mixi-event-place (event)
+  "Return the place of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 7))
+
+(defun mixi-event-detail (event)
+  "Return the detail of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 8))
+
+(defun mixi-event-limit (event)
+  "Return the limit of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 9))
+
+(defun mixi-event-members (event)
+  "Return the members of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-event-realize event)
+  (aref (cdr event) 10))
+
+(defun mixi-event-set-time (event time)
+  "Set the time of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 3 time))
+
+(defun mixi-event-set-title (event title)
+  "Set the title of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 4 title))
+
+(defun mixi-event-set-owner (event owner)
+  "Set the owner of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (unless (mixi-friend-p owner)
+    (signal 'wrong-type-argument (list 'mixi-friend-p owner)))
+  (aset (cdr event) 5 owner))
+
+(defun mixi-event-set-date (event date)
+  "Set the date of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 6 date))
+
+(defun mixi-event-set-place (event place)
+  "Set the place of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 7 place))
+
+(defun mixi-event-set-detail (event detail)
+  "Set the detail of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 8 detail))
+
+(defun mixi-event-set-limit (event limit)
+  "Set the limit of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 9 limit))
+
+(defun mixi-event-set-members (event members)
+  "Set the members of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 10 members))
+
+;; Bbs.
+(defmacro mixi-bbs-list-page (community)
   `(concat "/list_bbs.pl?page=%d"
 	   "&id=" (mixi-community-id ,community)))
 
-(defconst mixi-topic-list-regexp
-  "<a href=view_bbs\\.pl\\?id=\\([0-9]+\\)")
+(defconst mixi-bbs-list-regexp
+  "<a href=view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)")
 
-(defun mixi-get-topics (community &optional max-numbers)
-  "Get topics of COMMUNITY."
+(defun mixi-get-bbses (community &optional max-numbers)
+  "Get bbese of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (let ((items (mixi-get-matched-items (mixi-topic-list-page community)
+  (let ((items (mixi-get-matched-items (mixi-bbs-list-page community)
 				       max-numbers
-				       mixi-topic-list-regexp)))
+				       mixi-bbs-list-regexp)))
     (mapcar (lambda (item)
-	      (mixi-make-topic community (nth 0 item)))
+	      (let ((name (nth 0 item)))
+		(when (string= name "bbs")
+		  (setq name "topic"))
+		(let ((func (intern (concat "mixi-make-" name))))
+		  (funcall func community (nth 1 item)))))
 	    items)))
 
-(defmacro mixi-new-topic-list-page ()
+(defmacro mixi-new-bbs-list-page ()
   `(concat "/new_bbs.pl?page=%d"))
 
-(defconst mixi-new-topic-list-regexp
-  "<a href=\"view_bbs\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
+(defconst mixi-new-bbs-list-regexp
+  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
 
-(defun mixi-get-new-topics (&optional max-numbers)
+(defun mixi-get-new-bbses (&optional max-numbers)
   "Get new topics."
-  (let ((items (mixi-get-matched-items (mixi-new-topic-list-page)
+  (let ((items (mixi-get-matched-items (mixi-new-bbs-list-page)
 				       max-numbers
-				       mixi-new-topic-list-regexp)))
+				       mixi-new-bbs-list-regexp)))
     (mapcar (lambda (item)
-	      (mixi-make-topic (mixi-make-community (nth 1 item))
-			       (nth 0 item)))
+	      (let ((name (nth 0 item)))
+		(when (string= name "bbs")
+		  (setq name "topic"))
+		(let ((func (intern (concat "mixi-make-" name))))
+		  (funcall func (mixi-make-community (nth 2 item))
+			   (nth 1 item)))))
 	    items)))
 
 ;; Comment object.
@@ -1542,6 +1766,32 @@ Increase this value when unexpected error frequently occurs."
 \\(.+\\)
 </td>
 </tr>
+</table>
+</td>
+</tr>")
+
+(defun mixi-event-comment-list-page (event)
+  (concat "/view_event.pl?page=all"
+	  "&id=" (mixi-event-id event)
+	  "&comm_id=" (mixi-community-id (mixi-event-community event))))
+
+;; FIXME: Split regexp to time, owner(id and nick) and contents.
+(defconst mixi-event-comment-list-regexp
+  "<tr>
+<td ROWSPAN=2 ALIGN=center BGCOLOR=#F2DDB7 WIDTH=110>
+\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
+\\([0-9]+\\):\\([0-9]+\\)<br>
+\\(</td>\\)
+\\(<td BGCOLOR=#FDF9F2>\\)
+<font COLOR=#F8A448><b>[^<]+</b> :</font>
+<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
+
+</td>
+</tr>
+\\(<tr>\\)
+<td ALIGN=center BGCOLOR=#FFFFFF>
+<table BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH=500>
+<tr><td CLASS=h120>\\(.+\\)</td></tr>
 </table>
 </td>
 </tr>")

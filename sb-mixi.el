@@ -33,15 +33,15 @@
 
 (defcustom shimbun-mixi-group-alist '(("new-diaries" . mixi-get-new-diaries)
 				      ("new-comments" . mixi-get-new-comments)
-				      ("new-topics" . mixi-get-new-topics)
+				      ("new-bbses" . mixi-get-new-bbses)
 				      ("messages" . mixi-get-messages)
 				      ("my-diaries" . "/home.pl"))
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
 NAME is a shimbun group name.
 URL is the URL for mixi access point of the group.  When URL is friend's, get
-his/her diaries as article.  When community's, get its topics.  When diary's
-or topic's, get its comments.
+his/her diaries as article.  When community's, get its BBSes.  When diary's
+or BBS's, get its comments.
 FUNCTION is the function for getting articles."
   :group 'shimbun
   :type '(repeat (cons :fromat "%v"
@@ -49,7 +49,7 @@ FUNCTION is the function for getting articles."
 		       (radio (string :tag "URL")
 			      (const :tag "New diaries" mixi-get-new-diaries)
 			      (const :tag "New comments" mixi-get-new-comments)
-			      (const :tag "New topics" mixi-get-new-topics)
+			      (const :tag "New BBSes" mixi-get-new-bbses)
 			      (const :tag "Messages" mixi-get-messages)
 			      (function :tag "Other function")))))
 
@@ -60,7 +60,7 @@ FUNCTION is the function for getting articles."
   :type 'integer)
 
 (defcustom shimbun-mixi-get-comment-p t
-  "*If non-nil, get diaries or topics together with its comments."
+  "*If non-nil, get diaries or BBSes together with its comments."
   :group 'shimbun
   :type 'boolean)
 
@@ -69,9 +69,12 @@ FUNCTION is the function for getting articles."
 
 (defun shimbun-mixi-make-subject (object)
   (let ((class (mixi-object-class object)))
-    (if (eq class 'mixi-comment)
-	(concat "Re: " (mixi-object-title (mixi-comment-parent object)))
-      (mixi-object-title object))))
+    (cond ((eq class 'mixi-comment)
+	   (concat "Re: " (shimbun-mixi-make-subject
+			   (mixi-comment-parent object))))
+	  ((eq class 'mixi-event)
+	   (concat "[イベント]" (mixi-object-title object)))
+	  (t (mixi-object-title object)))))
 
 (defun shimbun-mixi-make-from (object)
   (let ((owner (mixi-object-owner object)))
@@ -107,11 +110,32 @@ FUNCTION is the function for getting articles."
 	   (mixi-expand-url (mixi-diary-page object)))
 	  ((eq class 'mixi-topic)
 	   (mixi-expand-url (mixi-topic-page object)))
+	  ((eq class 'mixi-event)
+	   (mixi-expand-url (mixi-event-page object)))
 	  ((eq class 'mixi-comment)
 	   (concat (shimbun-mixi-make-xref (mixi-comment-parent object))
 		   "#comment"))
 	  ((eq class 'mixi-message)
 	   (mixi-expand-url (mixi-message-page object))))))
+
+(defun shimbun-mixi-make-body (object)
+  (let ((class (mixi-object-class object)))
+    (if (eq class 'mixi-event)
+	(let ((limit (mixi-event-limit object)))
+	  (setq limit (if limit
+			  (format-time-string "%Y年%m月%d日" limit)
+			"指定なし"))
+	  (concat "<dl><dt>開催日時：</dt>"
+		  "<dd>" (mixi-event-date object) "</dd>"
+		  "<dt>開催場所：</dt>"
+		  "<dd>" (mixi-event-place object) "</dd>"
+		  "<dt>詳細：</dt>"
+		  "<dd>" (mixi-event-detail object) "</dd>"
+		  "<dt>募集期限：</dt>"
+		  "<dd>" limit "</dd>"
+		  "<dt>参加者：</dt>"
+		  "<dd>" (mixi-event-members object) "</dd></dl>"))
+      (mixi-object-content object))))
 
 (defun shimbun-mixi-get-headers (shimbun objects &optional range)
   (when objects
@@ -137,7 +161,8 @@ FUNCTION is the function for getting articles."
 		     headers)
 		    (when (and shimbun-mixi-get-comment-p
 			       (or (eq class 'mixi-diary)
-				   (eq class 'mixi-topic)))
+				   (eq class 'mixi-topic)
+				   (eq class 'mixi-event)))
 		      (let ((comments (mixi-get-comments object range)))
 			(mapc (lambda (header)
 				(push header headers))
@@ -158,8 +183,10 @@ FUNCTION is the function for getting articles."
 	  (cond ((eq class 'mixi-friend)
 		 (setq objects (mixi-get-diaries object range)))
 		((eq class 'mixi-community)
-		 (setq objects (mixi-get-topics object range)))
-		((or (eq class 'mixi-diary) (eq class 'mixi-topic))
+		 (setq objects (mixi-get-bbses object range)))
+		((or (eq class 'mixi-diary)
+		     (eq class 'mixi-topic)
+		     (eq class 'mixi-event))
 		 (setq objects (mixi-get-comments object range)))
 		(t (error (concat (symbol-name class)
 				  " is not supported yet.")))))
@@ -191,7 +218,7 @@ FUNCTION is the function for getting articles."
 		    (article (if (string-match "#comment$" url)
 				 (shimbun-comment-article url header)
 			       ;; FIXME: Concat community information?
-			       (mixi-object-content
+			       (shimbun-mixi-make-body
 				(mixi-make-object-from-url url)))))
 	       (when (stringp article)
 		 (insert article)))

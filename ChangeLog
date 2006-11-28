@@ -1,5 +1,9 @@
 2006-11-28  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-x-face-alist): New variable.
+
+2006-11-28  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-object-title): Follow the event object.
 	(mixi-object-content): Ditto.
 	(mixi-bbs-owner): New alias.

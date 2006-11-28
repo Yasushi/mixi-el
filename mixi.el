@@ -103,6 +103,11 @@
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
 
+;; Bug reports:
+;;
+;; If you have bug reports and/or suggestions for improvement, please
+;; send them via <URL:http://mixi.jp/view_community.pl?id=1596390>.
+
 ;;; Code:
 
 (eval-when-compile (require 'cl))

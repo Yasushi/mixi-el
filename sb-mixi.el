@@ -69,8 +69,8 @@ FUNCTION is the function for getting articles."
 
 (defvar shimbun-mixi-x-face-alist
   '(("default" . "X-Face: CY;j#FoBnpK^37`-IoJvN!J^u;GciiPmMQ@T)~RP1]t8iv?v)/bVI:I\"F!JfWJvhM5{zY!=
- h.d+'g\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\066X%$
- siG'|4K!2?==|oB&#E'5GGH\#z[muyQ")))
+ h.d+'g\\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\\066X%$
+ siG'|4K!2?==|oB&#E'5GGH\\#z[muyQ")))
 
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
   (mapcar 'car shimbun-mixi-group-alist))

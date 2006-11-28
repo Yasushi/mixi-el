@@ -1,3 +1,16 @@
+2006-11-28  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-object-title): Follow the event object.
+	(mixi-object-content): Ditto.
+	(mixi-bbs-owner): New alias.
+	(mixi-bbs-id): Ditto.
+	(mixi-bbs-time): Ditto.
+	(mixi-bbs-title): Ditto.
+	(mixi-bbs-content): Ditto.
+
+	* sb-mixi.el (shimbun-mixi-make-subject): Follow the change above.
+	(shimbun-mixi-make-body): Ditto.
+	
 2006-11-27  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-event-cache): New variable.

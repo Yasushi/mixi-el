@@ -493,17 +493,38 @@ Increase this value when unexpected error frequently occurs."
   "Return the title of OBJECT."
   (unless (mixi-object-p object)
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
-  (let ((func (intern (concat mixi-object-prefix
-			      (mixi-object-name object) "-title"))))
-    (funcall func object)))
+  (let ((class (mixi-object-class object))
+	(func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-title")))
+	prefix)
+    (cond ((eq class 'mixi-event)
+	   (setq prefix "[イベント]")))
+    (concat prefix (funcall func object))))
 
 (defun mixi-object-content (object)
   "Return the content of OBJECT."
   (unless (mixi-object-p object)
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
-  (let ((func (intern (concat mixi-object-prefix
-			      (mixi-object-name object) "-content"))))
-    (funcall func object)))
+  (let ((class (mixi-object-class object)))
+    (cond ((eq class 'mixi-event)
+	   (let ((limit (mixi-event-limit object)))
+	     (setq limit (if limit
+			     (format-time-string "%Y年%m月%d日" limit)
+			   "指定なし"))
+	     (concat "<dl><dt>開催日時：</dt>"
+		     "<dd>" (mixi-event-date object) "</dd>"
+		     "<dt>開催場所：</dt>"
+		     "<dd>" (mixi-event-place object) "</dd>"
+		     "<dt>詳細：</dt>"
+		     "<dd>" (mixi-event-detail object) "</dd>"
+		     "<dt>募集期限：</dt>"
+		     "<dd>" limit "</dd>"
+		     "<dt>参加者：</dt>"
+		     "<dd>" (mixi-event-members object) "</dd></dl>")))
+	  (t
+	   (let ((func (intern (concat mixi-object-prefix
+				       (mixi-object-name object) "-content"))))
+	     (funcall func object))))))
 
 (defun mixi-object-set-timestamp (object timestamp)
   "Set the timestamp of OBJECT."
@@ -1626,7 +1647,13 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (aset (cdr event) 10 members))
 
-;; Bbs.
+;; Bbs object.
+(defalias 'mixi-bbs-owner 'mixi-object-owner)
+(defalias 'mixi-bbs-id 'mixi-object-id)
+(defalias 'mixi-bbs-time 'mixi-object-time)
+(defalias 'mixi-bbs-title 'mixi-object-title)
+(defalias 'mixi-bbs-content 'mixi-object-content)
+
 (defmacro mixi-bbs-list-page (community)
   `(concat "/list_bbs.pl?page=%d"
 	   "&id=" (mixi-community-id ,community)))

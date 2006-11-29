@@ -32,7 +32,9 @@
 (require 'mixi)
 (require 'shimbun)
 
-(luna-define-class shimbun-mixi (shimbun) ())
+(eval-and-compile
+  (luna-define-class shimbun-mixi (shimbun) (comment-cache))
+  (luna-define-internal-accessors 'shimbun-mixi))
 
 (defcustom shimbun-mixi-group-alist '(("new-diaries" . mixi-get-new-diaries)
 				      ("new-comments" . mixi-get-new-comments)
@@ -71,6 +73,12 @@ FUNCTION is the function for getting articles."
   '(("default" . "X-Face: CY;j#FoBnpK^37`-IoJvN!J^u;GciiPmMQ@T)~RP1]t8iv?v)/bVI:I\"F!JfWJvhM5{zY!=
  h.d+'g\\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\\066X%$
  siG'|4K!2?==|oB&#E'5GGH\\#z[muyQ")))
+
+(luna-define-method initialize-instance :after ((shimbun shimbun-mixi)
+						&rest init-args)
+  (shimbun-mixi-set-comment-cache-internal shimbun
+					   (make-hash-table :test 'equal))
+  shimbun)
 
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
   (mapcar 'car shimbun-mixi-group-alist))
@@ -157,7 +165,11 @@ FUNCTION is the function for getting articles."
 			(mapc (lambda (header)
 				(push header headers))
 			      (shimbun-mixi-get-headers shimbun
-							comments)))))))
+							comments))))
+		    (when (eq class 'mixi-comment)
+		      (puthash id (mixi-comment-content object)
+			       (shimbun-mixi-comment-cache-internal
+				shimbun))))))
 	      objects))
       headers)))
 
@@ -183,20 +195,27 @@ FUNCTION is the function for getting articles."
       (setq objects (funcall url-or-function range)))
     (shimbun-sort-headers (shimbun-mixi-get-headers shimbun objects range))))
 
-(defun shimbun-comment-article (url header)
-  (let ((parent (mixi-make-object-from-url url))
-	(date (shimbun-header-date header))
-	(message-id (shimbun-header-id header)))
-    (catch 'found
-      (mapc (lambda (comment)
-	      (let ((id (mixi-friend-id (mixi-comment-owner comment)))
-		    (time (shimbun-mixi-make-date comment)))
-		(when (and (string= time date)
-			   (string-match (concat "^<[0-9]+\\." id "@")
-					 message-id))
-		  ;; FIXME: Concat parent's information?
-		  (throw 'found (mixi-comment-content comment)))))
-	    (mixi-get-comments parent)))))
+(defun shimbun-comment-article (url shimbun header)
+  (let* ((parent (mixi-make-object-from-url url))
+	 (date (shimbun-header-date header))
+	 (message-id (shimbun-header-id header))
+	 (cache (gethash message-id
+			 (shimbun-mixi-comment-cache-internal shimbun))))
+    (if (stringp cache)
+	cache
+      (catch 'found
+	(mapc (lambda (comment)
+		(let ((id (mixi-friend-id (mixi-comment-owner comment)))
+		      (time (shimbun-mixi-make-date comment)))
+		  (when (and (string= time date)
+			     (string-match (concat "^<[0-9]+\\." id "@")
+					   message-id))
+		    ;; FIXME: Concat parent's information?
+		    (let ((content (mixi-comment-content comment)))
+		      (puthash message-id content
+			       (shimbun-mixi-comment-cache-internal shimbun))
+		      (throw 'found content)))))
+	      (mixi-get-comments parent))))))
 
 (luna-define-method shimbun-article ((shimbun shimbun-mixi)
 				     header &optional outbuf)
@@ -206,7 +225,7 @@ FUNCTION is the function for getting articles."
        (or (with-temp-buffer
 	     (let* ((url (shimbun-article-url shimbun header))
 		    (article (if (string-match "#comment$" url)
-				 (shimbun-comment-article url header)
+				 (shimbun-comment-article url shimbun header)
 			       ;; FIXME: Concat community information?
 			       (shimbun-mixi-make-body
 				(mixi-make-object-from-url url)))))

@@ -203,19 +203,20 @@ FUNCTION is the function for getting articles."
 			 (shimbun-mixi-comment-cache-internal shimbun))))
     (if (stringp cache)
 	cache
-      (catch 'found
+      (let (article)
 	(mapc (lambda (comment)
 		(let ((id (mixi-friend-id (mixi-comment-owner comment)))
-		      (time (shimbun-mixi-make-date comment)))
+		      (time (shimbun-mixi-make-date comment))
+		      ;; FIXME: Concat parent's information?
+		      (content (mixi-comment-content comment)))
+		  (puthash (shimbun-mixi-make-message-id comment) content
+			   (shimbun-mixi-comment-cache-internal shimbun))
 		  (when (and (string= time date)
 			     (string-match (concat "^<[0-9]+\\." id "@")
 					   message-id))
-		    ;; FIXME: Concat parent's information?
-		    (let ((content (mixi-comment-content comment)))
-		      (puthash message-id content
-			       (shimbun-mixi-comment-cache-internal shimbun))
-		      (throw 'found content)))))
-	      (mixi-get-comments parent))))))
+		    (setq article content))))
+	      (mixi-get-comments parent))
+	article))))
 
 (luna-define-method shimbun-article ((shimbun shimbun-mixi)
 				     header &optional outbuf)

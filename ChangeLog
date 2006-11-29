@@ -1,5 +1,10 @@
 2006-11-29  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-comment-article): Cache the content of all
+	comment.
+
+2006-11-29  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi): Add the COMMENT-CACHE slot.
 	(initialize-instance): New method.
 	(shimbun-mixi-get-headers): Cache the content of comment.

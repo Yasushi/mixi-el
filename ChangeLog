@@ -1,3 +1,7 @@
+2006-11-30  OHASHI Akira  <bg66@koka-in.org>
+
+	* sb-mixi.el (shimbun-comment-article): Simplify.
+
 2006-11-29  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-comment-article): Cache the content of all

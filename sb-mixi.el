@@ -196,27 +196,20 @@ FUNCTION is the function for getting articles."
     (shimbun-sort-headers (shimbun-mixi-get-headers shimbun objects range))))
 
 (defun shimbun-comment-article (url shimbun header)
-  (let* ((parent (mixi-make-object-from-url url))
-	 (date (shimbun-header-date header))
-	 (message-id (shimbun-header-id header))
-	 (cache (gethash message-id
-			 (shimbun-mixi-comment-cache-internal shimbun))))
-    (if (stringp cache)
-	cache
-      (let (article)
+  (let* ((message-id (shimbun-header-id header))
+	 (cache (shimbun-mixi-comment-cache-internal shimbun))
+	 (article (gethash message-id cache)))
+    (unless (stringp article)
+      (let ((parent (mixi-make-object-from-url url)))
 	(mapc (lambda (comment)
-		(let ((id (mixi-friend-id (mixi-comment-owner comment)))
-		      (time (shimbun-mixi-make-date comment))
+		(let ((id (shimbun-mixi-make-message-id comment))
 		      ;; FIXME: Concat parent's information?
 		      (content (mixi-comment-content comment)))
-		  (puthash (shimbun-mixi-make-message-id comment) content
-			   (shimbun-mixi-comment-cache-internal shimbun))
-		  (when (and (string= time date)
-			     (string-match (concat "^<[0-9]+\\." id "@")
-					   message-id))
+		  (puthash id content cache)
+		  (when (string= id message-id)
 		    (setq article content))))
-	      (mixi-get-comments parent))
-	article))))
+	      (mixi-get-comments parent))))
+    article))
 
 (luna-define-method shimbun-article ((shimbun shimbun-mixi)
 				     header &optional outbuf)

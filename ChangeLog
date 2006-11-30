@@ -1,5 +1,22 @@
 2006-11-30  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-get-matched-items): Rename `max-numbers' to `range',
+	and swap `range' and `regexp'.
+	(mixi-get-friends): Follow the change above.
+	(mixi-get-favorites): Ditto.
+	(mixi-get-logs): Ditto.
+	(mixi-get-diaries): Ditto.
+	(mixi-get-new-diaries): Ditto.
+	(mixi-get-communities): Ditto.
+	(mixi-get-bbses): Ditto.
+	(mixi-get-new-bbses): Ditto.
+	(mixi-get-comments): Ditto.
+	(mixi-get-new-comments): Ditto.
+	(mixi-get-messages): Ditto.
+	(mixi-get-introductions): Ditto.
+
+2006-11-30  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-comment-article): Simplify.
 
 2006-11-29  OHASHI Akira  <bg66@koka-in.org>

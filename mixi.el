@@ -221,13 +221,13 @@ Increase this value when unexpected error frequently occurs."
 (defmacro mixi-retrieve (url &optional post-data)
   `(funcall mixi-retrieve-function ,url ,post-data))
 
-(defun mixi-retrieve-1 (buffer url &optional post-data)
+(defun mixi-parse-buffer (url buffer &optional post-data)
   (when (string-match mixi-message-adult-contents buffer)
     (if mixi-accept-adult-contents
 	(setq buffer (mixi-retrieve url "submit=agree"))
       (setq buffer (mixi-retrieve (concat url "?")))))
   (when (string-match mixi-warning-continuously-accessing buffer)
-    (error (mixi-message "Continuously accessing")))
+    (error (mixi-message "Access denied.  Please wait a while.")))
   (if (not (string-match mixi-message-continuously-accessing buffer))
       buffer
     (message (mixi-message "Waiting for continuously accessing..."))
@@ -266,7 +266,7 @@ Increase this value when unexpected error frequently occurs."
 		   (buffer-substring-no-properties (point) (point-max))
 		   mixi-coding-system))
 	(kill-buffer buffer)
-	(setq ret (mixi-retrieve-1 ret url post-data))))
+	(setq ret (mixi-parse-buffer url ret post-data))))
     ret))
 
 (defun mixi-w3m-retrieve (url &optional post-data)
@@ -277,7 +277,7 @@ Increase this value when unexpected error frequently occurs."
 	  (error (mixi-message "Cannot retrieve"))
 	(w3m-decode-buffer url)
 	(let ((ret (buffer-substring-no-properties (point-min) (point-max))))
-	  (mixi-retrieve-1 ret url post-data))))))
+	  (mixi-parse-buffer url ret post-data))))))
 
 (defun mixi-curl-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
@@ -313,7 +313,7 @@ Increase this value when unexpected error frequently occurs."
 	(error (mixi-message "Cannot retrieve")))
       (delete-region (point) (re-search-forward "\r?\n\r?\n"))
       (setq ret (decode-coding-string (buffer-string) mixi-coding-system))
-      (mixi-retrieve-1 ret url post-data))))
+      (mixi-parse-buffer url ret post-data))))
 
 (defconst mixi-my-id-regexp
   "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")
@@ -378,7 +378,6 @@ Increase this value when unexpected error frequently occurs."
 	    (when (not found)
 	      (throw 'end ids))))
 	(incf page)))
-    ;; FIXME: Sort? Now order by newest.
     (reverse ids)))
 
 ;; stolen (and modified) from shimbun.el

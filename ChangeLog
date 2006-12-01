@@ -1,3 +1,11 @@
+2006-12-01  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-parse-buffer): Rename from `mixi-retrieve-1', and
+	swap `buffer' argument and `url'.
+	(mixi-url-retrieve): Follow the change above.
+	(mixi-w3m-retrieve): Ditto.
+	(mixi-curl-retrieve): Ditto.
+
 2006-11-30  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-get-matched-items): Rename `max-numbers' to `range',

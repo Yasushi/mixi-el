@@ -254,17 +254,17 @@ Increase this value when unexpected error frequently occurs."
       (error (mixi-message "Cannot retrieve")))
     (with-current-buffer buffer
       (goto-char (point-min))
-      (if (re-search-forward "HTTP/[0-9]+\\.[0-9]+ 302" nil t)
+      (if (re-search-forward "HTTP/[0-9.]+ 302 Moved" nil t)
 	  (if (re-search-forward
 	       (concat "Location: " mixi-url "\\(.+\\)") nil t)
 	      (setq ret (mixi-url-retrieve (match-string 1) post-data))
 	    (setq ret (mixi-url-retrieve "/home.pl" post-data)))
-	;; Allow `500' because BBS page might return
-	;; `HTTP/1.0 500 Internal Server Error'.
-	(unless (looking-at "HTTP/[0-9]+\\.[0-9]+ [25]00")
+	(unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
 	  (error (mixi-message "Cannot retrieve")))
-	(delete-region (point) (re-search-forward "\r?\n\r?\n"))
-	(setq ret (decode-coding-string (buffer-string) mixi-coding-system))
+	(search-forward "\n\n")
+	(setq ret (decode-coding-string
+		   (buffer-substring-no-properties (point) (point-max))
+		   mixi-coding-system))
 	(kill-buffer buffer)
 	(setq ret (mixi-parse-buffer url ret post-data))))
     ret))
@@ -273,11 +273,11 @@ Increase this value when unexpected error frequently occurs."
   "Retrieve the URL and return gotten strings."
   (let ((url (mixi-expand-url url)))
     (with-temp-buffer
-      ;; Don't check return code of `w3m-retrieve' because BBS page might
-      ;; return `HTTP/1.0 500 Internal Server Error'.
-      (w3m-retrieve url nil nil post-data)
-      (w3m-decode-buffer url)
-      (mixi-parse-buffer url (buffer-string) post-data))))
+      (if (not (string= (w3m-retrieve url nil nil post-data) "text/html"))
+	  (error (mixi-message "Cannot retrieve"))
+	(w3m-decode-buffer url)
+	(let ((ret (buffer-substring-no-properties (point-min) (point-max))))
+	  (mixi-parse-buffer url ret post-data))))))
 
 (defun mixi-curl-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
@@ -309,9 +309,7 @@ Increase this value when unexpected error frequently occurs."
       (goto-char (point-min))
       (while (looking-at "HTTP/[0-9]+\\.[0-9]+ [13][0-9][0-9]")
 	(delete-region (point) (re-search-forward "\r?\n\r?\n")))
-      ;; Allow `500' because BBS page might return
-      ;; `HTTP/1.0 500 Internal Server Error'.
-      (unless (looking-at "HTTP/[0-9]+\\.[0-9]+ [25]00")
+      (unless (looking-at "HTTP/[0-9]+\\.[0-9]+ 200")
 	(error (mixi-message "Cannot retrieve")))
       (delete-region (point) (re-search-forward "\r?\n\r?\n"))
       (setq ret (decode-coding-string (buffer-string) mixi-coding-system))
@@ -1769,7 +1767,7 @@ Increase this value when unexpected error frequently occurs."
 </td></tr></table>")
 
 (defun mixi-topic-comment-list-page (topic)
-  (concat "/view_bbs.pl?page=%d"
+  (concat "/view_bbs.pl?page=all"
 	  "&id=" (mixi-topic-id topic)
 	  "&comm_id=" (mixi-community-id (mixi-topic-community topic))))
 
@@ -1804,7 +1802,7 @@ Increase this value when unexpected error frequently occurs."
 </tr>")
 
 (defun mixi-event-comment-list-page (event)
-  (concat "/view_event.pl?page=%d"
+  (concat "/view_event.pl?page=all"
 	  "&id=" (mixi-event-id event)
 	  "&comm_id=" (mixi-community-id (mixi-event-community event))))
 

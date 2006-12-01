@@ -1,5 +1,11 @@
 2006-12-01  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-diary-comment-list-page): Use `full=1' instead of
+	`page=%d'.
+	(mixi-get-comments): Get comments in latest order.
+
+2006-12-01  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-parse-buffer): Rename from `mixi-retrieve-1', and
 	swap `buffer' argument and `url'.
 	(mixi-url-retrieve): Follow the change above.

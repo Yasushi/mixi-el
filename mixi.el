@@ -1733,7 +1733,7 @@ Increase this value when unexpected error frequently occurs."
   (aref (cdr comment) 3))
 
 (defun mixi-diary-comment-list-page (diary)
-  (concat "/view_diary.pl?page=%d"
+  (concat "/view_diary.pl?full=1"
 	  "&id=" (mixi-diary-id diary)
 	  "&owner_id=" (mixi-friend-id (mixi-diary-owner diary))))
 
@@ -1837,7 +1837,16 @@ Increase this value when unexpected error frequently occurs."
 	 (regexp (eval (intern (concat mixi-object-prefix name
 				       "-comment-list-regexp")))))
     (let ((items (mixi-get-matched-items
-		  (funcall list-page parent) regexp range)))
+		  (funcall list-page parent) regexp)))
+      (let (list)
+	(catch 'stop
+	  (mapc (lambda (item)
+		  (when (and (numberp range)
+			     (>= (length list) range))
+		    (throw 'stop nil))
+		  (setq list (cons item list)))
+	        (reverse items)))
+	(setq items (reverse list)))
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
 					   (nth 7 item) (nth 8 item))

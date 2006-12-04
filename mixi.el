@@ -954,7 +954,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-title-regexp
   "<td BGCOLOR=#FFF4E0 WIDTH=430>&nbsp;\\([^<]+\\)</td></tr>")
 (defconst mixi-diary-content-regexp
-  "<td CLASS=h12>\\(.+\\)</td></tr>")
+  "<td CLASS=h12>\\(.*\\)</td></tr>")
 
 (defun mixi-diary-realize (diary)
   "Realize a DIARY."

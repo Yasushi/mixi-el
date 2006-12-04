@@ -31,6 +31,7 @@
 ;;  * mixi-get-logs
 ;;  * mixi-get-diaries
 ;;  * mixi-get-new-diaries
+;;  * mixi-search-diaries
 ;;  * mixi-get-communities
 ;;  * mixi-get-bbses
 ;;  * mixi-get-new-bbses
@@ -399,6 +400,25 @@ Increase this value when unexpected error frequently occurs."
 	(replace-match "\n" t t)))
     ;; FIXME: Decode entities.
     (buffer-string)))
+
+;; stolen (and modified) from w3m.el
+;; FIXME: Hmm.
+(defun mixi-url-encode-and-quote-percent-string (string)
+  (apply (function concat)
+	 (mapcar
+	  (lambda (char)
+	    (cond
+	     ((eq char ?\n)		; newline
+	      "%%0D%%0A")
+	     ((string-match "[-a-zA-Z0-9_:/.]" (char-to-string char)) ; xxx?
+	      (char-to-string char))	; printable
+	     ((char-equal char ?\x20)	; space
+	      "+")
+	     (t
+	      (format "%%%%%02x" char))))	; escape
+	  ;; Coerce a string into a list of chars.
+	  (append (encode-coding-string (or string "") mixi-coding-system)
+		  nil))))
 
 ;; Cache.
 ;; stolen from time-date.el
@@ -947,6 +967,8 @@ Increase this value when unexpected error frequently occurs."
 	   "&owner_id=" (mixi-friend-id (mixi-diary-owner ,diary))))
 
 ;; FIXME: Remove `さん'.
+(defconst mixi-diary-closed-regexp
+  "<td>友人\\(の友人\\)?まで公開のため読むことが出来ません。</td></tr>")
 (defconst mixi-diary-owner-nick-regexp
   "<td WIDTH=490 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b><font COLOR=#605048>\\(.+\\)\\(さん\\)?の日記</font></b></td>")
 (defconst mixi-diary-time-regexp
@@ -961,24 +983,25 @@ Increase this value when unexpected error frequently occurs."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realize-p diary)
     (with-mixi-retrieve (mixi-diary-page diary)
-      (if (string-match mixi-diary-owner-nick-regexp buffer)
-	  (mixi-friend-set-nick (mixi-diary-owner diary)
-				(match-string 1 buffer))
-	(signal 'error (list 'cannot-find-owner-nick diary)))
-      (if (string-match mixi-diary-time-regexp buffer)
-	  (mixi-diary-set-time
-	   diary (encode-time 0 (string-to-number (match-string 5 buffer))
-			      (string-to-number (match-string 4 buffer))
-			      (string-to-number (match-string 3 buffer))
-			      (string-to-number (match-string 2 buffer))
-			      (string-to-number (match-string 1 buffer))))
-	(signal 'error (list 'cannot-find-time diary)))
-      (if (string-match mixi-diary-title-regexp buffer)
-	  (mixi-diary-set-title diary (match-string 1 buffer))
-	(signal 'error (list 'cannot-find-title diary)))
-      (if (string-match mixi-diary-content-regexp buffer)
-	  (mixi-diary-set-content diary (match-string 1 buffer))
-	(signal 'error (list 'cannot-find-content diary))))
+      (unless (string-match mixi-diary-closed-regexp buffer)
+	(if (string-match mixi-diary-owner-nick-regexp buffer)
+	    (mixi-friend-set-nick (mixi-diary-owner diary)
+				  (match-string 1 buffer))
+	  (signal 'error (list 'cannot-find-owner-nick diary)))
+	(if (string-match mixi-diary-time-regexp buffer)
+	    (mixi-diary-set-time
+	     diary (encode-time 0 (string-to-number (match-string 5 buffer))
+				(string-to-number (match-string 4 buffer))
+				(string-to-number (match-string 3 buffer))
+				(string-to-number (match-string 2 buffer))
+				(string-to-number (match-string 1 buffer))))
+	  (signal 'error (list 'cannot-find-time diary)))
+	(if (string-match mixi-diary-title-regexp buffer)
+	    (mixi-diary-set-title diary (match-string 1 buffer))
+	  (signal 'error (list 'cannot-find-title diary)))
+	(if (string-match mixi-diary-content-regexp buffer)
+	    (mixi-diary-set-content diary (match-string 1 buffer))
+	  (signal 'error (list 'cannot-find-content diary)))))
     (mixi-object-touch diary)))
 
 (defun mixi-diary-owner (diary)
@@ -1068,6 +1091,21 @@ Increase this value when unexpected error frequently occurs."
   "Get new diaries."
   (let ((items (mixi-get-matched-items (mixi-new-diary-list-page)
 				       mixi-new-diary-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
+	    items)))
+
+(defmacro mixi-search-diary-list-page (keyword)
+  `(concat "/search_diary.pl?page=%d&submit=search&keyword="
+	     (mixi-url-encode-and-quote-percent-string keyword)))
+
+(defconst mixi-search-diary-list-regexp
+  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\">")
+
+(defun mixi-search-diaries (keyword &optional range)
+  (let ((items (mixi-get-matched-items (mixi-search-diary-list-page keyword)
+				       mixi-search-diary-list-regexp
 				       range)))
     (mapcar (lambda (item)
 	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))

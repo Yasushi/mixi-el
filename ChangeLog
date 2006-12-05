@@ -1,3 +1,10 @@
+2006-12-05  OHASHI Akira  <bg66@koka-in.org>
+
+	* sb-mixi.el (shimbun-mixi-logout-p): New user option.
+	(shimbun-mixi-initialize-comment-cache): New macro.
+	(initialize-instance): Use it.
+	(shimbun-close): New method.
+
 2006-12-04  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-url-encode-and-quote-percent-string): New function.

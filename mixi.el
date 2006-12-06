@@ -49,13 +49,11 @@
 ;; Display newest 3 diaries like a mail format.
 ;;
 ;; (let ((range 3)
-;;       (buffer (generate-new-buffer "*temp*"))
+;;       (buffer (get-buffer-create "*temp*"))
 ;;       (format "%Y/%m/%d %H:%M"))
 ;;   (pop-to-buffer buffer)
 ;;   (mapc (lambda (diary)
 ;; 	  (let ((subject (mixi-diary-title diary))
-;; 		;; Don't get owner's nick at first for omitting a useless
-;; 		;; retrieval.
 ;; 		(from (mixi-friend-nick (mixi-diary-owner diary)))
 ;; 		(date (format-time-string format (mixi-diary-time diary)))
 ;; 		(body (mixi-remove-markup (mixi-diary-content diary))))
@@ -72,13 +70,11 @@
 ;; Comments are displayed like a reply mail.
 ;;
 ;; (let ((range 3)
-;;       (buffer (generate-new-buffer "*temp*"))
+;;       (buffer (get-buffer-create "*temp*"))
 ;;       (format "%Y/%m/%d %H:%M"))
 ;;   (pop-to-buffer buffer)
 ;;   (mapc (lambda (diary)
 ;; 	  (let ((subject (mixi-diary-title diary))
-;;  		;; Don't get owner's nick at first for omitting a useless
-;;  		;; retrieval.
 ;;  		(from (mixi-friend-nick (mixi-diary-owner diary)))
 ;; 		(date (format-time-string format (mixi-diary-time diary)))
 ;; 		(body (mixi-remove-markup (mixi-diary-content diary))))

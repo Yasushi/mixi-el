@@ -962,11 +962,10 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/view_diary.pl?id=" (mixi-diary-id ,diary)
 	   "&owner_id=" (mixi-friend-id (mixi-diary-owner ,diary))))
 
-;; FIXME: Remove `さん'.
 (defconst mixi-diary-closed-regexp
   "<td>友人\\(の友人\\)?まで公開のため読むことが出来ません。</td></tr>")
 (defconst mixi-diary-owner-nick-regexp
-  "<td WIDTH=490 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b><font COLOR=#605048>\\(.+\\)\\(さん\\)?の日記</font></b></td>")
+  "<td WIDTH=490 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b><font COLOR=#605048>\\(.+?\\)\\(さん\\)?の日記</font></b></td>")
 (defconst mixi-diary-time-regexp
   "<td ALIGN=center ROWSPAN=2 NOWRAP WIDTH=95 bgcolor=#FFD8B0>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-diary-title-regexp
@@ -1372,9 +1371,8 @@ Increase this value when unexpected error frequently occurs."
   "<td rowspan=\"3\" width=\"110\" bgcolor=\"#ffd8b0\" align=\"center\" valign=\"top\" nowrap>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-topic-title-regexp
   "<td bgcolor=\"#fff4e0\">&nbsp;\\([^<]+\\)</td>")
-;; FIXME: Remove `さん'.
 (defconst mixi-topic-owner-regexp
-  "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(さん\\)?</a>")
+  "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)\\(さん\\)?</a>")
 (defconst mixi-topic-content-regexp
   "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\"><table><tr>\\(<td width=\"130\" height=\"140\" align=\"center\" valign=\"middle\"><a href=\"javascript:void(0)\" onClick=\"MM_openBrWindow('show_bbs_picture\\.pl\\?id=[0-9]+&number=[0-9]+','pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')\"><img src=\"http://ic[0-9]+\\.mixi\\.jp/[^.]+\\.jpg\" border=\"0\"></a></td>\n\\)*</tr></table>\\(.+\\)</td></tr></table>")
 

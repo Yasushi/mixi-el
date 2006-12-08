@@ -80,17 +80,14 @@ of mixi object."
  h.d+'g\\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\\066X%$
  siG'|4K!2?==|oB&#E'5GGH\\#z[muyQ")))
 
-(defmacro shimbun-mixi-initialize-comment-cache (shimbun)
-  `(shimbun-mixi-set-comment-cache-internal ,shimbun
-					    (make-hash-table :test 'equal)))
-
 (luna-define-method initialize-instance :after ((shimbun shimbun-mixi)
 						&rest init-args)
-  (shimbun-mixi-initialize-comment-cache shimbun)
+  (shimbun-mixi-set-comment-cache-internal shimbun
+					   (make-hash-table :test 'equal))
   shimbun)
 
 (luna-define-method shimbun-close :after ((shimbun shimbun-mixi))
-  (shimbun-mixi-initialize-comment-cache shimbun)
+  (shimbun-mixi-set-comment-cache-internal shimbun nil)
   (when shimbun-mixi-logout-p
     (mixi-logout)))
 

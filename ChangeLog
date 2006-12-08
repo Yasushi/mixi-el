@@ -1,5 +1,11 @@
 2006-12-08  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-initialize-comment-cache): Abolish.
+	(initialize-instance): Follow the change above.
+	(shimbun-close): Set the comment cache to nil.
+
+2006-12-08  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-topic-comment-list-regexp): Fix regexp.
 	(mixi-message): Rename the STRING argument to STRINGS.
 	(mixi-login): Follow the cange above.

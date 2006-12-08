@@ -200,8 +200,8 @@ Increase this value when unexpected error frequently occurs."
 (defvar mixi-me nil)
 
 ;; Utilities.
-(defmacro mixi-message (string)
-  `(concat "[mixi] " ,string))
+(defmacro mixi-message (&rest strings)
+  `(concat "[mixi] " ,@strings))
 
 (defconst mixi-message-adult-contents
   "このページから先はアダルト（成人向け）コンテンツが含まれています。<br>
@@ -224,7 +224,8 @@ Increase this value when unexpected error frequently occurs."
 	(setq buffer (mixi-retrieve url "submit=agree"))
       (setq buffer (mixi-retrieve (concat url "?")))))
   (when (string-match mixi-warning-continuously-accessing buffer)
-    (error (mixi-message "Access denied.  Please wait a while.")))
+    (error (mixi-message "Access denied.  Please wait a while and increase "
+			 "the value of `mixi-continuously-access-interval'.")))
   (if (not (string-match mixi-message-continuously-accessing buffer))
       buffer
     (message (mixi-message "Waiting for continuously accessing..."))
@@ -319,9 +320,8 @@ Increase this value when unexpected error frequently occurs."
   "Login to mixi."
   (when (and (eq mixi-retrieve-function 'mixi-w3m-retrieve)
 	     (not w3m-use-cookies))
-    (error
-     (mixi-message
-      "Require to accept cookies.  Please set `w3m-use-cookies' to t.")))
+    (error (mixi-message "Require to accept cookies.  Please set "
+			 "`w3m-use-cookies' to t.")))
   (let ((email (or email mixi-default-email
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
@@ -1818,6 +1818,7 @@ Increase this value when unexpected error frequently occurs."
 
 ?\\(
 
+\\|<font color=\"#f2ddb7\">|&nbsp;</font><a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+\">削除</a>
 \\|\\)</td>
 </tr>
 <tr>

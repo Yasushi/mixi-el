@@ -1,3 +1,10 @@
+2006-12-08  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-topic-comment-list-regexp): Fix regexp.
+	(mixi-message): Rename the STRING argument to STRINGS.
+	(mixi-login): Follow the cange above.
+	(mixi-parse-buffer): Fix error message.
+
 2006-12-07  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-owner-nick-regexp): Fix regexp.

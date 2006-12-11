@@ -1,5 +1,13 @@
 2006-12-11  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-diary-time-regexp): Follow the change of mixi;
+	Fix regexp.
+	(mixi-diary-title-regexp): Ditto.
+	(mixi-diary-content-regexp): Ditto.
+	(mixi-diary-realize): Follow the change above.
+
+2006-12-11  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-search-bbs-list-page): New macro.
 	(mixi-search-bbs-list-regexp): New regexp.
 	(mixi-search-bbses): New function.

@@ -969,11 +969,11 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-owner-nick-regexp
   "<td WIDTH=490 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b><font COLOR=#605048>\\(.+?\\)\\(さん\\)?の日記</font></b></td>")
 (defconst mixi-diary-time-regexp
-  "<td ALIGN=center ROWSPAN=2 NOWRAP WIDTH=95 bgcolor=#FFD8B0>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>")
+  "<td \\(align\\|ALIGN\\)=\"?center\"? \\(rowspan\\|ROWSPAN\\)=\"?[23]\"? \\(nowrap=\"nowrap\"\\|NOWRAP\\) \\(width\\|WIDTH\\)=\"?95\"? bgcolor=\"?#FFD8B0\"?>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日\\(<br />\\|<br>\\)\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-diary-title-regexp
-  "<td BGCOLOR=#FFF4E0 WIDTH=430>&nbsp;\\([^<]+\\)</td></tr>")
+  "<td \\(bgcolor\\|BGCOLOR\\)=\"?#FFF4E0\"? width=\"?430\"?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-diary-content-regexp
-  "<td CLASS=h12>\\(.*\\)</td></tr>")
+  "<td \\(class\\|CLASS\\)=\"?h12\"?>\\(.*\\)</td>")
 
 (defun mixi-diary-realize (diary)
   "Realize a DIARY."
@@ -987,17 +987,17 @@ Increase this value when unexpected error frequently occurs."
 	  (signal 'error (list 'cannot-find-owner-nick diary)))
 	(if (string-match mixi-diary-time-regexp buffer)
 	    (mixi-diary-set-time
-	     diary (encode-time 0 (string-to-number (match-string 5 buffer))
-				(string-to-number (match-string 4 buffer))
-				(string-to-number (match-string 3 buffer))
-				(string-to-number (match-string 2 buffer))
-				(string-to-number (match-string 1 buffer))))
+	     diary (encode-time 0 (string-to-number (match-string 10 buffer))
+				(string-to-number (match-string 9 buffer))
+				(string-to-number (match-string 7 buffer))
+				(string-to-number (match-string 6 buffer))
+				(string-to-number (match-string 5 buffer))))
 	  (signal 'error (list 'cannot-find-time diary)))
 	(if (string-match mixi-diary-title-regexp buffer)
-	    (mixi-diary-set-title diary (match-string 1 buffer))
+	    (mixi-diary-set-title diary (match-string 2 buffer))
 	  (signal 'error (list 'cannot-find-title diary)))
 	(if (string-match mixi-diary-content-regexp buffer)
-	    (mixi-diary-set-content diary (match-string 1 buffer))
+	    (mixi-diary-set-content diary (match-string 2 buffer))
 	  (signal 'error (list 'cannot-find-content diary)))))
     (mixi-object-touch diary)))
 

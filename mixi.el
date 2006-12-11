@@ -36,6 +36,7 @@
 ;;  * mixi-search-communities
 ;;  * mixi-get-bbses
 ;;  * mixi-get-new-bbses
+;;  * mixi-search-bbses
 ;;  * mixi-get-comments
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
@@ -1743,6 +1744,28 @@ Increase this value when unexpected error frequently occurs."
   "Get new topics."
   (let ((items (mixi-get-matched-items (mixi-new-bbs-list-page)
 				       mixi-new-bbs-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (let ((name (nth 0 item)))
+		(when (string= name "bbs")
+		  (setq name "topic"))
+		(let ((func (intern (concat "mixi-make-" name))))
+		  (funcall func (mixi-make-community (nth 2 item))
+			   (nth 1 item)))))
+	    items)))
+
+(defmacro mixi-search-bbs-list-page (keyword)
+  `(concat "/search_topic.pl?page=%d&type=top&submit=search"
+	   "&keyword=" (mixi-url-encode-and-quote-percent-string keyword)
+	   "&community_id=0&category_id=0"))
+
+(defconst mixi-search-bbs-list-regexp
+  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\"><img src=http://img\\.mixi\\.jp/img/shbtn\\.gif ALT=詳細を見る BORDER=0 WIDTH=104 HEIGHT=19></a>")
+
+;; FIXME: Support community and category.
+(defun mixi-search-bbses (keyword &optional range)
+  (let ((items (mixi-get-matched-items (mixi-search-bbs-list-page keyword)
+				       mixi-search-bbs-list-regexp
 				       range)))
     (mapcar (lambda (item)
 	      (let ((name (nth 0 item)))

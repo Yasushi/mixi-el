@@ -1,5 +1,11 @@
 2006-12-11  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-search-bbs-list-page): New macro.
+	(mixi-search-bbs-list-regexp): New regexp.
+	(mixi-search-bbses): New function.
+
+2006-12-11  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-search-community-list-page): New macro.
 	(mixi-search-community-list-regexp): New regexp.
 	(mixi-search-communities): New function.

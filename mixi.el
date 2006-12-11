@@ -179,7 +179,7 @@ Increase this value when unexpected error frequently occurs."
   :type 'number
   :group 'mixi)
 
-(defcustom mixi-cache-expires 3600
+(defcustom mixi-cache-expires nil
   "*Seconds for expiration of a cached object."
   :type '(radio (integer :tag "Expired seconds")
 		(const :tag "Don't expire" nil)

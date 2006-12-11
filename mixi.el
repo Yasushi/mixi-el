@@ -33,6 +33,7 @@
 ;;  * mixi-get-new-diaries
 ;;  * mixi-search-diaries
 ;;  * mixi-get-communities
+;;  * mixi-search-communities
 ;;  * mixi-get-bbses
 ;;  * mixi-get-new-bbses
 ;;  * mixi-get-comments
@@ -1341,6 +1342,26 @@ Increase this value when unexpected error frequently occurs."
 					       (nth 0 (nth index names))) ret))
 	  (incf index))
 	(reverse ret)))))
+
+(defmacro mixi-search-community-list-page (keyword)
+  `(concat "/search_community.pl?page=%d&&sort=date&type=com&submit=main"
+	   "&keyword=" (mixi-url-encode-and-quote-percent-string keyword)
+	   "&category_id=0"))
+
+(defconst mixi-search-community-list-regexp
+  "<td WIDTH=90 VALIGN=top ROWSPAN=4 ALIGN=center background=http://img\\.mixi\\.jp/img/bg_line\\.gif><a href=\"view_community\\.pl\\?id=\\([0-9]+\\)\"><img SRC=\"http://img-c[0-9]+\\.mixi\\.jp/photo/comm/[^.]+\\.jpg\" VSPACE=3 border=0></a></td>
+<td NOWRAP WIDTH=90 BGCOLOR=#FDF9F2><font COLOR=#996600>コミュニティ名</font></td>
+<td COLSPAN=2 WIDTH=370 BGCOLOR=#FFFFFF>\\([^<]+\\)</td></tr>")
+
+;; FIXME: Support category.
+(defun mixi-search-communities (keyword &optional range)
+  (let ((items (mixi-get-matched-items (mixi-search-community-list-page
+					keyword)
+				       mixi-search-community-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (mixi-make-community (nth 0 item) (nth 1 item)))
+	    items)))
 
 ;; Topic object.
 (defvar mixi-topic-cache (make-hash-table :test 'equal))

@@ -254,20 +254,14 @@ Increase this value when unexpected error frequently occurs."
       (error (mixi-message "Cannot retrieve")))
     (with-current-buffer buffer
       (goto-char (point-min))
-      (if (re-search-forward "HTTP/[0-9.]+ 302 Moved" nil t)
-	  (if (re-search-forward
-	       (concat "Location: " mixi-url "\\(.+\\)") nil t)
-	      (setq ret (mixi-url-retrieve (match-string 1) post-data))
-	    (setq ret (mixi-url-retrieve "/home.pl" post-data)))
-	(unless (re-search-forward "HTTP/[0-9.]+ 200 OK" nil t)
-	  (error (mixi-message "Cannot retrieve")))
-	(search-forward "\n\n")
-	(setq ret (decode-coding-string
-		   (buffer-substring-no-properties (point) (point-max))
-		   mixi-coding-system))
-	(kill-buffer buffer)
-	(setq ret (mixi-parse-buffer url ret post-data))))
-    ret))
+      (while (looking-at "HTTP/[0-9]+\\.[0-9]+ [13][0-9][0-9]")
+	(delete-region (point) (re-search-forward "\r?\n\r?\n")))
+      (unless (looking-at "HTTP/[0-9]+\\.[0-9]+ 200")
+	(error (mixi-message "Cannot retrieve")))
+      (delete-region (point) (re-search-forward "\r?\n\r?\n"))
+      (setq ret (decode-coding-string (buffer-string) mixi-coding-system))
+      (kill-buffer buffer)
+      (mixi-parse-buffer url ret post-data))))
 
 (defun mixi-w3m-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."

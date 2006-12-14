@@ -99,6 +99,8 @@ of mixi object."
     (cond ((eq class 'mixi-comment)
 	   (concat "Re: " (shimbun-mixi-make-subject
 			   (mixi-comment-parent object))))
+	  ((eq class 'mixi-event)
+	   (concat "[イベント] " (mixi-event-title object)))
 	  (t (mixi-object-title object)))))
 
 (defun shimbun-mixi-make-from (object)
@@ -144,7 +146,23 @@ of mixi object."
 	   (mixi-expand-url (mixi-message-page object))))))
 
 (defun shimbun-mixi-make-body (object)
-  (mixi-object-content object))
+  (let ((class (mixi-object-class object)))
+    (cond ((eq class 'mixi-event)
+	   (let ((limit (mixi-event-limit object)))
+	     (setq limit (if limit
+			     (format-time-string "%Y年%m月%d日" limit)
+			   "指定なし"))
+	     (concat "<dl><dt>開催日時：</dt>"
+		     "<dd>" (mixi-event-date object) "</dd>"
+		     "<dt>開催場所：</dt>"
+		     "<dd>" (mixi-event-place object) "</dd>"
+		     "<dt>詳細：</dt>"
+		     "<dd>" (mixi-event-detail object) "</dd>"
+		     "<dt>募集期限：</dt>"
+		     "<dd>" limit "</dd>"
+		     "<dt>参加者：</dt>"
+		     "<dd>" (mixi-event-members object) "</dd></dl>")))
+	  (t (mixi-object-content object)))))
 
 (defun shimbun-mixi-get-headers (shimbun objects &optional range)
   (when objects

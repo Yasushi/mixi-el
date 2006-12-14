@@ -480,38 +480,17 @@ Increase this value when unexpected error frequently occurs."
   "Return the title of OBJECT."
   (unless (mixi-object-p object)
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
-  (let ((class (mixi-object-class object))
-	(func (intern (concat mixi-object-prefix
-			      (mixi-object-name object) "-title")))
-	prefix)
-    (cond ((eq class 'mixi-event)
-	   (setq prefix "[イベント]")))
-    (concat prefix (funcall func object))))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-title"))))
+    (funcall func object)))
 
 (defun mixi-object-content (object)
   "Return the content of OBJECT."
   (unless (mixi-object-p object)
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
-  (let ((class (mixi-object-class object)))
-    (cond ((eq class 'mixi-event)
-	   (let ((limit (mixi-event-limit object)))
-	     (setq limit (if limit
-			     (format-time-string "%Y年%m月%d日" limit)
-			   "指定なし"))
-	     (concat "<dl><dt>開催日時：</dt>"
-		     "<dd>" (mixi-event-date object) "</dd>"
-		     "<dt>開催場所：</dt>"
-		     "<dd>" (mixi-event-place object) "</dd>"
-		     "<dt>詳細：</dt>"
-		     "<dd>" (mixi-event-detail object) "</dd>"
-		     "<dt>募集期限：</dt>"
-		     "<dd>" limit "</dd>"
-		     "<dt>参加者：</dt>"
-		     "<dd>" (mixi-event-members object) "</dd></dl>")))
-	  (t
-	   (let ((func (intern (concat mixi-object-prefix
-				       (mixi-object-name object) "-content"))))
-	     (funcall func object))))))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-content"))))
+    (funcall func object)))
 
 (defun mixi-object-set-timestamp (object timestamp)
   "Set the timestamp of OBJECT."

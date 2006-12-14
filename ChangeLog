@@ -1,5 +1,10 @@
 2006-12-14  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
+	(mixi-friend-realize): Ditto.
+
+2006-12-14  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-object-p): Check whether class is symbol.
 	(mixi-read-object): New function.
 	(mixi-cache-file-regexp): New regexp.

@@ -692,7 +692,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>\n\\(.*\\)さん([0-9]+)")
+  "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>?\n\\(.*\\)さん([0-9]+)")
 (defconst mixi-friend-name-sex-regexp
   "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>名\\(&nbsp;\\| \\)前</font></td>\n+<td WIDTH=345>\\([^<]+\\) (\\([男女]\\)性)</td>")
 (defconst mixi-friend-address-regexp
@@ -726,7 +726,8 @@ Increase this value when unexpected error frequently occurs."
 	(signal 'error (list 'cannot-find-nick friend)))
       ;; For getting my profile.
       (unless (string-match mixi-friend-name-sex-regexp buf)
-	(with-mixi-retrieve "/show_profile.pl"
+	(with-mixi-retrieve (concat "/show_profile.pl?id="
+				    (mixi-friend-id friend))
 	  (setq buf buffer)))
       (if (string-match mixi-friend-name-sex-regexp buf)
 	  (progn

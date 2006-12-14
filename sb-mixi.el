@@ -100,7 +100,7 @@ of mixi object."
 	   (concat "Re: " (shimbun-mixi-make-subject
 			   (mixi-comment-parent object))))
 	  ((eq class 'mixi-event)
-	   (concat "[イベント] " (mixi-event-title object)))
+	   (concat "[イベント]" (mixi-event-title object)))
 	  (t (mixi-object-title object)))))
 
 (defun shimbun-mixi-make-from (object)

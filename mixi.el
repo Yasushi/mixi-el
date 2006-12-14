@@ -120,6 +120,11 @@
   :type 'string
   :group 'mixi)
 
+(defcustom mixi-directory (expand-file-name "~/.mixi")
+  "*Where to look for mixi files."
+  :type 'directory
+  :group 'mixi)
+
 (defcustom mixi-coding-system 'euc-jp
   "*Coding system for mixi."
   :type 'coding-system
@@ -192,11 +197,6 @@ Increase this value when unexpected error frequently occurs."
 (defcustom mixi-cache-use-file t
   "*If non-nil, caches are saved to files."
   :type 'boolean
-  :group 'mixi)
-
-(defcustom mixi-cache-directory (expand-file-name "~/.mixi")
-  "*Where to look for cache files."
-  :type 'directory
   :group 'mixi)
 
 (defvar mixi-me nil)
@@ -412,51 +412,6 @@ Increase this value when unexpected error frequently occurs."
 	  (append (encode-coding-string (or string "") mixi-coding-system)
 		  nil))))
 
-;; Cache.
-;; stolen from time-date.el
-(defun mixi-time-less-p (t1 t2)
-  "Say whether time value T1 is less than time value T2."
-  (unless (numberp (cdr t1))
-    (setq t1 (cons (car t1) (car (cdr t1)))))
-  (unless (numberp (cdr t2))
-    (setq t2 (cons (car t2) (car (cdr t2)))))
-  (or (< (car t1) (car t2))
-      (and (= (car t1) (car t2))
-	   (< (cdr t1) (cdr t2)))))
-
-(defun mixi-time-add (t1 t2)
-  "Add two time values.  One should represent a time difference."
-  (unless (numberp (cdr t1))
-    (setq t1 (cons (car t1) (car (cdr t1)))))
-  (unless (numberp (cdr t2))
-    (setq t2 (cons (car t2) (car (cdr t2)))))
-  (let ((low (+ (cdr t1) (cdr t2))))
-    (cons (+ (car t1) (car t2) (lsh low -16)) low)))
-
-;; stolen from time-date.el
-(defun mixi-seconds-to-time (seconds)
-  "Convert SECONDS (a floating point number) to a time value."
-  (cons (floor seconds 65536)
-	(floor (mod seconds 65536))))
-
-(defun mixi-cache-expired-p (object)
-  "Whether a cache of OBJECT is expired."
-  (let ((timestamp (mixi-object-timestamp object)))
-    (unless (or (null mixi-cache-expires)
-		 (null timestamp))
-      (if (numberp mixi-cache-expires)
-	  (mixi-time-less-p
-	   (mixi-time-add timestamp (mixi-seconds-to-time mixi-cache-expires))
-	   (current-time))
-	t))))
-
-(defun mixi-make-cache (key value table)
-  "Make a cache object and return it."
-  (let ((cache (gethash key table)))
-    (if (and cache (not (mixi-cache-expired-p cache)))
-	cache
-      (puthash key value table))))
-
 ;; Object.
 (defconst mixi-object-prefix "mixi-")
 
@@ -464,8 +419,10 @@ Increase this value when unexpected error frequently occurs."
   `(car-safe ,object))
 
 (defmacro mixi-object-p (object)
-  `(eq (string-match (concat "^" mixi-object-prefix)
-		     (symbol-name (mixi-object-class ,object))) 0))
+  `(let ((class (mixi-object-class ,object)))
+     (when (symbolp class)
+       (eq (string-match (concat "^" mixi-object-prefix)
+			 (symbol-name class)) 0))))
 
 (defun mixi-object-name (object)
   "Return the name of OBJECT."
@@ -473,6 +430,20 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
   (let ((class (mixi-object-class object)))
     (substring (symbol-name class) (length mixi-object-prefix))))
+
+(defun mixi-read-object (exp)
+  "Read one Lisp expression as mixi object."
+  (if (mixi-object-p exp)
+      (let ((func (intern (concat mixi-object-prefix "make-"
+				  (mixi-object-name exp))))
+	    (args (mapcar (lambda (arg)
+			    (mixi-read-object arg))
+			  (cdr exp))))
+	(let ((object (apply func (cdr args))))
+	  (when (car args)
+	    (mixi-object-set-timestamp object (car args)))
+	  object))
+    exp))
 
 (defun mixi-object-timestamp (object)
   "Return the timestamp of OJBECT."
@@ -566,12 +537,132 @@ Increase this value when unexpected error frequently occurs."
     (when (string-match "/home\\.pl" url)
       (mixi-make-friend-from-url url))))
 
+;; Cache.
+;; stolen from time-date.el
+(defun mixi-time-less-p (t1 t2)
+  "Say whether time value T1 is less than time value T2."
+  (unless (numberp (cdr t1))
+    (setq t1 (cons (car t1) (car (cdr t1)))))
+  (unless (numberp (cdr t2))
+    (setq t2 (cons (car t2) (car (cdr t2)))))
+  (or (< (car t1) (car t2))
+      (and (= (car t1) (car t2))
+	   (< (cdr t1) (cdr t2)))))
+
+(defun mixi-time-add (t1 t2)
+  "Add two time values.  One should represent a time difference."
+  (unless (numberp (cdr t1))
+    (setq t1 (cons (car t1) (car (cdr t1)))))
+  (unless (numberp (cdr t2))
+    (setq t2 (cons (car t2) (car (cdr t2)))))
+  (let ((low (+ (cdr t1) (cdr t2))))
+    (cons (+ (car t1) (car t2) (lsh low -16)) low)))
+
+;; stolen from time-date.el
+(defun mixi-seconds-to-time (seconds)
+  "Convert SECONDS (a floating point number) to a time value."
+  (cons (floor seconds 65536)
+	(floor (mod seconds 65536))))
+
+(defun mixi-cache-expired-p (object)
+  "Whether a cache of OBJECT is expired."
+  (let ((timestamp (mixi-object-timestamp object)))
+    (unless (or (null mixi-cache-expires)
+		 (null timestamp))
+      (if (numberp mixi-cache-expires)
+	  (mixi-time-less-p
+	   (mixi-time-add timestamp (mixi-seconds-to-time mixi-cache-expires))
+	   (current-time))
+	t))))
+
+(defun mixi-make-cache (key value table)
+  "Make a cache object and return it."
+  (let ((cache (gethash key table)))
+    (if (and cache (not (mixi-cache-expired-p cache)))
+	cache
+      (puthash key value table))))
+
+(defconst mixi-cache-file-regexp "[a-z]+-cache$")
+(defconst mixi-cache-regexp (concat mixi-object-prefix
+				    mixi-cache-file-regexp))
+
+(defun mixi-save-cache ()
+  (unless (file-directory-p mixi-directory)
+    (make-directory mixi-directory t))
+  (let ((caches (apropos-internal mixi-cache-regexp 'boundp)))
+    (mapc (lambda (symbol)
+	    (with-temp-file (expand-file-name
+			     (substring (symbol-name symbol)
+					(length mixi-object-prefix))
+			     mixi-directory)
+	      (let ((coding-system-for-write mixi-coding-system)
+		    (cache (symbol-value symbol)))
+		(insert "#s(hash-table size "
+			(number-to-string (hash-table-count cache))
+			" test equal data (\n")
+		(maphash
+		 (lambda (key value)
+		   (let (print-level print-length)
+		     (insert (prin1-to-string key) " "
+			     (prin1-to-string value) "\n")))
+		 cache))
+	      (insert "))")))
+	  caches)))
+
+;; stolen (and modified) from lsdb.el
+(defun mixi-read-cache (&optional marker)
+  "Read one Lisp expression as text from MARKER, return as Lisp object."
+  (save-excursion
+    (goto-char marker)
+    (if (looking-at "^#s(")
+	(let ((end-marker
+	       (progn
+		 (forward-char 2);skip "#s"
+		 (forward-sexp);move to the left paren
+		 (point-marker))))
+	  (with-temp-buffer
+	    (buffer-disable-undo)
+	    (insert-buffer-substring (marker-buffer marker)
+				     marker end-marker)
+	    (goto-char (point-min))
+	    (delete-char 2)
+	    (let ((object (read (current-buffer)))
+		  data)
+	      (if (eq 'hash-table (car object))
+		  (progn
+		    (setq data (plist-get (cdr object) 'data))
+		    (while data
+		      (pop data);throw it away
+		      (mixi-read-object (pop data))))
+		object))))
+      (read marker))))
+
+(defun mixi-load-cache ()
+  (when (file-directory-p mixi-directory)
+    ;; FIXME: Load friend and community first.
+    (let ((files (directory-files mixi-directory t mixi-cache-file-regexp)))
+      (mapc (lambda (file)
+	      (let ((buffer (find-file-noselect file)))
+		(unwind-protect
+		    (save-excursion
+		      (set-buffer buffer)
+		      (goto-char (point-min))
+		      (re-search-forward "^#s(")
+		      (goto-char (match-beginning 0))
+		      (mixi-read-cache (point-marker)))
+		  (kill-buffer buffer))))
+	    files))))
+
 ;; Friend object.
 (defvar mixi-friend-cache (make-hash-table :test 'equal))
-(defun mixi-make-friend (id &optional nick)
+(defun mixi-make-friend (id &optional nick name sex address age birthday
+			    blood-type birthplace hobby job organization
+			    profile)
   "Return a friend object."
-  (mixi-make-cache id (cons 'mixi-friend (vector nil id nick nil nil nil nil
-						 nil nil nil nil nil nil nil))
+  (mixi-make-cache id (cons 'mixi-friend (vector nil id nick name sex address
+						 age birthday blood-type
+						 birthplace hobby job
+						 organization profile))
 		   mixi-friend-cache))
 
 (defun mixi-make-me ()
@@ -934,11 +1025,12 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Diary object.
 (defvar mixi-diary-cache (make-hash-table :test 'equal))
-(defun mixi-make-diary (owner id)
+(defun mixi-make-diary (owner id &optional time title content)
   "Return a diary object."
   (let ((owner (or owner (mixi-make-me))))
     (mixi-make-cache (list (mixi-friend-id owner) id)
-		     (cons 'mixi-diary (vector nil owner id nil nil nil))
+		     (cons 'mixi-diary (vector nil owner id time title
+					       content))
 		     mixi-diary-cache)))
 
 (defconst mixi-diary-url-regexp
@@ -1104,10 +1196,13 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Community object.
 (defvar mixi-community-cache (make-hash-table :test 'equal))
-(defun mixi-make-community (id &optional name)
+(defun mixi-make-community (id &optional name birthday owner category members
+			       open-level authority description)
   "Return a community object."
-  (mixi-make-cache id (cons 'mixi-community (vector nil id name nil nil nil
-						    nil nil nil nil))
+  (mixi-make-cache id (cons 'mixi-community (vector nil id name birthday owner
+						    category members
+						    open-level authority
+						    description))
 		   mixi-community-cache))
 
 (defconst mixi-community-url-regexp
@@ -1360,10 +1455,11 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Topic object.
 (defvar mixi-topic-cache (make-hash-table :test 'equal))
-(defun mixi-make-topic (community id)
+(defun mixi-make-topic (community id &optional time title owner content)
   "Return a topic object."
   (mixi-make-cache (list (mixi-community-id community) id)
-		   (cons 'mixi-topic (vector nil community id nil nil nil nil))
+		   (cons 'mixi-topic (vector nil community id time title owner
+					     content))
 		   mixi-topic-cache))
 
 (defconst mixi-topic-url-regexp
@@ -1486,11 +1582,12 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Event object.
 (defvar mixi-event-cache (make-hash-table :test 'equal))
-(defun mixi-make-event (community id)
+(defun mixi-make-event (community id &optional time title owner date place
+				  detail limit members)
   "Return a event object."
   (mixi-make-cache (list (mixi-community-id community) id)
-		   (cons 'mixi-event (vector nil community id nil nil nil nil
-					     nil nil nil nil))
+		   (cons 'mixi-event (vector nil community id time title owner
+					     date place detail limit members))
 		   mixi-event-cache))
 
 (defconst mixi-event-url-regexp
@@ -1960,10 +2057,11 @@ Increase this value when unexpected error frequently occurs."
   (symbol-name box))
 
 (defvar mixi-message-cache (make-hash-table :test 'equal))
-(defun mixi-make-message (id box)
+(defun mixi-make-message (id box &optional owner title time content)
   "Return a message object."
   (mixi-make-cache (list id box)
-		   (cons 'mixi-message (vector nil id box nil nil nil nil))
+		   (cons 'mixi-message (vector nil id box owner title time
+					       content))
 		   mixi-message-cache))
 
 (defconst mixi-message-url-regexp

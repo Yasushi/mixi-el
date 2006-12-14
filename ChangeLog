@@ -1,3 +1,19 @@
+2006-12-14  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-object-p): Check whether class is symbol.
+	(mixi-read-object): New function.
+	(mixi-cache-file-regexp): New regexp.
+	(mixi-cache-regexp): Use it.
+	(mixi-save-cache): Remove the prefix of file name.
+	(mixi-read-cache): Use `mixi-read-object' instead of `puthash'.
+	(mixi-load-cache): Follow the change above.
+	(mixi-make-friend): Add all slots to the argument. 
+	(mixi-make-diary): Ditto.
+	(mixi-make-community): Ditto.
+	(mixi-make-topic): Ditto.
+	(mixi-make-event): Ditto.
+	(mixi-make-message): Ditto.
+
 2006-12-12  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-url-retrieve): Simplify.
@@ -196,6 +212,19 @@
 
 	* mixi.el (mixi-topic-content-regexp): Fix regexp.
 	(mixi-topic-realize): Follow the change above.
+
+2006-11-25  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-save-cache): Use `symbol-value' instead of
+	`default-value'.
+
+2006-11-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-directory): Rename from `mixi-cache-directory'.
+	(mixi-cache-regexp): New regexp.
+	(mixi-save-cache): New function.
+	(mixi-read-cache): Ditto.
+	(mixi-load-cache): Ditto.
 
 2006-11-24  OHASHI Akira  <bg66@koka-in.org>
 

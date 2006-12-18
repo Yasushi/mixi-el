@@ -241,7 +241,6 @@ of mixi object."
       (let ((parent (mixi-make-object-from-url url)))
 	(mapc (lambda (comment)
 		(let ((id (shimbun-mixi-make-message-id comment))
-		      ;; FIXME: Concat parent's information?
 		      (content (mixi-comment-content comment)))
 		  (puthash id content cache)
 		  (when (string= id message-id)
@@ -258,7 +257,6 @@ of mixi object."
 	     (let* ((url (shimbun-article-url shimbun header))
 		    (article (if (string-match "#comment$" url)
 				 (shimbun-comment-article url shimbun header)
-			       ;; FIXME: Concat community information?
 			       (shimbun-mixi-make-body
 				(mixi-make-object-from-url url)))))
 	       (when (stringp article)

@@ -1,5 +1,19 @@
 2006-12-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
+	(mixi-friend-name-regexp): Ditto.
+	(mixi-friend-sex-regexp): Ditto.
+	(mixi-friend-hobby-regexp): Ditto.
+	(mixi-friend-realize): Follow the change above.
+	(mixi-community-birthday-regexp): Follow the change of mixi.
+	(mixi-community-owner-regexp): Ditto.
+	(mixi-community-category-regexp): Ditto.
+	(mixi-community-members-regexp): Ditto.
+	(mixi-community-open-level-regexp): Ditto.
+	(mixi-community-authority-regexp): Ditto.
+
+2006-12-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi-make-subject): Add SHIMBUN argument.
 	(shimbun-mixi-get-headers): Follow the change above.
 

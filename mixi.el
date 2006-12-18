@@ -672,9 +672,16 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>?\n\\(.*\\)さん([0-9]+)")
-(defconst mixi-friend-name-sex-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>名\\(&nbsp;\\| \\)前</font></td>\n+<td WIDTH=345>\\([^<]+\\) (\\([男女]\\)性)</td>")
+  "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>?
+\\(.*\\)さん([0-9]+)")
+(defconst mixi-friend-name-regexp
+  "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>名\\(&nbsp;\\| \\)前</font></td>
+
+?<td WIDTH=345>\\(.+?\\)\\(</td>\\|<img\\)")
+(defconst mixi-friend-sex-regexp
+  "<td BGCOLOR=#F2DDB7\\( WIDTH=80 NOWRAP\\)?><font COLOR=#996600>性\\(&nbsp;\\| \\)別</font></td>
+
+?<td WIDTH=345>\\([男女]\\)性\\(</td>\\|<img\\)")
 (defconst mixi-friend-address-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>現住所</font></td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
 (defconst mixi-friend-age-regexp
@@ -686,7 +693,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-friend-birthplace-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>出身地</font>\n?</td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
 (defconst mixi-friend-hobby-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>趣\\(&nbsp;\\| \\)味</font></td>\n<td>\\(.+\\)</td></tr>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>趣\\(&nbsp;\\| \\)味</font></td>\n<td>\\(.+?\\)\\(</td>\\|<img\\)")
 (defconst mixi-friend-job-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>職\\(&nbsp;\\| \\)業</font></td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
 (defconst mixi-friend-organization-regexp
@@ -705,17 +712,18 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-friend-set-nick friend (match-string 1 buf))
 	(signal 'error (list 'cannot-find-nick friend)))
       ;; For getting my profile.
-      (unless (string-match mixi-friend-name-sex-regexp buf)
+      (unless (string-match mixi-friend-name-regexp buf)
 	(with-mixi-retrieve (concat "/show_profile.pl?id="
 				    (mixi-friend-id friend))
 	  (setq buf buffer)))
-      (if (string-match mixi-friend-name-sex-regexp buf)
-	  (progn
+      (if (string-match mixi-friend-name-regexp buf)
 	    (mixi-friend-set-name friend (match-string 2 buf))
-	    (mixi-friend-set-sex friend
-				 (if (string= (match-string 3 buf) "男")
-				     'male 'female)))
-	(signal 'error (list 'cannot-find-name-or-sex friend)))
+	(signal 'error (list 'cannot-find-name friend)))
+      (if (string-match mixi-friend-sex-regexp buf)
+	  (mixi-friend-set-sex friend
+			       (if (string= (match-string 3 buf) "男")
+				   'male 'female))
+	(signal 'error (list 'cannot-find-sex friend)))
       (when (string-match mixi-friend-address-regexp buf)
 	(mixi-friend-set-address friend (match-string 1 buf)))
       (when (string-match mixi-friend-age-regexp buf)
@@ -1207,19 +1215,27 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-name-regexp
   "<td WIDTH=345>\\(.*\\)</td></tr>")
 (defconst mixi-community-birthday-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>開設日</font></td>\n<td>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>開設日</font></td>
+<td>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
 ;; FIXME: Care when the owner has seceded.
 (defconst mixi-community-owner-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>管理人</font></td>\n<td>\n\n<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\n\\(.*\\)</a>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>管理人</font></td>
+<td>
+
+<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">
+\\(.*\\)</a>")
 (defconst mixi-community-category-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>カテゴリ</font></td>\n<td>\\([^<]+\\)</td>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>カテゴリ</font></td>
+<td>\\([^<]+\\)</td>")
 (defconst mixi-community-members-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>メンバー数</font></td>\n<td>\\([0-9]+\\)人</td></tr>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>メンバー数</font></td>
+<td>\\([0-9]+\\)人</td></tr>")
 (defconst mixi-community-open-level-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>参加条件と<br>公開レベル</font></td>
 <td>\\(.+\\)</td></tr>")
 (defconst mixi-community-authority-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>トピック作成の権限</font></td>\n<td>\\(.+\\)</td></tr>")
+  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>トピック作成の権限</font></td>
+<td>\\(.+\\)</td></tr>")
 (defconst mixi-community-description-regexp
   "<td CLASS=h120>\\(.+\\)</td>")
 

@@ -106,7 +106,7 @@ of mixi object."
 		      (concat " ("
 			      (if (eq class 'mixi-diary)
 				  (mixi-friend-nick
-				   (mixi-diary-friend object))
+				   (mixi-diary-owner object))
 				(mixi-community-name
 				 (mixi-bbs-community object)))
 			      ")"))))

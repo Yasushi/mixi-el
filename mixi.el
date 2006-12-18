@@ -1460,6 +1460,8 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/view_bbs.pl?id=" (mixi-topic-id ,topic)
 	   "&comm_id=" (mixi-community-id (mixi-topic-community ,topic))))
 
+(defconst mixi-topic-community-regexp
+  "<td width=\"595\" background=\"http://img\\.mixi\\.jp/img/bg_w\\.gif\"><b>\\[\\(.+\\)\\] トピック</b></td>")
 (defconst mixi-topic-time-regexp
   "<td rowspan=\"3\" width=\"110\" bgcolor=\"#ffd8b0\" align=\"center\" valign=\"top\" nowrap>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-topic-title-regexp
@@ -1474,6 +1476,10 @@ Increase this value when unexpected error frequently occurs."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realize-p topic)
     (with-mixi-retrieve (mixi-topic-page topic)
+      (if (string-match mixi-topic-community-regexp buffer)
+	  (mixi-community-set-name (mixi-topic-community topic)
+				   (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-community topic)))
       (if (string-match mixi-topic-time-regexp buffer)
 	  (mixi-topic-set-time
 	   topic (encode-time 0 (string-to-number (match-string 5 buffer))
@@ -1588,6 +1594,8 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/view_event.pl?id=" (mixi-event-id ,event)
 	   "&comm_id=" (mixi-community-id (mixi-event-community ,event))))
 
+(defconst mixi-event-community-regexp
+  "<td WIDTH=595 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b>\\[\\(.+\\)\\] イベント</b></td>")
 (defconst mixi-event-time-regexp
   "<td ROWSPAN=11 BGCOLOR=#FFD8B0 ALIGN=center VALIGN=top WIDTH=110>
 \\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
@@ -1624,6 +1632,10 @@ Increase this value when unexpected error frequently occurs."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realize-p event)
     (with-mixi-retrieve (mixi-event-page event)
+      (if (string-match mixi-event-community-regexp buffer)
+	  (mixi-community-set-name (mixi-event-community event)
+				   (match-string 1 buffer))
+	(signal 'error (list 'cannot-find-title event)))
       (if (string-match mixi-event-time-regexp buffer)
 	  (mixi-event-set-time
 	   event (encode-time 0 (string-to-number (match-string 5 buffer))
@@ -1778,10 +1790,24 @@ Increase this value when unexpected error frequently occurs."
   (aset (cdr event) 10 members))
 
 ;; Bbs object.
-(defalias 'mixi-bbs-owner 'mixi-object-owner)
+(defconst mixi-bbs-list '(mixi-topic mixi-event))
+
+(defmacro mixi-bbs-p (object)
+  `(when (memq (mixi-object-class ,object) mixi-bbs-list)
+     t))
+
+(defun mixi-bbs-community (object)
+  "Return the community of OBJECT."
+  (unless (mixi-bbs-p object)
+    (signal 'wrong-type-argument (list 'mixi-bbs-p object)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name object) "-community"))))
+    (funcall func object)))
+
 (defalias 'mixi-bbs-id 'mixi-object-id)
 (defalias 'mixi-bbs-time 'mixi-object-time)
 (defalias 'mixi-bbs-title 'mixi-object-title)
+(defalias 'mixi-bbs-owner 'mixi-object-owner)
 (defalias 'mixi-bbs-content 'mixi-object-content)
 
 (defmacro mixi-bbs-list-page (community)

@@ -71,7 +71,7 @@ of mixi object."
   :type 'boolean)
 
 (defcustom shimbun-mixi-logout-p nil
-  "*If non-ni, Logout from mixi when shimbun server was closed."
+  "*If non-ni, logout from mixi when shimbun server was closed."
   :group 'shimbun
   :type 'boolean)
 
@@ -94,14 +94,23 @@ of mixi object."
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
   (mapcar 'car shimbun-mixi-group-alist))
 
-(defun shimbun-mixi-make-subject (object)
+(defun shimbun-mixi-make-subject (shimbun object)
   (let ((class (mixi-object-class object)))
-    (cond ((eq class 'mixi-comment)
-	   (concat "Re: " (shimbun-mixi-make-subject
-			   (mixi-comment-parent object))))
-	  ((eq class 'mixi-event)
-	   (concat "[イベント]" (mixi-event-title object)))
-	  (t (mixi-object-title object)))))
+    (if (eq class 'mixi-comment)
+        (concat "Re: " (shimbun-mixi-make-subject
+			shimbun (mixi-comment-parent object)))
+      (let ((prefix (when (eq class 'mixi-event) "[イベント]"))
+	    (subject (mixi-object-title object))
+	    (suffix (when (string-match
+			   "^new-" (shimbun-current-group-internal shimbun))
+		      (concat " ("
+			      (if (eq class 'mixi-diary)
+				  (mixi-friend-nick
+				   (mixi-diary-friend object))
+				(mixi-community-name
+				 (mixi-bbs-community object)))
+			      ")"))))
+	(concat prefix subject suffix)))))
 
 (defun shimbun-mixi-make-from (object)
   (let ((owner (mixi-object-owner object)))
@@ -175,7 +184,7 @@ of mixi object."
 		    (push
 		     (shimbun-create-header
 		      0
-		      (shimbun-mixi-make-subject object)
+		      (shimbun-mixi-make-subject shimbun object)
 		      (shimbun-mixi-make-from object)
 		      (shimbun-mixi-make-date object)
 		      id

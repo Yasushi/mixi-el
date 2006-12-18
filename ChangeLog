@@ -1,5 +1,18 @@
 2006-12-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-make-subject): Add SHIMBUN argument.
+	(shimbun-mixi-get-headers): Follow the change above.
+
+	* mixi.el (mixi-topic-community-regexp): New regexp.
+	(mixi-topic-realize): Use it.
+	(mixi-event-community-regexp): New regexp.
+	(mixi-event-realize): Use it.
+	(mixi-bbs-list): New constant.
+	(mixi-bbs-p): New macro.
+	(mixi-bbs-community): New function.
+
+2006-12-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-curl-cookie-file): Change the default value to
 	~/.mixi/cookies.txt.
 

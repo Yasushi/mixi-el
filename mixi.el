@@ -135,7 +135,8 @@
   :type 'file
   :group 'mixi)
 
-(defcustom mixi-curl-cookie-file (expand-file-name "~/.mixi-cookies.txt")
+(defcustom mixi-curl-cookie-file (expand-file-name "cookies.txt"
+						   mixi-directory)
   "*The location of cookie file created by `curl'."
   :type 'file
   :group 'mixi)

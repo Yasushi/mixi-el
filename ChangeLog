@@ -1,5 +1,11 @@
 2006-12-19  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-comment-article): Rename from
+	`shimbun-comment-article'.
+	(shimbun-article): Follow the change above.
+
+2006-12-19  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-parse-buffer): Use `sleep-for' instead of `sit-for'.
 
 2006-12-18  OHASHI Akira  <bg66@koka-in.org>

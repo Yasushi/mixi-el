@@ -233,7 +233,7 @@ of mixi object."
       (setq objects (funcall url-or-function range)))
     (shimbun-sort-headers (shimbun-mixi-get-headers shimbun objects range))))
 
-(defun shimbun-comment-article (url shimbun header)
+(defun shimbun-mixi-comment-article (url shimbun header)
   (let* ((message-id (shimbun-header-id header))
 	 (cache (shimbun-mixi-comment-cache-internal shimbun))
 	 (article (gethash message-id cache)))
@@ -256,7 +256,8 @@ of mixi object."
        (or (with-temp-buffer
 	     (let* ((url (shimbun-article-url shimbun header))
 		    (article (if (string-match "#comment$" url)
-				 (shimbun-comment-article url shimbun header)
+				 (shimbun-mixi-comment-article
+				  url shimbun header)
 			       (shimbun-mixi-make-body
 				(mixi-make-object-from-url url)))))
 	       (when (stringp article)

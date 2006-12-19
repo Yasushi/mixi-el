@@ -1,5 +1,55 @@
 2006-12-19  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-object-realized-p): Rename from
+	`mixi-object-realize-p'.
+	(mixi-realize-friend): Rename from `mixi-friend-realize'.
+	(mixi-friend-nick): Follow the change above.
+	(mixi-friend-name): Ditto.
+	(mixi-friend-sex): Ditto.
+	(mixi-friend-address): Ditto.
+	(mixi-friend-age): Ditto.
+	(mixi-friend-birthday): Ditto.
+	(mixi-friend-blood-type): Ditto.
+	(mixi-friend-birthplace): Ditto.
+	(mixi-friend-hobby): Ditto.
+	(mixi-friend-job): Ditto.
+	(mixi-friend-organization): Ditto.
+	(mixi-friend-profile): Ditto.
+	(mixi-realize-diary): Rename from `mixi-diary-realize'.
+	(mixi-diary-time): Follow the change above.
+	(mixi-diary-title): Ditto.
+	(mixi-diary-content): Ditto.
+	(mixi-realize-community): Rename from `mixi-community-realize'.
+	(mixi-community-name): Follow the change above.
+	(mixi-community-birthday): Ditto.
+	(mixi-community-owner): Ditto.
+	(mixi-community-category): Ditto.
+	(mixi-community-members): Ditto.
+	(mixi-community-open-level): Ditto.
+	(mixi-community-authority): Ditto.
+	(mixi-community-description): Ditto.
+	(mixi-realize-topic): Rename from `mixi-topic-realize'.
+	(mixi-topic-time): Follow the change above.
+	(mixi-topic-title): Ditto.
+	(mixi-topic-owner): Ditto.
+	(mixi-topic-content): Ditto.
+	(mixi-realize-event): Rename from `mixi-event-realize'.
+	(mixi-event-time): Follow the change above.
+	(mixi-event-title): Ditto.
+	(mixi-event-owner): Ditto.
+	(mixi-event-date): Ditto.
+	(mixi-event-place): Ditto.
+	(mixi-event-detail): Ditto.
+	(mixi-event-limit): Ditto.
+	(mixi-event-members): Ditto.
+	(mixi-realize-message): Rename from `mixi-message-realize'.
+	(mixi-message-owner): Follow the change above.
+	(mixi-message-title): Ditto.
+	(mixi-message-time): Ditto.
+	(mixi-message-content): Ditto.
+
+2006-12-19  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi-comment-article): Rename from
 	`shimbun-comment-article'.
 	(shimbun-article): Follow the change above.

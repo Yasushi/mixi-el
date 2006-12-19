@@ -451,7 +451,7 @@ Increase this value when unexpected error frequently occurs."
   (unless (mixi-object-p object)
     (signal 'wrong-type-argument (list 'mixi-object-p object)))
   (aref (cdr object) 0))
-(defalias 'mixi-object-realize-p 'mixi-object-timestamp)
+(defalias 'mixi-object-realized-p 'mixi-object-timestamp)
 
 (defun mixi-object-owner (object)
   "Return the owner of OBJECT."
@@ -701,10 +701,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-friend-profile-regexp
   "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¼«¸Ê¾Ò²ð</font></td>\n<td CLASS=h120>\\(.+\\)</td></tr>")
 
-(defun mixi-friend-realize (friend)
+(defun mixi-realize-friend (friend)
   "Realize a FRIEND."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-object-realize-p friend)
+  (unless (mixi-object-realized-p friend)
     (let (buf)
       (with-mixi-retrieve (mixi-friend-page friend)
 	(setq buf buffer))
@@ -759,84 +759,84 @@ Increase this value when unexpected error frequently occurs."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
   (unless (aref (cdr friend) 2)
-    (mixi-friend-realize friend))
+    (mixi-realize-friend friend))
   (aref (cdr friend) 2))
 
 (defun mixi-friend-name (friend)
   "Return the name of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 3))
 
 (defun mixi-friend-sex (friend)
   "Return the sex of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 4))
 
 (defun mixi-friend-address (friend)
   "Return the address of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 5))
 
 (defun mixi-friend-age (friend)
   "Return the age of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 6))
 
 (defun mixi-friend-birthday (friend)
   "Return the birthday of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 7))
 
 (defun mixi-friend-blood-type (friend)
   "Return the blood type of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 8))
 
 (defun mixi-friend-birthplace (friend)
   "Return the birthplace of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 9))
 
 (defun mixi-friend-hobby (friend)
   "Return the hobby of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 10))
 
 (defun mixi-friend-job (friend)
   "Return the job of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 11))
 
 (defun mixi-friend-organization (friend)
   "Return the organization of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 12))
 
 (defun mixi-friend-profile (friend)
   "Return the pforile of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-  (mixi-friend-realize friend)
+  (mixi-realize-friend friend)
   (aref (cdr friend) 13))
 
 (defun mixi-friend-set-nick (friend nick)
@@ -1050,10 +1050,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-content-regexp
   "<td \\(class\\|CLASS\\)=\"?h12\"?>\\(.*\\)</td>")
 
-(defun mixi-diary-realize (diary)
+(defun mixi-realize-diary (diary)
   "Realize a DIARY."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-object-realize-p diary)
+  (unless (mixi-object-realized-p diary)
     (with-mixi-retrieve (mixi-diary-page diary)
       (unless (string-match mixi-diary-closed-regexp buffer)
 	(if (string-match mixi-diary-owner-nick-regexp buffer)
@@ -1092,21 +1092,21 @@ Increase this value when unexpected error frequently occurs."
   "Return the time of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (mixi-diary-realize diary)
+  (mixi-realize-diary diary)
   (aref (cdr diary) 3))
 
 (defun mixi-diary-title (diary)
   "Return the title of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (mixi-diary-realize diary)
+  (mixi-realize-diary diary)
   (aref (cdr diary) 4))
 
 (defun mixi-diary-content (diary)
   "Return the content of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (mixi-diary-realize diary)
+  (mixi-realize-diary diary)
   (aref (cdr diary) 5))
 
 (defun mixi-diary-set-time (diary time)
@@ -1239,10 +1239,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-description-regexp
   "<td CLASS=h120>\\(.+\\)</td>")
 
-(defun mixi-community-realize (community)
+(defun mixi-realize-community (community)
   "Realize a COMMUNITY."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-object-realize-p community)
+  (unless (mixi-object-realized-p community)
     (with-mixi-retrieve (mixi-community-page community)
       (if (string-match mixi-community-nodata-regexp buffer)
 	  ;; FIXME: Set all members?
@@ -1293,56 +1293,56 @@ Increase this value when unexpected error frequently occurs."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (unless (aref (cdr community) 2)
-    (mixi-community-realize community))
+    (mixi-realize-community community))
   (aref (cdr community) 2))
 
 (defun mixi-community-birthday (community)
   "Return the birthday of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 3))
 
 (defun mixi-community-owner (community)
   "Return the owner of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 4))
 
 (defun mixi-community-category (community)
   "Return the category of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 5))
 
 (defun mixi-community-members (community)
   "Return the members of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 6))
 
 (defun mixi-community-open-level (community)
   "Return the open-level of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 7))
 
 (defun mixi-community-authority (community)
   "Return the authority of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 8))
 
 (defun mixi-community-description (community)
   "Return the description of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
-  (mixi-community-realize community)
+  (mixi-realize-community community)
   (aref (cdr community) 9))
 
 (defun mixi-community-set-name (community name)
@@ -1487,10 +1487,10 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-topic-content-regexp
   "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\"><table><tr>\\(<td width=\"130\" height=\"140\" align=\"center\" valign=\"middle\"><a href=\"javascript:void(0)\" onClick=\"MM_openBrWindow('show_bbs_picture\\.pl\\?id=[0-9]+&number=[0-9]+','pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')\"><img src=\"http://ic[0-9]+\\.mixi\\.jp/[^.]+\\.jpg\" border=\"0\"></a></td>\n\\)*</tr></table>\\(.+\\)</td></tr></table>")
 
-(defun mixi-topic-realize (topic)
+(defun mixi-realize-topic (topic)
   "Realize a TOPIC."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-object-realize-p topic)
+  (unless (mixi-object-realized-p topic)
     (with-mixi-retrieve (mixi-topic-page topic)
       (if (string-match mixi-topic-community-regexp buffer)
 	  (mixi-community-set-name (mixi-topic-community topic)
@@ -1533,28 +1533,28 @@ Increase this value when unexpected error frequently occurs."
   "Return the time of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-topic-realize topic)
+  (mixi-realize-topic topic)
   (aref (cdr topic) 3))
 
 (defun mixi-topic-title (topic)
   "Return the title of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-topic-realize topic)
+  (mixi-realize-topic topic)
   (aref (cdr topic) 4))
 
 (defun mixi-topic-owner (topic)
   "Return the owner of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-topic-realize topic)
+  (mixi-realize-topic topic)
   (aref (cdr topic) 5))
 
 (defun mixi-topic-content (topic)
   "Return the content of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-topic-realize topic)
+  (mixi-realize-topic topic)
   (aref (cdr topic) 6))
 
 (defun mixi-topic-set-time (topic time)
@@ -1643,10 +1643,10 @@ Increase this value when unexpected error frequently occurs."
 <tr>
 <td>&nbsp;\\(.+\\)</td>")
 
-(defun mixi-event-realize (event)
+(defun mixi-realize-event (event)
   "Realize a EVENT."
   ;; FIXME: Check a expiration of cache?
-  (unless (mixi-object-realize-p event)
+  (unless (mixi-object-realized-p event)
     (with-mixi-retrieve (mixi-event-page event)
       (if (string-match mixi-event-community-regexp buffer)
 	  (mixi-community-set-name (mixi-event-community event)
@@ -1703,56 +1703,56 @@ Increase this value when unexpected error frequently occurs."
   "Return the time of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 3))
 
 (defun mixi-event-title (event)
   "Return the title of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 4))
 
 (defun mixi-event-owner (event)
   "Return the owner of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 5))
 
 (defun mixi-event-date (event)
   "Return the date of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 6))
 
 (defun mixi-event-place (event)
   "Return the place of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 7))
 
 (defun mixi-event-detail (event)
   "Return the detail of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 8))
 
 (defun mixi-event-limit (event)
   "Return the limit of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 9))
 
 (defun mixi-event-members (event)
   "Return the members of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-event-realize event)
+  (mixi-realize-event event)
   (aref (cdr event) 10))
 
 (defun mixi-event-set-time (event time)
@@ -2113,9 +2113,9 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-message-content-regexp
   "<tr><td CLASS=h120>\\(.+\\)</td></tr>")
 
-(defun mixi-message-realize (message)
+(defun mixi-realize-message (message)
   "Realize a MESSAGE."
-  (unless (mixi-object-realize-p message)
+  (unless (mixi-object-realized-p message)
     (with-mixi-retrieve (mixi-message-page message)
       (if (string-match mixi-message-owner-regexp buffer)
 	  (mixi-message-set-owner message
@@ -2154,28 +2154,28 @@ Increase this value when unexpected error frequently occurs."
   "Return the owner of MESSAGE."
   (unless (mixi-message-p message)
     (signal 'wrong-type-argument (list 'mixi-message-p message)))
-  (mixi-message-realize message)
+  (mixi-realize-message message)
   (aref (cdr message) 3))
 
 (defun mixi-message-title (message)
   "Return the title of MESSAGE."
   (unless (mixi-message-p message)
     (signal 'wrong-type-argument (list 'mixi-message-p message)))
-  (mixi-message-realize message)
+  (mixi-realize-message message)
   (aref (cdr message) 4))
 
 (defun mixi-message-time (message)
   "Return the date of MESSAGE."
   (unless (mixi-message-p message)
     (signal 'wrong-type-argument (list 'mixi-message-p message)))
-  (mixi-message-realize message)
+  (mixi-realize-message message)
   (aref (cdr message) 5))
 
 (defun mixi-message-content (message)
   "Return the content of MESSAGE."
   (unless (mixi-message-p message)
     (signal 'wrong-type-argument (list 'mixi-message-p message)))
-  (mixi-message-realize message)
+  (mixi-realize-message message)
   (aref (cdr message) 6))
 
 (defun mixi-message-set-owner (message owner)

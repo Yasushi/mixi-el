@@ -1,3 +1,7 @@
+2006-12-19  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-parse-buffer): Use `slee-for' instead of `sit-for'.
+
 2006-12-18  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.

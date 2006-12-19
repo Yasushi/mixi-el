@@ -232,7 +232,7 @@ Increase this value when unexpected error frequently occurs."
   (if (not (string-match mixi-message-continuously-accessing buffer))
       buffer
     (message (mixi-message "Waiting for continuously accessing..."))
-    (sit-for mixi-continuously-access-interval)
+    (sleep-for mixi-continuously-access-interval)
     (mixi-retrieve url post-data)))
 
 (defmacro mixi-expand-url (url)

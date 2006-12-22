@@ -212,7 +212,10 @@ Increase this value when unexpected error frequently occurs."
      'error-conditions '(mixi-realization-error error))
 
 (defmacro mixi-realization-error (type object)
-  `(signal 'mixi-realization-error (list ,type ,object buffer)))
+  `(let ((data (if (and (boundp 'buffer) debug-on-error)
+		   (list ,type ,object buffer)
+		 (list ,type ,object))))
+     (signal 'mixi-realization-error data)))
 
 (defconst mixi-message-adult-contents
   "このページから先はアダルト（成人向け）コンテンツが含まれています。<br>

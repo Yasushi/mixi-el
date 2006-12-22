@@ -1,5 +1,10 @@
 2006-12-22  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-realization-error): Use buffer variable only when it
+	is bound and debug-on-error is t.
+
+2006-12-22  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-realization-error): New error symbol.
 	(mixi-realization-error): New macro.
 	(mixi-realize-friend): Use it.

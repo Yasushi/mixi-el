@@ -920,15 +920,16 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-friend-list-nick-regexp
   "<td valign=middle>\\(.+\\)¤µ¤ó([0-9]+)<br />")
 
-(defun mixi-get-friends (&rest args)
+(defun mixi-get-friends (&rest friend-or-range)
   "Get friends of FRIEND."
-  (when (> (length args) 2)
-    (signal 'wrong-number-of-arguments (list 'mixi-get-friends (length args))))
-  (let ((friend (nth 0 args))
-	(range (nth 1 args)))
+  (when (> (length friend-or-range) 2)
+    (signal 'wrong-number-of-arguments (list 'mixi-get-friends
+					     (length friend-or-range))))
+  (let ((friend (nth 0 friend-or-range))
+	(range (nth 1 friend-or-range)))
     (when (or (not (mixi-friend-p friend)) (mixi-friend-p range))
-      (setq friend (nth 1 args))
-      (setq range (nth 0 args)))
+      (setq friend (nth 1 friend-or-range))
+      (setq range (nth 0 friend-or-range)))
     (unless (or (null friend) (mixi-friend-p friend))
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
     (let ((ids (mixi-get-matched-items (mixi-friend-list-page friend)
@@ -1134,16 +1135,16 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">")
 
-(defun mixi-get-diaries (&rest args)
+(defun mixi-get-diaries (&rest friend-or-range)
   "Get diaries of FRIEND."
-  (when (> (length args) 2)
+  (when (> (length friend-or-range) 2)
     (signal 'wrong-number-of-arguments
-	    (list 'mixi-get-diaries (length args))))
-  (let ((friend (nth 0 args))
-	(range (nth 1 args)))
+	    (list 'mixi-get-diaries (length friend-or-range))))
+  (let ((friend (nth 0 friend-or-range))
+	(range (nth 1 friend-or-range)))
     (when (or (not (mixi-friend-p friend)) (mixi-friend-p range))
-      (setq friend (nth 1 args))
-      (setq range (nth 0 args)))
+      (setq friend (nth 1 friend-or-range))
+      (setq range (nth 0 friend-or-range)))
     (unless (or (null friend) (mixi-friend-p friend))
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
     (let ((items (mixi-get-matched-items (mixi-diary-list-page friend)
@@ -1404,16 +1405,16 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-list-name-regexp
   "<td valign=middle>\\(.+\\)([0-9]+)</td>")
 
-(defun mixi-get-communities (&rest args)
+(defun mixi-get-communities (&rest friend-or-range)
   "Get communities of FRIEND."
-  (when (> (length args) 2)
+  (when (> (length friend-or-range) 2)
     (signal 'wrong-number-of-arguments
-	    (list 'mixi-get-communities (length args))))
-  (let ((friend (nth 0 args))
-	(range (nth 1 args)))
+	    (list 'mixi-get-communities (length friend-or-range))))
+  (let ((friend (nth 0 friend-or-range))
+	(range (nth 1 friend-or-range)))
     (when (or (not (mixi-friend-p friend)) (mixi-friend-p range))
-      (setq friend (nth 1 args))
-      (setq range (nth 0 args)))
+      (setq friend (nth 1 friend-or-range))
+      (setq range (nth 0 friend-or-range)))
     (unless (or (null friend) (mixi-friend-p friend))
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
     (let ((ids (mixi-get-matched-items (mixi-community-list-page friend)
@@ -2209,17 +2210,17 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-message-list-regexp
   "<td><a HREF=\"view_message\\.pl\\?id=\\(.+\\)&box=\\(.+\\)\">")
 
-(defun mixi-get-messages (&rest args)
-  "Get messages."
-  (when (> (length args) 2)
+(defun mixi-get-messages (&rest box-or-range)
+  "Get messages of BOX."
+  (when (> (length box-or-range) 2)
     (signal 'wrong-number-of-arguments
-	    (list 'mixi-get-messages (length args))))
-  (let ((box (nth 0 args))
-	(range (nth 1 args)))
+	    (list 'mixi-get-messages (length box-or-range))))
+  (let ((box (nth 0 box-or-range))
+	(range (nth 1 box-or-range)))
     (when (or (not (mixi-message-box-p box))
 	      (mixi-message-box-p range))
-      (setq box (nth 1 args))
-      (setq range (nth 0 args)))
+      (setq box (nth 1 box-or-range))
+      (setq range (nth 0 box-or-range)))
     (let ((items (mixi-get-matched-items
 		  (mixi-message-list-page
 		   (when box (mixi-message-box-name box)))
@@ -2300,16 +2301,16 @@ Increase this value when unexpected error frequently occurs."
 </td>
 </tr>")
 
-(defun mixi-get-introductions (&rest args)
-  "Get introductions."
-  (when (> (length args) 2)
+(defun mixi-get-introductions (&rest friend-or-range)
+  "Get introductions of FRIEND."
+  (when (> (length friend-or-range) 2)
     (signal 'wrong-number-of-arguments
-	    (list 'mixi-get-introduction (length args))))
-  (let ((friend (nth 0 args))
-	(range (nth 1 args)))
+	    (list 'mixi-get-introduction (length friend-or-range))))
+  (let ((friend (nth 0 friend-or-range))
+	(range (nth 1 friend-or-range)))
     (when (or (not (mixi-friend-p friend)) (mixi-friend-p range))
-      (setq friend (nth 1 args))
-      (setq range (nth 0 args)))
+      (setq friend (nth 1 friend-or-range))
+      (setq range (nth 0 friend-or-range)))
     (unless (or (null friend) (mixi-friend-p friend))
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
     (let* ((regexp (if friend mixi-introduction-list-regexp

@@ -1,3 +1,11 @@
+2006-12-22  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-get-friends): Rename ARGS argument to FRIEND-OR-RANGE.
+	(mixi-get-diaries): Ditto.
+	(mixi-get-communities): Ditto.
+	(mixi-get-messages): Rename ARGS argument to BOX-OR-RANGE.
+	(mixi-get-introductions): Rename ARGS argument to FRIEND-OR-RANGE.
+
 2006-12-19  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-object-realized-p): Rename from

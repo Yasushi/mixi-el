@@ -353,7 +353,8 @@ Increase this value when unexpected error frequently occurs."
   `(let (buffer)
      (when ,url
        (setq buffer (mixi-retrieve ,url))
-       (when (string-match "login.pl" buffer)
+       (when (string-match "<form action=\"login\\.pl\" method=\"post\">"
+			   buffer)
 	 (mixi-login)
 	 (setq buffer (mixi-retrieve ,url))))
      ,@body))

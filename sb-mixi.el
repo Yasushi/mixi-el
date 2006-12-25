@@ -65,11 +65,6 @@ of mixi object."
   :group 'shimbun
   :type 'integer)
 
-(defcustom shimbun-mixi-get-comment-p t
-  "*If non-nil, get diaries or BBSes together with its comments."
-  :group 'shimbun
-  :type 'boolean)
-
 (defcustom shimbun-mixi-logout-p nil
   "*If non-ni, logout from mixi when shimbun server was closed."
   :group 'shimbun
@@ -195,10 +190,8 @@ of mixi object."
 		      0 0
 		      (shimbun-mixi-make-xref object))
 		     headers)
-		    (when (and shimbun-mixi-get-comment-p
-			       (or (eq class 'mixi-diary)
-				   (eq class 'mixi-topic)
-				   (eq class 'mixi-event)))
+		    (when (or (eq class 'mixi-diary)
+			      (mixi-bbs-p object))
 		      (let ((comments (mixi-get-comments object range)))
 			(mapc (lambda (header)
 				(push header headers))
@@ -225,8 +218,7 @@ of mixi object."
 		((eq class 'mixi-community)
 		 (setq objects (mixi-get-bbses object range)))
 		((or (eq class 'mixi-diary)
-		     (eq class 'mixi-topic)
-		     (eq class 'mixi-event))
+		     (mixi-bbs-p object))
 		 (setq objects (mixi-get-comments object range)))
 		(t (error (concat (symbol-name class)
 				  " is not supported yet.")))))

@@ -579,27 +579,28 @@ Increase this value when unexpected error frequently occurs."
 				    mixi-cache-file-regexp))
 
 (defun mixi-save-cache ()
-  (unless (file-directory-p mixi-directory)
-    (make-directory mixi-directory t))
-  (let ((caches (apropos-internal mixi-cache-regexp 'boundp)))
-    (mapc (lambda (symbol)
-	    (with-temp-file (expand-file-name
-			     (substring (symbol-name symbol)
-					(length mixi-object-prefix))
-			     mixi-directory)
-	      (let ((coding-system-for-write mixi-coding-system)
-		    (cache (symbol-value symbol)))
-		(insert "#s(hash-table size "
-			(number-to-string (hash-table-count cache))
-			" test equal data (\n")
-		(maphash
-		 (lambda (key value)
-		   (let (print-level print-length)
-		     (insert (prin1-to-string key) " "
-			     (prin1-to-string value) "\n")))
-		 cache))
-	      (insert "))")))
-	  caches)))
+  (let ((cache-directory (expand-file-name "cache" mixi-directory)))
+    (unless (file-directory-p cache-directory)
+      (make-directory cache-directory t))
+    (let ((caches (apropos-internal mixi-cache-regexp 'boundp)))
+      (mapc (lambda (symbol)
+	      (with-temp-file (expand-file-name
+			       (substring (symbol-name symbol)
+					  (length mixi-object-prefix))
+			       cache-directory)
+		(let ((coding-system-for-write mixi-coding-system)
+		      (cache (symbol-value symbol)))
+		  (insert "#s(hash-table size "
+			  (number-to-string (hash-table-count cache))
+			  " test equal data (\n")
+		  (maphash
+		   (lambda (key value)
+		     (let (print-level print-length)
+		       (insert (prin1-to-string key) " "
+			       (prin1-to-string value) "\n")))
+		   cache))
+		(insert "))")))
+	    caches))))
 
 ;; stolen (and modified) from lsdb.el
 (defun mixi-read-cache (&optional marker)
@@ -630,20 +631,22 @@ Increase this value when unexpected error frequently occurs."
       (read marker))))
 
 (defun mixi-load-cache ()
-  (when (file-directory-p mixi-directory)
-    ;; FIXME: Load friend and community first.
-    (let ((files (directory-files mixi-directory t mixi-cache-file-regexp)))
-      (mapc (lambda (file)
-	      (let ((buffer (find-file-noselect file)))
-		(unwind-protect
-		    (save-excursion
-		      (set-buffer buffer)
-		      (goto-char (point-min))
-		      (re-search-forward "^#s(")
-		      (goto-char (match-beginning 0))
-		      (mixi-read-cache (point-marker)))
-		  (kill-buffer buffer))))
-	    files))))
+  (let ((cache-directory (expand-file-name "cache" mixi-directory)))
+    (when (file-directory-p cache-directory)
+      ;; FIXME: Load friend and community first.
+      (let ((files (directory-files cache-directory t
+				    mixi-cache-file-regexp)))
+	(mapc (lambda (file)
+		(let ((buffer (find-file-noselect file)))
+		  (unwind-protect
+		      (save-excursion
+			(set-buffer buffer)
+			(goto-char (point-min))
+			(re-search-forward "^#s(")
+			(goto-char (match-beginning 0))
+			(mixi-read-cache (point-marker)))
+		    (kill-buffer buffer))))
+	      files)))))
 
 ;; Friend object.
 (defvar mixi-friend-cache (make-hash-table :test 'equal))

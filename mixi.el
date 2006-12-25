@@ -1626,35 +1626,38 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-event-community-regexp
   "<td WIDTH=595 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b>\\[\\(.+\\)\\] イベント</b></td>")
 (defconst mixi-event-time-regexp
-  "<td ROWSPAN=11 BGCOLOR=#FFD8B0 ALIGN=center VALIGN=top WIDTH=110>
-\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
-\\([0-9]+\\):\\([0-9]+\\)</td>")
+  "<td ROWSPAN=11 \\(BGCOLOR\\|bgcolor\\)=#FFD8B0 \\(ALIGN\\|align\\)=center \\(VALIGN\\|Valign\\)=top WIDTH=110>
+?\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
+?\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-event-title-regexp
-  "<td bgcolor=#FFF4E0 width=410>&nbsp;\\([^<]+\\)</td>")
+  "<td bgcolor=#FFF4E0\\( width=410\\)?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-event-owner-regexp
-  "<td BGCOLOR=#FDF9F2>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
+  "<td \\(BGCOLOR\\|bgcolor\\)=#FDF9F2>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
 (defconst mixi-event-date-regexp
-  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>開催日時</td>
-<td BGCOLOR=#FFFFFF>
+  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>開催日時</td>
+<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
 &nbsp;\\(.+\\)
 </td>")
 (defconst mixi-event-place-regexp
-  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>開催場所</td>
-<td BGCOLOR=#FFFFFF>
+  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>開催場所</td>
+<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
 &nbsp;\\(.+\\)
 </td>")
 (defconst mixi-event-detail-regexp
-  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>詳細</td>
-<td BGCOLOR=#FFFFFF><table BORDER=0 CELLSPACING=0 CELLPADDING=5><tr><td CLASS=h120>\\(.+\\)</td></tr></table></td>")
+  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>詳細</td>
+<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)><table BORDER=0 CELLSPACING=0 CELLPADDING=5><tr><td CLASS=h120>\\(.+\\)</td></tr></table></td>")
 (defconst mixi-event-limit-regexp
-  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>募集期限</td>
-<td BGCOLOR=#FFFFFF>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+  "<td \\(BGCOLOR\\|bgcolor\\)=\"?#\\(FFFFFF\\|ffffff\\)\"? \\(ALIGN\\|align\\)=\"?center\"? NOWRAP>募集期限</td>
+?<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
 (defconst mixi-event-members-regexp
-  "<td BGCOLOR=#FFFFFF ALIGN=center NOWRAP>参加者</td>
-<td BGCOLOR=#FFFFFF>
-<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=100%>
+  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>参加者</td>
+<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
+
+?
+?<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=100%>
 <tr>
-<td>&nbsp;\\(.+\\)</td>")
+
+?<td>&nbsp;\\(.+\\)</td>")
 
 (defun mixi-realize-event (event)
   "Realize a EVENT."
@@ -1664,39 +1667,39 @@ Increase this value when unexpected error frequently occurs."
       (if (string-match mixi-event-community-regexp buffer)
 	  (mixi-community-set-name (mixi-event-community event)
 				   (match-string 1 buffer))
-	(mixi-realization-error 'cannot-find-title event))
+	(mixi-realization-error 'cannot-find-community event))
       (if (string-match mixi-event-time-regexp buffer)
 	  (mixi-event-set-time
-	   event (encode-time 0 (string-to-number (match-string 5 buffer))
-			      (string-to-number (match-string 4 buffer))
-			      (string-to-number (match-string 3 buffer))
-			      (string-to-number (match-string 2 buffer))
-			      (string-to-number (match-string 1 buffer))))
+	   event (encode-time 0 (string-to-number (match-string 8 buffer))
+			      (string-to-number (match-string 7 buffer))
+			      (string-to-number (match-string 6 buffer))
+			      (string-to-number (match-string 5 buffer))
+			      (string-to-number (match-string 4 buffer))))
 	(mixi-realization-error 'cannot-find-time event))
       (if (string-match mixi-event-title-regexp buffer)
-	  (mixi-event-set-title event (match-string 1 buffer))
+	  (mixi-event-set-title event (match-string 2 buffer))
 	(mixi-realization-error 'cannot-find-title event))
       (if (string-match mixi-event-owner-regexp buffer)
 	  (mixi-event-set-owner event
-				(mixi-make-friend (match-string 1 buffer)
-						  (match-string 2 buffer)))
+				(mixi-make-friend (match-string 2 buffer)
+						  (match-string 3 buffer)))
 	(mixi-realization-error 'cannot-find-owner event))
       (if (string-match mixi-event-date-regexp buffer)
-	  (mixi-event-set-date event (match-string 1 buffer))
+	  (mixi-event-set-date event (match-string 6 buffer))
 	(mixi-realization-error 'cannot-find-date event))
       (if (string-match mixi-event-place-regexp buffer)
-	  (mixi-event-set-place event (match-string 1 buffer))
+	  (mixi-event-set-place event (match-string 6 buffer))
 	(mixi-realization-error 'cannot-find-place event))
       (if (string-match mixi-event-detail-regexp buffer)
-	  (mixi-event-set-detail event (match-string 1 buffer))
+	  (mixi-event-set-detail event (match-string 6 buffer))
 	(mixi-realization-error 'cannot-find-detail event))
       (when (string-match mixi-event-limit-regexp buffer)
 	(mixi-event-set-limit
-	 event (encode-time 0 0 0 (string-to-number (match-string 3 buffer))
-			    (string-to-number (match-string 2 buffer))
-			    (string-to-number (match-string 1 buffer)))))
+	 event (encode-time 0 0 0 (string-to-number (match-string 8 buffer))
+			    (string-to-number (match-string 7 buffer))
+			    (string-to-number (match-string 6 buffer)))))
       (if (string-match mixi-event-members-regexp buffer)
-	  (mixi-event-set-members event (match-string 1 buffer))
+	  (mixi-event-set-members event (match-string 6 buffer))
 	(mixi-realization-error 'cannot-find-members event)))
     (mixi-object-touch event)))
 

@@ -1966,7 +1966,7 @@ Increase this value when unexpected error frequently occurs."
 </table>
 </td>
 </tr>
-<!-- 本文 : start -->
+<!-- コメント本文 : start -->
 <tr>
 <td bgcolor=\"#ffffff\">
 <table BORDER=0 CELLSPACING=0 CELLPADDING=[35] WIDTH=410>

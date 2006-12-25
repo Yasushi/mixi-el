@@ -1,5 +1,9 @@
 2006-12-25  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-diary-comment-list-regexp): Follow the change of mixi.
+
+2006-12-25  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-save-cache): Change the location of cache files.
 	(mixi-load-cache): Ditto.
 

@@ -1,5 +1,22 @@
 2006-12-26  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-post-error): New error symbol.
+	(mixi-post-error): New macro.
+	(mixi-post-form): New macro.
+	(mixi-make-form-data): New function.
+	(mixi-url-retrieve): Add optional argument `extra-headers'.
+	(mixi-url-post-form): New function.
+	(mixi-w3m-post-form): Ditto.
+	(with-mixi-post-form): New macro.
+	(mixi-post-diary-key-regexp): New constant.
+	(mixi-post-diary-id-regexp): Ditto.
+	(mixi-post-diary-title-regexp): Ditto.
+	(mixi-post-diary-body-regexp): Ditto.
+	(mixi-post-diary-succeed-regexp): Ditto.
+	(mixi-post-diary): New function.
+
+2006-12-26  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-url-retrieve): Simplify.
 
 2006-12-25  OHASHI Akira  <bg66@koka-in.org>

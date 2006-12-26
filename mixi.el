@@ -211,11 +211,22 @@ Increase this value when unexpected error frequently occurs."
 (put 'mixi-realization-error
      'error-conditions '(mixi-realization-error error))
 
+(put 'mixi-post-error
+     'error-message (mixi-message "Cannot post"))
+(put 'mixi-post-error
+     'error-conditions '(mixi-post-error error))
+
 (defmacro mixi-realization-error (type object)
   `(let ((data (if (and (boundp 'buffer) debug-on-error)
 		   (list ,type ,object buffer)
 		 (list ,type ,object))))
      (signal 'mixi-realization-error data)))
+
+(defmacro mixi-post-error (type)
+  `(let ((data (if (and (boundp 'buffer) debug-on-error)
+		   (list ,type buffer)
+		 (list ,type))))
+     (signal 'mixi-post-error data)))
 
 (defconst mixi-message-adult-contents
   "このページから先はアダルト（成人向け）コンテンツが含まれています。<br>
@@ -231,6 +242,14 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-retrieve (url &optional post-data)
   `(funcall mixi-retrieve-function ,url ,post-data))
+
+;; FIXME: Change `mixi-retrieve-function' to `mixi-backend'.
+(defmacro mixi-post-form (url fields)
+  `(let ((name (symbol-name mixi-retrieve-function)))
+     (when (string-match "-\\([a-z]+\\)-" name)
+       (let ((func (intern (concat "mixi-" (match-string 1 name)
+				   "-post-form"))))
+	 (funcall func ,url ,fields)))))
 
 (defun mixi-parse-buffer (url buffer &optional post-data)
   (when (string-match mixi-message-adult-contents buffer)
@@ -251,10 +270,27 @@ Increase this value when unexpected error frequently occurs."
        ,url
      (concat mixi-url ,url)))
 
-(defun mixi-url-retrieve (url &optional post-data)
+;; FIXME: Support file, checkbox and so on.
+(defun mixi-make-form-data (fields)
+  "Make form data and eturn (CONTENT-TYPE . FORM-DATA)."
+  (let* ((boundary (apply 'format "--_%d_%d_%d" (current-time)))
+	 (content-type (concat "multipart/form-data; boundary=" boundary))
+	 (form-data
+	  (mapconcat
+	   (lambda (field)
+	     (concat "--" boundary "\r\n"
+		     "Content-Disposition: form-data; name=\""
+		     (car field) "\"\r\n"
+		     "\r\n"
+		     (encode-coding-string (cdr field) mixi-coding-system)))
+	   fields "\r\n")))
+    (cons content-type (concat form-data "\r\n--" boundary "--"))))
+
+(defun mixi-url-retrieve (url &optional post-data extra-headers)
   "Retrieve the URL and return gotten strings."
   (let* ((url-request-method (if post-data "POST" "GET"))
 	 (url-request-data post-data)
+	 (url-request-extra-headers extra-headers)
 	 (url (mixi-expand-url url))
 	 (buffer (url-retrieve-synchronously url))
 	 ret)
@@ -271,6 +307,11 @@ Increase this value when unexpected error frequently occurs."
       (kill-buffer buffer)
       (mixi-parse-buffer url ret post-data))))
 
+(defun mixi-url-post-form (url fields)
+  (let* ((form-data (mixi-make-form-data fields))
+	 (extra-headers `(("Content-Type" . ,(car form-data)))))
+    (mixi-url-retrieve url (cdr form-data) extra-headers)))
+
 (defun mixi-w3m-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
   (let ((url (mixi-expand-url url)))
@@ -280,6 +321,10 @@ Increase this value when unexpected error frequently occurs."
 	(w3m-decode-buffer url)
 	(let ((ret (buffer-substring-no-properties (point-min) (point-max))))
 	  (mixi-parse-buffer url ret post-data))))))
+
+(defun mixi-w3m-post-form (url fields)
+  (let ((form-data (mixi-make-form-data fields)))
+    (mixi-w3m-retrieve url form-data)))
 
 (defun mixi-curl-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
@@ -356,6 +401,18 @@ Increase this value when unexpected error frequently occurs."
      ,@body))
 (put 'with-mixi-retrieve 'lisp-indent-function 'defun)
 (put 'with-mixi-retrieve 'edebug-form-spec '(form body))
+
+(defmacro with-mixi-post-form (url fields &rest body)
+  `(let (buffer)
+     (when ,url
+       (setq buffer (mixi-post-form ,url ,fields))
+       (when (string-match "<form action=\"login\\.pl\" method=\"post\">"
+			   buffer)
+	 (mixi-login)
+	 (setq buffer (mixi-post-form ,url ,fields))))
+     ,@body))
+(put 'with-mixi-post-form 'lisp-indent-function 'defun)
+(put 'with-mixi-post-form 'edebug-form-spec '(form body))
 
 (defun mixi-get-matched-items (url regexp &optional range)
   "Get matched items to REGEXP in URL."
@@ -1194,6 +1251,51 @@ Increase this value when unexpected error frequently occurs."
     (mapcar (lambda (item)
 	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
 	    items)))
+
+(defconst mixi-post-diary-key-regexp
+  "<input type=hidden name=post_key value=\"\\([a-z0-9]+\\)\">")
+(defconst mixi-post-diary-id-regexp
+  "<input type=\"hidden\" name=\"id\" value=\"\\([0-9]+\\)\">")
+(defconst mixi-post-diary-title-regexp
+  "<input type=hidden name=diary_title value=\"\\([^\"]+\\)\">")
+(defconst mixi-post-diary-body-regexp
+  "<input type=hidden name=diary_body value=\"\\([^\"]+\\)\">")
+(defconst mixi-post-diary-succeed-regexp
+  "<b>作成が完了しました。反映に時間がかかることがありますので、表示されていない場合は少々お待ちください。</b>")
+
+;; FIXME: Support photos.
+(defun mixi-post-diary (title content)
+  "Post a diary."
+  (unless (stringp title)
+    (signal 'wrong-type-argument (list 'stringp title)))
+  (unless (stringp title)
+    (signal 'wrong-type-argument (list 'stringp content)))
+  (let ((fields `(("id" . ,(mixi-friend-id (mixi-make-me)))
+		  ("diary_title" . ,title)
+		  ("diary_body" . ,content)
+		  ("submit" . "main")))
+	post-key id diary-title diary-body)
+    (with-mixi-post-form "/add_diary.pl" fields
+      (if (string-match mixi-post-diary-key-regexp buffer)
+	  (setq post-key (match-string 1 buffer))
+	(mixi-post-error 'cannot-find-key))
+      (if (string-match mixi-post-diary-id-regexp buffer)
+	  (setq id (match-string 1 buffer))
+	(mixi-error 'cannot-find-id))
+      (if (string-match mixi-post-diary-title-regexp buffer)
+	  (setq diary-title (match-string 1 buffer))
+	(mixi-error 'cannot-find-title))
+      (if (string-match mixi-post-diary-body-regexp buffer)
+	  (setq diary-body (match-string 1 buffer))
+	(mixi-error 'cannot-find-body)))
+    (setq fields `(("post_key" . ,post-key)
+		   ("id" . ,id)
+		   ("diary_title" . ,diary-title)
+		   ("diary_body" . ,diary-body)
+		   ("submit" . "confirm")))
+    (with-mixi-post-form "/add_diary.pl" fields
+      (unless (string-match mixi-post-diary-succeed-regexp buffer)
+	(mixi-error 'cannot-find-succeed)))))
 
 ;; Community object.
 (defvar mixi-community-cache (make-hash-table :test 'equal))

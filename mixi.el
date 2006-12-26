@@ -253,13 +253,9 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-url-retrieve (url &optional post-data)
   "Retrieve the URL and return gotten strings."
-  (if post-data
-      (progn
-	(setq url-request-method "POST")
-	(setq url-request-data post-data))
-    (setq url-request-method "GET")
-    (setq url-request-data nil))
-  (let* ((url (mixi-expand-url url))
+  (let* ((url-request-method (if post-data "POST" "GET"))
+	 (url-request-data post-data)
+	 (url (mixi-expand-url url))
 	 (buffer (url-retrieve-synchronously url))
 	 ret)
     (unless (bufferp buffer)

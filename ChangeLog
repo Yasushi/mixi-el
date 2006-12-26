@@ -1,3 +1,7 @@
+2006-12-26  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-url-retrieve): Simplify.
+
 2006-12-25  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-comment-list-regexp): Follow the change of mixi.

@@ -41,6 +41,10 @@
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
 ;;  * mixi-get-introductions
+;;
+;; API for posting:
+;;
+;;  * mixi-post-diary
 ;; 
 ;; Utilities:
 ;;
@@ -272,7 +276,7 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Support file, checkbox and so on.
 (defun mixi-make-form-data (fields)
-  "Make form data and eturn (CONTENT-TYPE . FORM-DATA)."
+  "Make form data and return (CONTENT-TYPE . FORM-DATA)."
   (let* ((boundary (apply 'format "--_%d_%d_%d" (current-time)))
 	 (content-type (concat "multipart/form-data; boundary=" boundary))
 	 (form-data
@@ -1281,13 +1285,13 @@ Increase this value when unexpected error frequently occurs."
 	(mixi-post-error 'cannot-find-key))
       (if (string-match mixi-post-diary-id-regexp buffer)
 	  (setq id (match-string 1 buffer))
-	(mixi-error 'cannot-find-id))
+	(mixi-post-error 'cannot-find-id))
       (if (string-match mixi-post-diary-title-regexp buffer)
 	  (setq diary-title (match-string 1 buffer))
-	(mixi-error 'cannot-find-title))
+	(mixi-post-error 'cannot-find-title))
       (if (string-match mixi-post-diary-body-regexp buffer)
 	  (setq diary-body (match-string 1 buffer))
-	(mixi-error 'cannot-find-body)))
+	(mixi-post-error 'cannot-find-body)))
     (setq fields `(("post_key" . ,post-key)
 		   ("id" . ,id)
 		   ("diary_title" . ,diary-title)
@@ -1295,7 +1299,7 @@ Increase this value when unexpected error frequently occurs."
 		   ("submit" . "confirm")))
     (with-mixi-post-form "/add_diary.pl" fields
       (unless (string-match mixi-post-diary-succeed-regexp buffer)
-	(mixi-error 'cannot-find-succeed)))))
+	(mixi-post-error 'cannot-find-succeed)))))
 
 ;; Community object.
 (defvar mixi-community-cache (make-hash-table :test 'equal))

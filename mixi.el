@@ -47,6 +47,7 @@
 ;;  * mixi-post-diary
 ;;  * mixi-post-topic
 ;;  * mixi-post-comment
+;;  * mixi-post-message
 ;; 
 ;; Utilities:
 ;;
@@ -2413,6 +2414,40 @@ Increase this value when unexpected error frequently occurs."
       (mapcar (lambda (item)
 		(mixi-make-message (nth 0 item) (nth 1 item)))
 	      items))))
+
+(defmacro mixi-post-message-page (friend)
+  `(concat "/send_message.pl?id=" (mixi-friend-id friend)))
+
+(defconst mixi-post-message-key-regexp
+  "<input name=post_key type=hidden value=\\([a-z0-9]+\\)>")
+
+(defconst mixi-post-message-succeed-regexp
+  "<b>送信完了</b>しました。")
+
+(defun mixi-post-message (friend title content)
+  "Post a message to FRIEND."
+  (unless (mixi-friend-p friend)
+    (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+  (unless (stringp title)
+    (signal 'wrong-type-argument (list 'stringp title)))
+  (unless (stringp content)
+    (signal 'wrong-type-argument (list 'stringp content)))
+  (let ((fields `(("subject" . ,title)
+		  ("body" . ,content)
+		  ("submit" . "main")))
+	post-key)
+    (with-mixi-post-form (mixi-post-message-page friend) fields
+      (if (string-match mixi-post-message-key-regexp buffer)
+	  (setq post-key (match-string 1 buffer))
+	(mixi-post-error 'cannot-find-key friend)))
+    (setq fields `(("post_key" . ,post-key)
+		   ("subject" . ,title)
+		   ("body" . ,content)
+		   ("yes" . "　送　信　")
+		   ("submit" . "confirm")))
+    (with-mixi-post-form (mixi-post-message-page friend) fields
+      (unless (string-match mixi-post-message-succeed-regexp buffer)
+	(mixi-post-error 'cannot-find-succeed friend)))))
 
 ;; Introduction object.
 (defun mixi-make-introduction (parent owner content)

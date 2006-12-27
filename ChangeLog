@@ -1,5 +1,12 @@
 2006-12-27  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-post-message-page): New macro.
+	(mixi-post-message-key-regexp): New constant.
+	(mixi-post-message-succeed-regexp): Ditto.
+	(mixi-post-message): New function.
+
+2006-12-27  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-post-diary-id-regexp): Abolish.
 	(mixi-post-diary-title-regexp): Ditto.
 	(mixi-post-diary-body-regexp): Ditto.

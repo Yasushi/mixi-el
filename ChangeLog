@@ -1,5 +1,24 @@
 2006-12-27  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-post-diary-id-regexp): Abolish.
+	(mixi-post-diary-title-regexp): Ditto.
+	(mixi-post-diary-body-regexp): Ditto.
+	(mixi-post-key-regexp): Rename from `mixi-post-diary-key-regex'.
+	(mixi-post-succeed-regexp): Rename from
+	`mixi-post-diary-succeed-regexp'.
+	(mixi-post-diary): Follow the change above.
+	(mixi-post-topic-title-regexp): Abolish.
+	(mixi-post-topic-body-regexp): Ditto.
+	(mixi-post-topic-key-regexp): Ditto.
+	(mixi-post-topic-succeed-regexp): Ditto.
+	(mixi-post-topic): Follow the change above.
+	(mixi-post-diary-comment-page): New function.
+	(mixi-post-topic-comment-page): Ditto.
+	(mixi-post-event-comment-page): Ditto.
+	(mixi-post-comment): Ditto.
+
+2006-12-27  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-post-diary-page): New macro.
 	(mixi-post-diary): Use it and fix typo.
 	(mixi-post-error): Add optional argument `object'.

@@ -1,3 +1,15 @@
+2006-12-27  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-post-diary-page): New macro.
+	(mixi-post-diary): Use it and fix typo.
+	(mixi-post-error): Add optional argument `object'.
+	(mixi-post-topic-page): New macro.
+	(mixi-post-topic-title-regexp): New constant.
+	(mixi-post-topic-body-regexp): Ditto.
+	(mixi-post-topic-key-regexp): Ditto.
+	(mixi-post-topic-succeed-regexp): Ditto.
+	(mixi-post-topic): New function.
+
 2006-12-26  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-post-error): New error symbol.

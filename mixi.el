@@ -45,6 +45,7 @@
 ;; API for posting:
 ;;
 ;;  * mixi-post-diary
+;;  * mixi-post-topic
 ;; 
 ;; Utilities:
 ;;
@@ -226,10 +227,12 @@ Increase this value when unexpected error frequently occurs."
 		 (list ,type ,object))))
      (signal 'mixi-realization-error data)))
 
-(defmacro mixi-post-error (type)
-  `(let ((data (if (and (boundp 'buffer) debug-on-error)
-		   (list ,type buffer)
-		 (list ,type))))
+(defmacro mixi-post-error (type &optional object)
+  `(let ((data (when (and (boundp 'buffer) debug-on-error)
+		 (list buffer))))
+     (if ,object
+	 (setq data (cons ,type (cons ,object data)))
+       (setq data (cons ,type data)))
      (signal 'mixi-post-error data)))
 
 (defconst mixi-message-adult-contents
@@ -1256,6 +1259,9 @@ Increase this value when unexpected error frequently occurs."
 	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
 	    items)))
 
+(defmacro mixi-post-diary-page ()
+  `(concat "/add_diary.pl"))
+
 (defconst mixi-post-diary-key-regexp
   "<input type=hidden name=post_key value=\"\\([a-z0-9]+\\)\">")
 (defconst mixi-post-diary-id-regexp
@@ -1272,14 +1278,14 @@ Increase this value when unexpected error frequently occurs."
   "Post a diary."
   (unless (stringp title)
     (signal 'wrong-type-argument (list 'stringp title)))
-  (unless (stringp title)
+  (unless (stringp content)
     (signal 'wrong-type-argument (list 'stringp content)))
   (let ((fields `(("id" . ,(mixi-friend-id (mixi-make-me)))
 		  ("diary_title" . ,title)
 		  ("diary_body" . ,content)
 		  ("submit" . "main")))
 	post-key id diary-title diary-body)
-    (with-mixi-post-form "/add_diary.pl" fields
+    (with-mixi-post-form mixi-post-diary-page fields
       (if (string-match mixi-post-diary-key-regexp buffer)
 	  (setq post-key (match-string 1 buffer))
 	(mixi-post-error 'cannot-find-key))
@@ -1297,7 +1303,7 @@ Increase this value when unexpected error frequently occurs."
 		   ("diary_title" . ,diary-title)
 		   ("diary_body" . ,diary-body)
 		   ("submit" . "confirm")))
-    (with-mixi-post-form "/add_diary.pl" fields
+    (with-mixi-post-form mixi-post-diary-page fields
       (unless (string-match mixi-post-diary-succeed-regexp buffer)
 	(mixi-post-error 'cannot-find-succeed)))))
 
@@ -1700,6 +1706,49 @@ Increase this value when unexpected error frequently occurs."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (aset (cdr topic) 6 content))
+
+(defmacro mixi-post-topic-page (community)
+  `(concat "/add_bbs.pl?id=" (mixi-community-id community)))
+
+(defconst mixi-post-topic-title-regexp
+  "<input type=hidden name=bbs_title value=\"\\([^\"]+\\)\">")
+(defconst mixi-post-topic-body-regexp
+  "<input type=hidden name=bbs_body value=\"\\([^\"]+\\)\">")
+(defconst mixi-post-topic-key-regexp
+  "<input type=hidden name=post_key value=\"\\([a-z0-9]+\\)\">")
+(defconst mixi-post-topic-succeed-regexp
+  "<b>作成が完了しました。反映に時間がかかることがありますので、表示されていない場合は少々お待ちください。</b>")
+
+;; FIXME: Support photos.
+(defun mixi-post-topic (community title content)
+  "Post a topic to COMMUNITY."
+  (unless (mixi-community-p community)
+    (signal 'wrong-type-argument (list 'mixi-community-p community)))
+  (unless (stringp title)
+    (signal 'wrong-type-argument (list 'stringp title)))
+  (unless (stringp content)
+    (signal 'wrong-type-argument (list 'stringp content)))
+  (let ((fields `(("bbs_title" . ,title)
+		  ("bbs_body" . ,content)
+		  ("submit" . "main")))
+	post-key topic-title topic-body)
+    (with-mixi-post-form (mixi-post-topic-page community) fields
+      (if (string-match mixi-post-topic-title-regexp buffer)
+	  (setq topic-title (match-string 1 buffer))
+	(mixi-post-error 'cannot-find-title community))
+      (if (string-match mixi-post-topic-body-regexp buffer)
+	  (setq topic-body (match-string 1 buffer))
+	(mixi-post-error 'cannot-find-body community))
+      (if (string-match mixi-post-topic-key-regexp buffer)
+	  (setq post-key (match-string 1 buffer))
+	(mixi-post-error 'cannot-find-key community)))
+    (setq fields `(("post_key" . ,post-key)
+		   ("bbs_title" . ,topic-title)
+		   ("bbs_body" . ,topic-body)
+		   ("submit" . "confirm")))
+    (with-mixi-post-form (mixi-post-topic-page community) fields
+      (unless (string-match mixi-post-topic-succeed-regexp buffer)
+	(mixi-post-error 'cannot-find-succeed community)))))
 
 ;; Event object.
 (defvar mixi-event-cache (make-hash-table :test 'equal))

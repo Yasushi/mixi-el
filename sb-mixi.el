@@ -115,19 +115,52 @@ of mixi object."
 	    month " "
 	    (format-time-string "%Y %H:%M:%S %z" time))))
 
+(defconst shimbun-mixi-message-id-suffix "@mixi.jp")
+
 (defun shimbun-mixi-make-message-id (object)
+  "Make message-id for OBJECT.
+If OBJECT is comment, message-id is like follow:
+
+  <date$owner-id.owner-class$parent-id.parent-class$parent-owner-id.
+   parent-owner-class@mixi.jp>
+
+If OBJECT is diary or BBS or message:
+
+  <date$id.class$owner-id.owner-class@mixi.jp>
+
+If OBJECT is log:
+
+  <date$id.class@mixi.jp>
+
+The others:
+
+  <id.class@mixi.jp>"
   (let ((class (mixi-object-class object)))
     (concat "<"
-	    (format-time-string "%Y%m%d%H%M" (mixi-object-time object)) "."
-	    (if (eq class 'mixi-comment)
-		(concat (mixi-friend-id (mixi-comment-owner object)) "@"
-			(mixi-object-id (mixi-comment-parent object)) "."
-			(mixi-friend-id (mixi-object-owner
-					 (mixi-comment-parent object))) ".")
-	      (concat (mixi-object-id object) "@"
-		      (mixi-object-id (mixi-object-owner object)) "."))
-	    (mixi-object-name object) ".mixi.jp"
-	    ">")))
+	    (unless (or (eq class 'mixi-friend) (eq class 'mixi-community))
+	      (format-time-string "%Y%m%d%H%M." (mixi-object-time object)))
+	    (mapconcat (lambda (object)
+			 (concat (mixi-object-id object)
+				 "." (mixi-object-name object)))
+		       (cond ((eq class 'mixi-comment)
+			      (let ((parent (mixi-comment-parent object)))
+				(list (mixi-comment-owner object)
+				      parent
+				      (if (eq (mixi-object-class parent)
+					      'mixi-diary)
+					  (mixi-object-owner parent)
+					(mixi-bbs-community parent)))))
+			     ((or (eq class 'mixi-diary)
+				  (eq class 'mixi-message))
+			      (list object (mixi-object-owner object)))
+			     ((mixi-bbs-p object)
+			      (list object (mixi-bbs-community object)))
+			     ((eq class 'mixi-log)
+			      (list (mixi-log-friend object)))
+			     (t
+			      (list object)))
+		       "$")
+	    shimbun-mixi-message-id-suffix ">")))
 
 (defun shimbun-mixi-make-xref (object)
   (let ((class (mixi-object-class object)))
@@ -253,6 +286,32 @@ of mixi object."
 	     (prog1 (shimbun-make-contents shimbun header)
 	       (shimbun-message shimbun "shimbun: Make contents...done")))
 	   "")))))
+
+(defun shimbun-mixi-make-object-from-message-id (message-id)
+  (when (string-match (concat "^<\\(.+\\)"
+			      (regexp-quote shimbun-mixi-message-id-suffix)
+			      ">$") message-id)
+    (let ((parts (reverse (split-string (match-string 1 message-id) "\\$")))
+	  object parent comment)
+      (catch 'stop
+	(mapc (lambda (part)
+		(if (string-match "\\([a-z0-9]+\\)\\.\\([a-z]+\\)$" part)
+		    (let ((id (match-string 1 part))
+			  (func (intern (concat
+					 mixi-object-prefix
+					 "make-" (match-string 2 part)))))
+		      (cond ((null object)
+			     (setq object (funcall func id)))
+			    ((null parent)
+			     (setq parent (funcall func object id)))
+			    ((null comment)
+			     (setq comment
+				   (mixi-make-comment parent
+						      (mixi-make-friend id)
+						      nil "dummy")))))
+		  (throw 'stop nil)))
+	      parts))
+      (or comment parent object))))
 
 (provide 'sb-mixi)
 

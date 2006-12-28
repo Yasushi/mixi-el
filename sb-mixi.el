@@ -313,6 +313,22 @@ The others:
 	      parts))
       (or comment parent object))))
 
+(defun shimbun-mixi-post-mail-wrapper (in-reply-to title content)
+  (let ((object (shimbun-mixi-make-object-from-message-id in-reply-to)))
+    (when (mixi-object-p object)
+      (let ((class (mixi-object-class object)))
+	(cond ((eq class 'mixi-comment)
+	       (let ((parent (mixi-comment-parent object)))
+		 (mixi-post-comment parent content)))
+	      ((or (eq class 'mixi-diary) (mixi-bbs-p object))
+	       (mixi-post-comment object content))
+	      ((eq class 'mixi-community)
+	       (mixi-post-topic object title content))
+	      ((eq object (mixi-make-me))
+	       (mixi-post-diary title content))
+	      ((or (eq class 'mixi-friend) (eq class 'mixi-log))
+	       (mixi-post-message title content)))))))
+
 (provide 'sb-mixi)
 
 ;;; sb-mixi.el ends here

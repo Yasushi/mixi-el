@@ -65,11 +65,6 @@ of mixi object."
   :group 'shimbun
   :type 'integer)
 
-(defcustom shimbun-mixi-logout-p nil
-  "*If non-ni, logout from mixi when shimbun server was closed."
-  :group 'shimbun
-  :type 'boolean)
-
 (defvar shimbun-mixi-x-face-alist
   '(("default" . "X-Face: CY;j#FoBnpK^37`-IoJvN!J^u;GciiPmMQ@T)~RP1]t8iv?v)/bVI:I\"F!JfWJvhM5{zY!=
  h.d+'g\\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\\066X%$
@@ -83,8 +78,7 @@ of mixi object."
 
 (luna-define-method shimbun-close :after ((shimbun shimbun-mixi))
   (shimbun-mixi-set-comment-cache-internal shimbun nil)
-  (when shimbun-mixi-logout-p
-    (mixi-logout)))
+  (mixi-logout))
 
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
   (mapcar 'car shimbun-mixi-group-alist))

@@ -313,7 +313,7 @@ The others:
 	      parts))
       (or comment parent object))))
 
-(defun shimbun-mixi-post-mail-wrapper (in-reply-to title content)
+(defun shimbun-mixi-send-mail-wrapper (in-reply-to title content)
   (let ((object (shimbun-mixi-make-object-from-message-id in-reply-to)))
     (when (mixi-object-p object)
       (let ((class (mixi-object-class object)))

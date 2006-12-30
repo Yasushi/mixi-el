@@ -1,3 +1,8 @@
+2006-12-30  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-event-owner-seceded-regexp): New regexp.
+	(mixi-realize-event): Follow the change above.
+
 2006-12-28  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-mixi-message-id-suffix): Abolish.

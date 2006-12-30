@@ -1759,6 +1759,8 @@ Increase this value when unexpected error frequently occurs."
   "<td bgcolor=#FFF4E0\\( width=410\\)?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-event-owner-regexp
   "<td \\(BGCOLOR\\|bgcolor\\)=#FDF9F2>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
+(defconst mixi-event-owner-seceded-regexp
+  "<td \\(BGCOLOR\\|bgcolor\\)=#FDF9F2>&nbsp;\\((mixi Âà²ñºÑ)\\)")
 (defconst mixi-event-date-regexp
   "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>³«ºÅÆü»þ</td>
 <td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
@@ -1809,7 +1811,11 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-event-set-owner event
 				(mixi-make-friend (match-string 2 buffer)
 						  (match-string 3 buffer)))
-	(mixi-realization-error 'cannot-find-owner event))
+	(if (string-match mixi-event-owner-seceded-regexp buffer)
+	    (mixi-event-set-owner event
+				  (mixi-make-friend nil
+						    (match-string 2 buffer)))
+	  (mixi-realization-error 'cannot-find-owner event)))
       (if (string-match mixi-event-date-regexp buffer)
 	  (mixi-event-set-date event (match-string 6 buffer))
 	(mixi-realization-error 'cannot-find-date event))

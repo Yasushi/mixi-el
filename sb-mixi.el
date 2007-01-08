@@ -70,6 +70,8 @@ of mixi object."
  h.d+'g\\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\\066X%$
  siG'|4K!2?==|oB&#E'5GGH\\#z[muyQ")))
 
+(defvar shimbun-mixi-reply-to nil)
+
 (luna-define-method initialize-instance :after ((shimbun shimbun-mixi)
 						&rest init-args)
   (shimbun-mixi-set-comment-cache-internal shimbun
@@ -82,6 +84,9 @@ of mixi object."
 
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
   (mapcar 'car shimbun-mixi-group-alist))
+
+(luna-define-method shimbun-reply-to ((shimbun shimbun-mixi))
+  shimbun-mixi-reply-to)
 
 (defun shimbun-mixi-make-subject (shimbun object)
   (let ((class (mixi-object-class object)))
@@ -162,6 +167,32 @@ of mixi object."
 		     "<dd>" (mixi-event-members object) "</dd></dl>")))
 	  (t (mixi-object-content object)))))
 
+(defun shimbun-mixi-make-reply-to (object)
+  (setq shimbun-mixi-reply-to "mixi;")
+  (let ((class (mixi-object-class object)))
+    (setq shimbun-mixi-reply-to
+	  (concat
+	   (cond ((eq class 'mixi-diary)
+		  (concat shimbun-mixi-reply-to "comment;diary;"
+			  (mixi-friend-id (mixi-diary-owner object)) ";"
+			  (mixi-diary-id object)))
+		 ((mixi-bbs-p object)
+		  (concat shimbun-mixi-reply-to "comment;"
+			  (mixi-object-name object) ";"
+			  (mixi-community-id (mixi-bbs-community object)) ";"
+			  (mixi-bbs-id object)))
+		 ((eq class 'mixi-community)
+		  (concat shimbun-mixi-reply-to "topic;"
+			  (mixi-community-id object)))
+		 ((eq object (mixi-make-me))
+		  (concat shimbun-mixi-reply-to "diary"))
+		 ((eq class 'mixi-message)
+		  (concat shimbun-mixi-reply-to "message;"
+			  (mixi-friend-id (mixi-message-owner object))))
+		 ((or (eq class 'mixi-friend) (eq class 'mixi-log))
+		  (concat shimbun-mixi-reply-to "message;"
+			  (mixi-friend-id object))))))))
+
 (defun shimbun-mixi-get-headers (shimbun objects &optional range)
   (when objects
     (let (headers)
@@ -241,11 +272,12 @@ of mixi object."
       (w3m-insert-string
        (or (with-temp-buffer
 	     (let* ((url (shimbun-article-url shimbun header))
+		    (object (mixi-make-object-from-url url))
 		    (article (if (string-match "#comment$" url)
 				 (shimbun-mixi-comment-article
 				  url shimbun header)
-			       (shimbun-mixi-make-body
-				(mixi-make-object-from-url url)))))
+			       (shimbun-mixi-make-body object))))
+	       (shimbun-mixi-make-reply-to object)
 	       (when (stringp article)
 		 (insert article)))
 	     (shimbun-message shimbun "shimbun: Make contents...")
@@ -254,47 +286,32 @@ of mixi object."
 	       (shimbun-message shimbun "shimbun: Make contents...done")))
 	   "")))))
 
-(defun shimbun-mixi-make-object-from-message-id (message-id)
-  (when (string-match (concat "^<\\(.+\\)"
-			      (regexp-quote shimbun-mixi-message-id-suffix)
-			      ">$") message-id)
-    (let ((parts (reverse (split-string (match-string 1 message-id) "\\$")))
-	  object parent comment)
-      (catch 'stop
-	(mapc (lambda (part)
-		(if (string-match "\\([a-z0-9]+\\)\\.\\([a-z]+\\)$" part)
-		    (let ((id (match-string 1 part))
-			  (func (intern (concat
-					 mixi-object-prefix
-					 "make-" (match-string 2 part)))))
-		      (cond ((null object)
-			     (setq object (funcall func id)))
-			    ((null parent)
-			     (setq parent (funcall func object id)))
-			    ((null comment)
-			     (setq comment
-				   (mixi-make-comment parent
-						      (mixi-make-friend id)
-						      nil "dummy")))))
-		  (throw 'stop nil)))
-	      parts))
-      (or comment parent object))))
+(defconst shimbun-mixi-to-regexp
+  "^mixi;\\([a-z]+\\);?\\([a-z0-9]+\\)?;?\\([0-9]+\\)?;?\\([0-9]+\\)?")
 
-(defun shimbun-mixi-send-mail-wrapper (in-reply-to title content)
-  (let ((object (shimbun-mixi-make-object-from-message-id in-reply-to)))
-    (when (mixi-object-p object)
-      (let ((class (mixi-object-class object)))
-	(cond ((eq class 'mixi-comment)
-	       (let ((parent (mixi-comment-parent object)))
-		 (mixi-post-comment parent content)))
-	      ((or (eq class 'mixi-diary) (mixi-bbs-p object))
-	       (mixi-post-comment object content))
-	      ((eq class 'mixi-community)
-	       (mixi-post-topic object title content))
-	      ((eq object (mixi-make-me))
-	       (mixi-post-diary title content))
-	      ((or (eq class 'mixi-friend) (eq class 'mixi-log))
-	       (mixi-post-message title content)))))))
+(defun shimbun-mixi-send-mail-wrapper (to title content)
+  (when (string-match shimbun-mixi-to-regexp to)
+    (let ((method (match-string 1 to)))
+      (cond ((string= method "comment")
+	     (let ((parent (match-string 2 to))
+		   (owner-id (match-string 3 to))
+		   (id (match-string 4 to)))
+	       (if (string= parent "diary")
+		   (mixi-post-comment
+		    (mixi-make-diary (mixi-make-friend owner-id) id) content)
+		 (let ((func (intern
+			      (concat mixi-object-prefix "make-" parent))))
+		   (mixi-post-comment
+		    (funcall func (mixi-make-community owner-id) id)
+		    content)))))
+	    ((string= method "topic")
+	     (mixi-post-topic (mixi-make-community (match-string 2 to))
+			      title content))
+	    ((string= method "diary")
+	     (mixi-post-diary title content))
+	    ((string= method "message")
+	     (mixi-post-message (mixi-make-friend (match-string 2 to))
+				title content))))))
 
 (provide 'sb-mixi)
 

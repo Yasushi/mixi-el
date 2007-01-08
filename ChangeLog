@@ -1,3 +1,13 @@
+2007-01-08  OHASHI Akira  <bg66@koka-in.org>
+
+	* sb-mixi.el (shimbun-mixi-reply-to): New variable.
+	(shimbun-reply-to): New method.
+	(shimbun-mixi-make-reply-to): New function.
+	(shimbun-article): Use it.
+	(shimbun-mixi-make-object-from-message-id): Abolish.
+	(shimbun-mixi-to-regexp): New constant.
+	(shimbun-mixi-send-mail-wrapper): Follow the change above.
+
 2006-12-30  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-event-owner-seceded-regexp): New regexp.

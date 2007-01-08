@@ -1,5 +1,13 @@
 2007-01-08  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-backend): Rename from `mixi-retrieve-function' and
+	change the default value to `w3m'.
+	(mixi-retrieve): Follow the change above.
+	(mixi-post-form): Ditto.
+	(mixi-login): Ditto.
+
+2007-01-08  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi-reply-to): New variable.
 	(shimbun-reply-to): New method.
 	(shimbun-mixi-make-reply-to): New function.

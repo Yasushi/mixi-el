@@ -148,27 +148,27 @@
   :type 'file
   :group 'mixi)
 
-(defcustom mixi-retrieve-function
+(defcustom mixi-backend
   (or (condition-case nil
 	  (progn
-	    (require 'url)
-	    (if (fboundp 'url-retrieve-synchronously)
-		'mixi-url-retrieve))
+	    (require 'w3m)
+	    'w3m)
 	(error))
       (condition-case nil
 	  (progn
-	    (require 'w3m)
-	    'mixi-w3m-retrieve)
+	    (require 'url)
+	    (if (fboundp 'url-retrieve-synchronously)
+		'url))
 	(error))
       (if (and (fboundp 'executable-find)
 	       (executable-find mixi-curl-program))
-	  'mixi-curl-retrieve)
-      (error "Can't set `mixi-retrieve-function'"))
+	  'curl)
+      (error "Cannot set `mixi-backend'."))
   "*The function for retrieving."
-  :type '(radio (const :tag "Using url" mixi-url-retrieve)
-		(const :tag "Using w3m" mixi-w3m-retrieve)
-		(const :tag "Using curl" mixi-curl-retrieve)
-		(function :format "Other function: %v\n" :size 0))
+  :type '(radio (const :tag "Use w3m" w3m)
+		(const :tag "Use url.el" url)
+		(const :tag "Use curl" curl)
+		(symbol :tag "The other backend"))
   :group 'mixi)
 
 (defcustom mixi-default-email nil
@@ -250,15 +250,12 @@ Increase this value when unexpected error frequently occurs."
 せんが、しばらくの間お待ちください。")
 
 (defmacro mixi-retrieve (url &optional post-data)
-  `(funcall mixi-retrieve-function ,url ,post-data))
+  `(funcall (intern (concat "mixi-" (symbol-name mixi-backend) "-retrieve"))
+	    ,url ,post-data))
 
-;; FIXME: Change `mixi-retrieve-function' to `mixi-backend'.
 (defmacro mixi-post-form (url fields)
-  `(let ((name (symbol-name mixi-retrieve-function)))
-     (when (string-match "-\\([a-z]+\\)-" name)
-       (let ((func (intern (concat "mixi-" (match-string 1 name)
-				   "-post-form"))))
-	 (funcall func ,url ,fields)))))
+  `(funcall (intern (concat "mixi-" (symbol-name mixi-backend) "-post-form"))
+	    ,url ,post-data))
 
 (defun mixi-parse-buffer (url buffer &optional post-data)
   (when (string-match mixi-message-adult-contents buffer)
@@ -376,8 +373,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-login (&optional email password)
   "Login to mixi."
-  (when (and (eq mixi-retrieve-function 'mixi-w3m-retrieve)
-	     (not w3m-use-cookies))
+  (when (and (eq mixi-backend 'w3m) (not w3m-use-cookies))
     (error (mixi-message "Require to accept cookies.  Please set "
 			 "`w3m-use-cookies' to t.")))
   (let ((email (or email mixi-default-email

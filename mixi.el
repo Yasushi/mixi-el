@@ -255,7 +255,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-post-form (url fields)
   `(funcall (intern (concat "mixi-" (symbol-name mixi-backend) "-post-form"))
-	    ,url ,post-data))
+	    ,url ,fields))
 
 (defun mixi-parse-buffer (url buffer &optional post-data)
   (when (string-match mixi-message-adult-contents buffer)
@@ -2228,23 +2228,23 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-object-p parent)))
   (unless (stringp content)
     (signal 'wrong-type-argument (list 'stringp content)))
-  (let* ((name (mixi-object-name bbs))
+  (let* ((name (mixi-object-name parent))
 	 (page (intern (concat mixi-object-prefix "-post" name
 			       "-comment-page")))
 	 fields post-key)
     (if (mixi-diary-p parent)
 	(setq fields
-	      `(("owner_id" . ,(mixi-friend-id (mixi-diary-owner diary)))
+	      `(("owner_id" . ,(mixi-friend-id (mixi-diary-owner parent)))
 		("comment_body" . ,content)))
       (setq fields `(("comment" . ,content))))
     (with-mixi-post-form (funcall page parent) fields
       (if (string-match mixi-post-key-regexp buffer)
 	  (setq post-key (match-string 1 buffer))
-	(mixi-post-error 'cannot-find-key bbs)))
+	(mixi-post-error 'cannot-find-key parent)))
     (if (mixi-diary-p parent)
 	(setq fields
 	      `(("post_key" . ,post-key)
-		("owner_id" . ,(mixi-friend-id (mixi-diary-owner diary)))
+		("owner_id" . ,(mixi-friend-id (mixi-diary-owner parent)))
 		("comment_body" . ,content)
 		("submit" . "confirm")))
       (setq fields `(("post_key" . ,post-key)
@@ -2252,7 +2252,7 @@ Increase this value when unexpected error frequently occurs."
 		     ("submit" . "confirm"))))
     (with-mixi-post-form (funcall page parent) fields
       (unless (string-match mixi-post-succeed-regexp buffer)
-	(mixi-post-error 'cannot-find-succeed bbs)))))
+	(mixi-post-error 'cannot-find-succeed parent)))))
 
 ;; Message object.
 (defconst mixi-message-box-list '(inbox outbox savebox thrash)) ; thrash?

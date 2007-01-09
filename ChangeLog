@@ -1,5 +1,9 @@
 2007-01-09  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-gnus.el (message-mixi-p): Simplify.
+
+2007-01-09  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-event-comment-list-regexp): Fix regexp.
 
 2007-01-09  OHASHI Akira  <bg66@koka-in.org>

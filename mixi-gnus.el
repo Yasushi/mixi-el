@@ -40,13 +40,12 @@
 (defun message-mixi-p ()
   "Say whether the current buffer contains a mixi message."
   (and (not message-this-is-news)
-       (or message-this-is-mail
-	   (save-excursion
-	     (save-restriction
-	       (message-narrow-to-headers)
-	       (or (message-fetch-field "mixi")
-		   (string-match shimbun-mixi-to-regexp
-				 (message-fetch-field "to"))))))))
+       (save-excursion
+	 (save-restriction
+	   (message-narrow-to-headers)
+	   (or (message-fetch-field "mixi")
+	       (string-match shimbun-mixi-to-regexp
+			     (message-fetch-field "to")))))))
 
 (defun message-send-via-mixi (arg)
   "Send the current message via mixi."

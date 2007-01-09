@@ -164,8 +164,8 @@
 	       (executable-find mixi-curl-program))
 	  'curl)
       (error "Cannot set `mixi-backend'."))
-  "*The function for retrieving."
-  :type '(radio (const :tag "Use w3m" w3m)
+  "*The backend for accessing to mixi."
+  :type '(radio (const :tag "Use emacs-w3m" w3m)
 		(const :tag "Use url.el" url)
 		(const :tag "Use curl" curl)
 		(symbol :tag "The other backend"))

@@ -2152,9 +2152,12 @@ Increase this value when unexpected error frequently occurs."
 <font COLOR=#F8A448><b>[^<]+</b> :</font>
 <a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
 
-</td>
+\\(<font COLOR=#F2DDB7>|</font>
+<a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+&type=event\">ºï½ü</a>
+
+\\|\\)</td>
 </tr>
-\\(<tr>\\)
+<tr>
 <td ALIGN=center BGCOLOR=#FFFFFF>
 <table BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH=500>
 <tr><td CLASS=h120>\\(.+\\)</td></tr>

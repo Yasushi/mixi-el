@@ -289,7 +289,7 @@ of mixi object."
 (defconst shimbun-mixi-to-regexp
   "^mixi;\\([a-z]+\\);?\\([a-z0-9]+\\)?;?\\([0-9]+\\)?;?\\([0-9]+\\)?")
 
-(defun shimbun-mixi-send-mail-wrapper (to title content)
+(defun shimbun-mixi-send-mail (to title content)
   (when (string-match shimbun-mixi-to-regexp to)
     (let ((method (match-string 1 to)))
       (cond ((string= method "comment")

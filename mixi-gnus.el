@@ -55,8 +55,9 @@
     ;; Avoid matching with message-mail-p.
     (with-current-buffer mailbuf
       (goto-char (point-min))
-      (when (search-forward "\nTo: " nil t)
-	(replace-match "\nMixi-To: ")))
+      (unless (search-forward "\nMixi-To: " nil t)
+	(when (search-forward "\nTo: " nil t)
+	  (replace-match "\nMixi-To: "))))
     (unwind-protect
 	(save-excursion
 	  (set-buffer tembuf)

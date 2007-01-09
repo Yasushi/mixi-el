@@ -1,5 +1,9 @@
 2007-01-09  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-topic-content-regexp): Follow the change of mixi.
+
+2007-01-09  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi-wl.el: New file.
 
 2007-01-09  OHASHI Akira  <bg66@koka-in.org>

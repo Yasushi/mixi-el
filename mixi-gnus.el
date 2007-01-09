@@ -43,7 +43,7 @@
        (save-excursion
 	 (save-restriction
 	   (message-narrow-to-headers)
-	   (or (message-fetch-field "mixi")
+	   (or (message-fetch-field "mixi-to")
 	       (string-match shimbun-mixi-to-regexp
 			     (message-fetch-field "to")))))))
 
@@ -56,7 +56,7 @@
     (with-current-buffer mailbuf
       (goto-char (point-min))
       (when (search-forward "\nTo: " nil t)
-	(replace-match "\nMixi: ")))
+	(replace-match "\nMixi-To: ")))
     (unwind-protect
 	(save-excursion
 	  (set-buffer tembuf)
@@ -65,7 +65,7 @@
 	  (insert (with-current-buffer mailbuf
 		    (mml-buffer-substring-no-properties-except-hard-newlines
 		     (point-min) (point-max))))
-	  (shimbun-mixi-send-mail (message-fetch-field "mixi")
+	  (shimbun-mixi-send-mail (message-fetch-field "mixi-to")
 				  (message-fetch-field "subject")
 				  (buffer-substring (message-goto-body)
 						    (point-max))))

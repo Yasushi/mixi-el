@@ -2229,7 +2229,7 @@ Increase this value when unexpected error frequently occurs."
   (unless (stringp content)
     (signal 'wrong-type-argument (list 'stringp content)))
   (let* ((name (mixi-object-name parent))
-	 (page (intern (concat mixi-object-prefix "-post" name
+	 (page (intern (concat mixi-object-prefix "post-" name
 			       "-comment-page")))
 	 fields post-key)
     (if (mixi-diary-p parent)

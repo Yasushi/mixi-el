@@ -78,8 +78,7 @@
   (let ((method '(mixi message-mixi-p message-send-via-mixi)))
     (unless (member method message-send-method-alist)
       (setq message-send-method-alist
-	    (cons '(mixi message-mixi-p message-send-via-mixi)
-		  message-send-method-alist)))))
+	    (cons method message-send-method-alist)))))
 
 (provide 'mixi-gnus)
 

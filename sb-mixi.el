@@ -44,9 +44,9 @@
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
 NAME is a shimbun group name.
-URL is the URL for mixi access point of the group.  When URL is friend's, get
-his/her diaries as article.  When community's, get its BBSes.  When diary's
-or BBS's, get its comments.
+URL is the URL for mixi access point of the group.  If URL is friend's, get
+his/her diaries as article.  If community's, get its BBSes.  If diary's or
+BBS's, get its comments.
 FUNCTION is the function which has one `range' argument and returns the list
 of mixi object."
   :group 'shimbun

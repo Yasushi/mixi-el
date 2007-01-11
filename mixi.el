@@ -1322,29 +1322,28 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-name-regexp
   "<td WIDTH=345>\\(.*\\)</td></tr>")
 (defconst mixi-community-birthday-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>開設日</font></td>
-<td>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>開設日</font></td>
+<td WIDTH=345>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
 ;; FIXME: Care when the owner has seceded.
 (defconst mixi-community-owner-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>管理人</font></td>
-<td>
-
-<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">
-\\(.*\\)</a>")
+  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>管理人</font></td>
+<td WIDTH=345>
+<table style=\"width: 100%;\"><tr><td>
+<a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\\(.*\\)</a>")
 (defconst mixi-community-category-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>カテゴリ</font></td>
-<td>\\([^<]+\\)</td>")
+  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>カテゴリ</font></td>
+<td WIDTH=345>\\([^<]+\\)</td>")
 (defconst mixi-community-members-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>メンバー数</font></td>
-<td>\\([0-9]+\\)人</td></tr>")
+  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>メンバー数</font></td>
+<td WIDTH=345>\\([0-9]+\\)人</td></tr>")
 (defconst mixi-community-open-level-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>参加条件と<br>公開レベル</font></td>
-<td>\\(.+\\)</td></tr>")
+  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>参加条件と<br>公開レベル</font></td>
+<td WIDTH=345>\\(.+\\)</td></tr>")
 (defconst mixi-community-authority-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>トピック作成の権限</font></td>
-<td>\\(.+\\)</td></tr>")
+  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>トピック作成の権限</font></td>
+<td WIDTH=345>\\(.+\\)</td></tr>")
 (defconst mixi-community-description-regexp
-  "<td CLASS=h120>\\(.+\\)</td>")
+  "<td CLASS=h120 WIDTH=345>\\(.+\\)</td>")
 
 (defun mixi-realize-community (community)
   "Realize a COMMUNITY."

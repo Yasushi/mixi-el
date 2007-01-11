@@ -1,3 +1,13 @@
+2007-01-11  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-community-birthday-regexp): Follow the change of mixi.
+	(mixi-community-owner-regexp): Ditto.
+	(mixi-community-category-regexp): Ditto.
+	(mixi-community-members-regexp): Ditto.
+	(mixi-community-open-level-regexp): Ditto.
+	(mixi-community-authority-regexp): Ditto.
+	(mixi-community-description-regexp): Ditto.
+
 2007-01-10  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-gnus.el (mixi-gnus-setup): Simplify.

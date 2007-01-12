@@ -1166,14 +1166,16 @@ Increase this value when unexpected error frequently occurs."
   "Return the time of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (mixi-realize-diary diary)
+  (unless (aref (cdr diary) 3)
+    (mixi-realize-diary diary))
   (aref (cdr diary) 3))
 
 (defun mixi-diary-title (diary)
   "Return the title of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (mixi-realize-diary diary)
+  (unless (aref (cdr diary) 4)
+    (mixi-realize-diary diary))
   (aref (cdr diary) 4))
 
 (defun mixi-diary-content (diary)
@@ -1206,7 +1208,23 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-diary-list-regexp
-  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">")
+  "<tr VALIGN=top>
+<td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#F2DDB7><font COLOR=#996600>\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</font>\\(<br><input type=\"checkbox\" name=\"diary_id\" value=\"[0-9]+\">\\|\\)</td>
+<td bgcolor=\"#FFF4E0\">&nbsp;<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a></td>
+</tr>
+<tr>
+<td ALIGN=center BGCOLOR=#FFFFFF>
+<table BORDER=0 CELLSPACING=0 CELLPADDING=3 WIDTH=410>
+<tr>
+<td CLASS=h120>
+
+\\(.*\\)
+
+?<br>
+
+</td></tr>
+</table>
+</td></tr>")
 
 (defun mixi-get-diaries (&rest friend-or-range)
   "Get diaries of FRIEND."
@@ -1222,16 +1240,29 @@ Increase this value when unexpected error frequently occurs."
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
     (let ((items (mixi-get-matched-items (mixi-diary-list-page friend)
 					 mixi-diary-list-regexp
-					 range)))
+					 range))
+	  (year (nth 5 (decode-time (current-time))))
+	  (month (nth 4 (decode-time (current-time)))))
       (mapcar (lambda (item)
-		(mixi-make-diary friend (nth 0 item)))
+		(let ((month-of-item (string-to-number (nth 0 item))))
+		  (when (> month-of-item month)
+		    (decf year))
+		  (setq month month-of-item)
+		  (mixi-make-diary friend (nth 5 item)
+				   (encode-time
+				    0 (string-to-number (nth 3 item))
+				    (string-to-number (nth 2 item))
+				    (string-to-number (nth 1 item))
+				    month year)
+				   (nth 6 item) (nth 7 item))))
 	      items))))
 
 (defmacro mixi-new-diary-list-page ()
   `(concat "/new_friend_diary.pl?page=%d"))
 
 (defconst mixi-new-diary-list-regexp
-  "<a class=\"new_link\" href=view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)>")
+  "<td WIDTH=180><img src=http://img\\.mixi\\.jp/img/pen\\.gif ALIGN=left WIDTH=14 HEIGHT=16>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td>
+<td WIDTH=450><a class=\"new_link\" href=view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)>\\(.+\\)</a> (\\(.*\\)) ")
 
 (defun mixi-get-new-diaries (&optional range)
   "Get new diaries."
@@ -1239,7 +1270,15 @@ Increase this value when unexpected error frequently occurs."
 				       mixi-new-diary-list-regexp
 				       range)))
     (mapcar (lambda (item)
-	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
+	      (mixi-make-diary (mixi-make-friend (nth 6 item) (nth 8 item))
+			       (nth 5 item)
+			       (encode-time
+				0 (string-to-number (nth 4 item))
+				(string-to-number (nth 3 item))
+				(string-to-number (nth 2 item))
+				(string-to-number (nth 1 item))
+				(string-to-number (nth 0 item)))
+			       (nth 7 item)))
 	    items)))
 
 (defmacro mixi-search-diary-list-page (keyword)
@@ -1247,14 +1286,47 @@ Increase this value when unexpected error frequently occurs."
 	     (mixi-url-encode-and-quote-percent-string keyword)))
 
 (defconst mixi-search-diary-list-regexp
-  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\">")
+  "<td BGCOLOR=#FDF9F2><font COLOR=#996600>名&nbsp;&nbsp;前</font></td>
+<td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.*\\)
+
+</td></tr>
+
+<tr>
+<td BGCOLOR=#FDF9F2><font COLOR=#996600>タイトル</font></td>
+<td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.+\\)</td></tr>
+
+<tr>
+<td BGCOLOR=#FDF9F2><font COLOR=#996600>本&nbsp;&nbsp;文</font></td>
+<td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.*\\)</td></tr>
+
+
+<tr>
+<td NOWRAP BGCOLOR=#FDF9F2 WIDTH=80><font COLOR=#996600>作成日時</font></td>
+<td BGCOLOR=#FFFFFF WIDTH=220>\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td>
+<td ALIGN=center BGCOLOR=#FDF9F2 width=250><a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\"><img src=http://img\\.mixi\\.jp/img/shbtn\\.gif ALT=詳細を見る BORDER=0 WIDTH=104 HEIGHT=19></a></td></tr>
+</table>
+</td></tr></table>")
 
 (defun mixi-search-diaries (keyword &optional range)
   (let ((items (mixi-get-matched-items (mixi-search-diary-list-page keyword)
 				       mixi-search-diary-list-regexp
-				       range)))
+				       range))
+	(year (nth 5 (decode-time (current-time))))
+	(month (nth 4 (decode-time (current-time)))))
     (mapcar (lambda (item)
-	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
+		(let ((month-of-item (string-to-number (nth 3 item))))
+		  (when (> month-of-item month)
+		    (decf year))
+		  (setq month month-of-item)
+		  (mixi-make-diary (mixi-make-friend (nth 8 item) (nth 0 item))
+				   (nth 7 item)
+				   (encode-time
+				    0 (string-to-number (nth 6 item))
+				    (string-to-number (nth 5 item))
+				    (string-to-number (nth 4 item))
+				    month year)
+				   (nth 1 item)
+				   (nth 2 item))))
 	    items)))
 
 (defmacro mixi-post-diary-page ()

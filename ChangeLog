@@ -1,3 +1,14 @@
+2007-01-12  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-list-regexp): Fix regexp.
+	(mixi-get-diaries): Follow the change above.
+	(mixi-diary-time): Ditto.
+	(mixi-diary-title): Ditto.
+	(mixi-new-diary-list-regexp): Fix regexp.
+	(mixi-get-new-diaries): Follow the change above.
+	(mixi-search-diary-list-regexp): Fix regexp.
+	(mixi-search-diaries): Follow the change above.
+
 2007-01-11  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-community-birthday-regexp): Follow the change of mixi.

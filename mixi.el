@@ -1283,7 +1283,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-search-diary-list-page (keyword)
   `(concat "/search_diary.pl?page=%d&submit=search&keyword="
-	     (mixi-url-encode-and-quote-percent-string keyword)))
+	     (mixi-url-encode-and-quote-percent-string ,keyword)))
 
 (defconst mixi-search-diary-list-regexp
   "<td BGCOLOR=#FDF9F2><font COLOR=#996600>名&nbsp;&nbsp;前</font></td>
@@ -1610,7 +1610,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defmacro mixi-search-community-list-page (keyword)
   `(concat "/search_community.pl?page=%d&&sort=date&type=com&submit=main"
-	   "&keyword=" (mixi-url-encode-and-quote-percent-string keyword)
+	   "&keyword=" (mixi-url-encode-and-quote-percent-string ,keyword)
 	   "&category_id=0"))
 
 (defconst mixi-search-community-list-regexp
@@ -1711,14 +1711,16 @@ Increase this value when unexpected error frequently occurs."
   "Return the time of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-realize-topic topic)
+  (unless (aref (cdr topic) 3)
+    (mixi-realize-topic topic))
   (aref (cdr topic) 3))
 
 (defun mixi-topic-title (topic)
   "Return the title of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-realize-topic topic)
+  (unless (aref (cdr topic) 4)
+    (mixi-realize-topic topic))
   (aref (cdr topic) 4))
 
 (defun mixi-topic-owner (topic)
@@ -1918,14 +1920,16 @@ Increase this value when unexpected error frequently occurs."
   "Return the time of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-realize-event event)
+  (unless (aref (cdr event) 3)
+    (mixi-realize-event event))
   (aref (cdr event) 3))
 
 (defun mixi-event-title (event)
   "Return the title of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-realize-event event)
+  (unless (aref (cdr event) 4)
+    (mixi-realize-event event))
   (aref (cdr event) 4))
 
 (defun mixi-event-owner (event)
@@ -2046,7 +2050,9 @@ Increase this value when unexpected error frequently occurs."
 	   "&id=" (mixi-community-id ,community)))
 
 (defconst mixi-bbs-list-regexp
-  "<a href=view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)")
+  "<tr VALIGN=top>
+<td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#FFD8B0>\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>
+<td bgcolor=#FFF4E0>&nbsp;<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comm_id=[0-9]+\">\\(.+\\)</a></td></tr>")
 
 (defun mixi-get-bbses (community &optional range)
   "Get bbese of COMMUNITY."
@@ -2054,20 +2060,38 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (let ((items (mixi-get-matched-items (mixi-bbs-list-page community)
 				       mixi-bbs-list-regexp
-				       range)))
+				       range))
+	(year (nth 5 (decode-time (current-time))))
+	(month (nth 4 (decode-time (current-time)))))
     (mapcar (lambda (item)
-	      (let ((name (nth 0 item)))
+	      (let ((name (nth 4 item))
+		    (month-of-item (string-to-number (nth 0 item)))
+		    (title (nth 6 item)))
 		(when (string= name "bbs")
 		  (setq name "topic"))
+		(when (> month-of-item month)
+		  (decf year))
+		(setq month month-of-item)
+		(when (string-match "^\\[イベント\\]\\(.+\\)" title)
+		  (setq title (match-string 1 title)))
 		(let ((func (intern (concat "mixi-make-" name))))
-		  (funcall func community (nth 1 item)))))
+		  (funcall func community (nth 5 item)
+			   (encode-time
+			    0 (string-to-number (nth 3 item))
+			    (string-to-number (nth 2 item))
+			    (string-to-number (nth 1 item))
+			    month year)
+			   title))))
 	    items)))
 
 (defmacro mixi-new-bbs-list-page ()
   `(concat "/new_bbs.pl?page=%d"))
 
 (defconst mixi-new-bbs-list-regexp
-  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
+  "<td WIDTH=180><img src=http://img\\.mixi\\.jp/img/pen_r\\.gif ALIGN=left WIDTH=14 HEIGHT=16>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td>
+<td WIDTH=450>
+<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">\\(.+\\) ([0-9]+)</a> (\\(.+\\))
+</td>")
 
 (defun mixi-get-new-bbses (&optional range)
   "Get new topics."
@@ -2075,17 +2099,28 @@ Increase this value when unexpected error frequently occurs."
 				       mixi-new-bbs-list-regexp
 				       range)))
     (mapcar (lambda (item)
-	      (let ((name (nth 0 item)))
+	      (let ((name (nth 5 item))
+		    (title (nth 8 item)))
 		(when (string= name "bbs")
 		  (setq name "topic"))
+		(when (string-match "^\\[イベント\\]\\(.+\\)" title)
+		  (setq title (match-string 1 title)))
 		(let ((func (intern (concat "mixi-make-" name))))
-		  (funcall func (mixi-make-community (nth 2 item))
-			   (nth 1 item)))))
+		  (funcall func (mixi-make-community
+				 (nth 7 item) (nth 9 item))
+			   (nth 6 item)
+			   (encode-time
+			    0 (string-to-number (nth 4 item))
+			    (string-to-number (nth 3 item))
+			    (string-to-number (nth 2 item))
+			    (string-to-number (nth 1 item))
+			    (string-to-number (nth 0 item)))
+			   title))))
 	    items)))
 
 (defmacro mixi-search-bbs-list-page (keyword)
   `(concat "/search_topic.pl?page=%d&type=top&submit=search"
-	   "&keyword=" (mixi-url-encode-and-quote-percent-string keyword)
+	   "&keyword=" (mixi-url-encode-and-quote-percent-string ,keyword)
 	   "&community_id=0&category_id=0"))
 
 (defconst mixi-search-bbs-list-regexp

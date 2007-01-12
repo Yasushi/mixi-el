@@ -1,14 +1,6 @@
 2007-01-12  OHASHI Akira  <bg66@koka-in.org>
 
-	* mixi.el (mixi-bbs-list-regexp): Fix regexp.
-	(mixi-get-bbses): Follow the change above.
-	(mixi-topic-time): Ditto.
-	(mixi-topic-title): Ditto.
-	(mixi-event-time): Ditto.
-	(mixi-event-title): Ditto.
-	(mixi-new-bbs-list-regexp): Fix regexp.
-	(mixi-get-new-bbses): Follow the change above.
-	(mixi-search-diary-list-page): Fix typo.
+	* mixi.el (mixi-search-diary-list-page): Fix typo.
 	(mixi-search-community-list-page): Ditto.
 	(mixi-search-bbs-list-page): Ditto.
 

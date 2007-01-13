@@ -1,3 +1,31 @@
+2007-01-14  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-expand-url): Fix for news.
+	(mixi-news-cache): New variable.
+	(mixi-make-news): New function.
+	(mixi-news-url-regexp): New constant.
+	(mixi-make-news-from-url): New function.
+	(mixi-news-p): New macro.
+	(mixi-news-page): Ditto.
+	(mixi-news-title-regexp): New regexp.
+	(mixi-news-time-regexp): Ditto.
+	(mixi-news-content-regexp): Ditto.
+	(mixi-realize-news): New function.
+	(mixi-news-media-id): New accessor method.
+	(mixi-news-id): Ditto.
+	(mixi-news-time): Ditto.
+	(mixi-news-title): Ditto.
+	(mixi-news-content): Ditto.
+	(mixi-news-set-time): Ditto.
+	(mixi-news-set-title): Ditto.
+	(mixi-news-set-content): Ditto.
+	(mixi-news-category-list): New constant.
+	(mixi-news-category-p): New macro.
+	(mixi-news-category-id): New function.
+	(mixi-news-list-page): New macro.
+	(mixi-news-list-regexp): New regexp.
+	(mixi-get-news): New function.
+
 2007-01-12  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-search-diary-list-page): Fix typo.

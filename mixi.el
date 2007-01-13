@@ -272,7 +272,7 @@ Increase this value when unexpected error frequently occurs."
     (mixi-retrieve url post-data)))
 
 (defmacro mixi-expand-url (url)
-  `(if (string-match (concat "^" mixi-url) ,url)
+  `(if (string-match "^http" ,url)
        ,url
      (concat mixi-url ,url)))
 
@@ -2619,6 +2619,176 @@ Increase this value when unexpected error frequently occurs."
 							  (nth 1 item))
 					(nth 2 item)))
 	      items))))
+
+;; News object.
+(defvar mixi-news-cache (make-hash-table :test 'equal))
+(defun mixi-make-news (media-id id &optional time title content)
+  "Return a news object."
+  (mixi-make-cache (list media-id id)
+		   (cons 'mixi-news (vector nil media-id id time title
+					    content))
+		   mixi-news-cache))
+
+(defconst mixi-news-url-regexp
+  "/view_news\\.pl\\?id=\\([0-9]+\\)&media_id=\\([0-9]+\\)")
+
+(defun mixi-make-news-from-url (url)
+  "Return a news object from URL."
+  (when (string-match mixi-news-url-regexp url)
+    (let ((id (match-string 1 url))
+	  (media-id (match-string 2 url)))
+      (mixi-make-news media-id id))))
+
+(defmacro mixi-news-p (news)
+  `(eq (mixi-object-class ,news) 'mixi-news))
+
+(defmacro mixi-news-page (news)
+  `(concat "http://news.mixi.jp/view_news.pl?id=" (mixi-news-id ,news)
+	   "&media_id=" (mixi-news-media-id ,news)))
+
+(defconst mixi-news-title-regexp
+  "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)</td>")
+(defconst mixi-news-time-regexp
+  "<td COLSPAN=\"2\" ALIGN=\"right\">(.+&nbsp;-&nbsp;\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\))</td></tr>")
+(defconst mixi-news-content-regexp
+  "<td CLASS=\"h150\">
+
+\\(.+\\)
+
+?
+
+\\(</td>\\|<br>\\)
+")
+
+(defun mixi-realize-news (news)
+  "Realize a NEWS."
+  ;; FIXME: Check a expiration of cache?
+  (unless (mixi-object-realized-p news)
+    (with-mixi-retrieve (mixi-news-page news)
+      (if (string-match mixi-news-title-regexp buffer)
+	  (mixi-news-set-title news (match-string 1 buffer))
+	(mixi-realization-error 'cannot-find-title news))
+      (if (string-match mixi-news-time-regexp buffer)
+	  (let ((year (nth 5 (decode-time (current-time))))
+		(month (nth 4 (decode-time (current-time))))
+		(month-of-item (string-to-number (match-string 1 buffer))))
+	    (when (> month-of-item month)
+	      (decf year))
+	    (mixi-news-set-time
+	     news (encode-time 0 (string-to-number (match-string 4 buffer))
+			       (string-to-number (match-string 3 buffer))
+			       (string-to-number (match-string 2 buffer))
+			       month year)))
+	(mixi-realization-error 'cannot-find-time news))
+      (if (string-match mixi-news-content-regexp buffer)
+	  (mixi-news-set-content news (match-string 1 buffer))
+	(mixi-realization-error 'cannot-find-content news)))
+    (mixi-object-touch news)))
+
+(defun mixi-news-media-id (news)
+  "Return the media-id of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (aref (cdr news) 1))
+
+(defun mixi-news-id (news)
+  "Return the id of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (aref (cdr news) 2))
+
+(defun mixi-news-time (news)
+  "Return the time of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (unless (aref (cdr news) 3)
+    (mixi-realize-news news))
+  (aref (cdr news) 3))
+
+(defun mixi-news-title (news)
+  "Return the title of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (unless (aref (cdr news) 4)
+    (mixi-realize-news news))
+  (aref (cdr news) 4))
+
+(defun mixi-news-content (news)
+  "Return the content of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (mixi-realize-news news)
+  (aref (cdr news) 5))
+
+(defun mixi-news-set-time (news time)
+  "Set the time of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (aset (cdr news) 3 time))
+
+(defun mixi-news-set-title (news title)
+  "Set the title of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (aset (cdr news) 4 title))
+
+(defun mixi-news-set-content (news content)
+  "Set the content of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (aset (cdr news) 5 content))
+
+(defconst mixi-news-category-list '(domestic politics economy area abroad
+					     sports entertainment IT))
+
+(defmacro mixi-news-category-p (category)
+  `(when (memq ,category mixi-news-category-list)
+     t))
+
+(defun mixi-news-category-id (category)
+  "Return the id of CATEGORY."
+  (unless (mixi-news-category-p category)
+    (signal 'wrong-type-argument (list 'mixi-news-category-p category)))
+  (number-to-string
+   (1+ (- (length mixi-news-category-list)
+	  (length (memq category mixi-news-category-list))))))
+
+(defmacro mixi-news-list-page (category)
+  `(concat "http://news.mixi.jp/list_news_category.pl?page=%d&sort=1"
+	   (concat "&id=" (mixi-news-category-id category) "&type=bn")))
+
+(defconst mixi-news-list-regexp
+  "<tr bgcolor=\"\\(#FCF5EB\\|#FFFFFF\\)\">
+<td WIDTH=\"1%\" valign=top CLASS=\"h120\">・</td>
+<td WIDTH=\"97%\" CLASS=\"h120\"><A HREF=\"view_news\\.pl\\?id=\\([0-9]+\\)&media_id=\\([0-9]+\\)\"class=\"new_link\">\\(.+\\)</A>
+\\(<IMG SRC=\"http://img\\.mixi\\.jp/img/news_camera3\\.gif\" WIDTH=\"11\" HEIGHT=\"12\">\\|\\)
+
+</td>
+<td WIDTH=\"1%\" nowrap CLASS=\"f08\"><A HREF=\"list_news_media\\.pl\\?id=[0-9]+\">.+</A></td>
+<td WIDTH=\"1%\" nowrap CLASS=\"f08\">\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td></tr>")
+
+(defun mixi-get-news (category &optional range)
+  "Get news of CATEGORY."
+  (unless (mixi-news-category-p category)
+    (signal 'wrong-type-argument (list 'mixi-news-category-p category)))
+    (let ((items (mixi-get-matched-items (mixi-news-list-page category)
+					 mixi-news-list-regexp
+					 range))
+	  (year (nth 5 (decode-time (current-time))))
+	  (month (nth 4 (decode-time (current-time)))))
+      (mapcar (lambda (item)
+		(let ((month-of-item (string-to-number (nth 5 item))))
+		  (when (> month-of-item month)
+		    (decf year))
+		  (setq month month-of-item)
+		  (mixi-make-news (nth 2 item) (nth 1 item)
+				   (encode-time
+				    0 (string-to-number (nth 8 item))
+				    (string-to-number (nth 7 item))
+				    (string-to-number (nth 6 item))
+				    month year)
+				   (nth 3 item))))
+	      items)))
 
 (provide 'mixi)
 

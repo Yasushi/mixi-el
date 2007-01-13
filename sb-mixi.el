@@ -62,7 +62,7 @@
 				      ("news.entertainment" .
 				       (lambda (range)
 					 (mixi-get-news 'entertainment range)))
-				      ("news.IT" .
+				      ("news.it" .
 				       (lambda (range)
 					 (mixi-get-news 'IT range))))
   "*An alist of mixi shimbun group definition.

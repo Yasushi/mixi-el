@@ -1,7 +1,7 @@
 2007-01-14  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-mixi-group-alist): Add news groups.
-	(shimbun-mixi-make-from): Fix for news.
+	(shimbun-mixi-make-from): Support news.
 	(shimbun-mixi-make-message-id): Ditto.
 	(shimbun-mixi-make-xref): Ditto.
 	(shimbun-mixi-make-reply-to): Ditto.

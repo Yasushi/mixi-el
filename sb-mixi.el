@@ -40,7 +40,31 @@
 				      ("new-comments" . mixi-get-new-comments)
 				      ("new-bbses" . mixi-get-new-bbses)
 				      ("messages" . mixi-get-messages)
-				      ("my-diaries" . "/home.pl"))
+				      ("my-diaries" . "/home.pl")
+				      ("news.domestic" .
+				       (lambda (range)
+					 (mixi-get-news 'domestic range)))
+				      ("news.politics" .
+				       (lambda (range)
+					 (mixi-get-news 'politics range)))
+				      ("news.economy" .
+				       (lambda (range)
+					 (mixi-get-news 'economy range)))
+				      ("news.area" .
+				       (lambda (range)
+					 (mixi-get-news 'area range)))
+				      ("news.abroad" .
+				       (lambda (range)
+					 (mixi-get-news 'abroad range)))
+				      ("news.sports" .
+				       (lambda (range)
+					 (mixi-get-news 'sports range)))
+				      ("news.entertainment" .
+				       (lambda (range)
+					 (mixi-get-news 'entertainment range)))
+				      ("news.IT" .
+				       (lambda (range)
+					 (mixi-get-news 'IT range))))
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
 NAME is a shimbun group name.
@@ -107,8 +131,10 @@ of mixi object."
 	(concat prefix subject suffix)))))
 
 (defun shimbun-mixi-make-from (object)
-  (let ((owner (mixi-object-owner object)))
-    (mixi-friend-nick owner)))
+  (if (eq class 'mixi-news)
+      (mixi-news-media object)
+    (let ((owner (mixi-object-owner object)))
+      (mixi-friend-nick owner))))
 
 (defun shimbun-mixi-make-date (object)
   (let* ((time (mixi-object-time object))
@@ -130,7 +156,9 @@ of mixi object."
 			(mixi-friend-id (mixi-object-owner
 					 (mixi-comment-parent object))) ".")
 	      (concat (mixi-object-id object) "@"
-		      (mixi-object-id (mixi-object-owner object)) "."))
+		      (if (eq class 'mixi-news)
+			  (mixi-news-media-id object)
+			(mixi-object-id (mixi-object-owner object))) "."))
 	    (mixi-object-name object) ".mixi.jp"
 	    ">")))
 
@@ -146,7 +174,9 @@ of mixi object."
 	   (concat (shimbun-mixi-make-xref (mixi-comment-parent object))
 		   "#comment"))
 	  ((eq class 'mixi-message)
-	   (mixi-expand-url (mixi-message-page object))))))
+	   (mixi-expand-url (mixi-message-page object)))
+	  ((eq class 'mixi-news)
+	   (mixi-news-page object)))))
 
 (defun shimbun-mixi-make-body (object)
   (let ((class (mixi-object-class object)))
@@ -184,7 +214,7 @@ of mixi object."
 		 ((eq class 'mixi-community)
 		  (concat shimbun-mixi-reply-to "topic;"
 			  (mixi-community-id object)))
-		 ((eq object (mixi-make-me))
+		 ((or (eq class 'mixi-news) (eq object (mixi-make-me)))
 		  (concat shimbun-mixi-reply-to "diary"))
 		 ((eq class 'mixi-message)
 		  (concat shimbun-mixi-reply-to "message;"

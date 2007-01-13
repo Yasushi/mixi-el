@@ -1,5 +1,13 @@
 2007-01-14  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-group-alist): Add news groups.
+	(shimbun-mixi-make-from): Fix for news.
+	(shimbun-mixi-make-message-id): Ditto.
+	(shimbun-mixi-make-xref): Ditto.
+	(shimbun-mixi-make-reply-to): Ditto.
+
+2007-01-14  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-expand-url): Fix for news.
 	(mixi-news-cache): New variable.
 	(mixi-make-news): New function.
@@ -8,7 +16,6 @@
 	(mixi-news-p): New macro.
 	(mixi-news-page): Ditto.
 	(mixi-news-title-regexp): New regexp.
-	(mixi-news-media-regexp): Ditto.
 	(mixi-news-media-time-regexp): Ditto.
 	(mixi-news-content-regexp): Ditto.
 	(mixi-realize-news): New function.

@@ -2657,8 +2657,7 @@ Increase this value when unexpected error frequently occurs."
 
 ?
 
-\\(</td>\\|<br>\\)
-")
+\\(</td>\\|<br>\\)")
 
 (defun mixi-realize-news (news)
   "Realize a NEWS."

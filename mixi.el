@@ -41,6 +41,7 @@
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
 ;;  * mixi-get-introductions
+;;  * mixi-get-news
 ;;
 ;; API for posting:
 ;;
@@ -2622,10 +2623,10 @@ Increase this value when unexpected error frequently occurs."
 
 ;; News object.
 (defvar mixi-news-cache (make-hash-table :test 'equal))
-(defun mixi-make-news (media-id id &optional time title content)
+(defun mixi-make-news (media-id id &optional media time title content)
   "Return a news object."
   (mixi-make-cache (list media-id id)
-		   (cons 'mixi-news (vector nil media-id id time title
+		   (cons 'mixi-news (vector nil media-id id media time title
 					    content))
 		   mixi-news-cache))
 
@@ -2648,8 +2649,8 @@ Increase this value when unexpected error frequently occurs."
 
 (defconst mixi-news-title-regexp
   "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)</td>")
-(defconst mixi-news-time-regexp
-  "<td COLSPAN=\"2\" ALIGN=\"right\">(.+&nbsp;-&nbsp;\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\))</td></tr>")
+(defconst mixi-news-media-time-regexp
+  "<td COLSPAN=\"2\" ALIGN=\"right\">(\\(.+\\)&nbsp;-&nbsp;\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\))</td></tr>")
 (defconst mixi-news-content-regexp
   "<td CLASS=\"h150\">
 
@@ -2667,18 +2668,20 @@ Increase this value when unexpected error frequently occurs."
       (if (string-match mixi-news-title-regexp buffer)
 	  (mixi-news-set-title news (match-string 1 buffer))
 	(mixi-realization-error 'cannot-find-title news))
-      (if (string-match mixi-news-time-regexp buffer)
-	  (let ((year (nth 5 (decode-time (current-time))))
-		(month (nth 4 (decode-time (current-time))))
-		(month-of-item (string-to-number (match-string 1 buffer))))
-	    (when (> month-of-item month)
-	      (decf year))
-	    (mixi-news-set-time
-	     news (encode-time 0 (string-to-number (match-string 4 buffer))
-			       (string-to-number (match-string 3 buffer))
-			       (string-to-number (match-string 2 buffer))
-			       month year)))
-	(mixi-realization-error 'cannot-find-time news))
+      (if (string-match mixi-news-media-time-regexp buffer)
+	  (progn
+	    (mixi-news-set-media news (match-string 1 buffer))
+	    (let ((year (nth 5 (decode-time (current-time))))
+		  (month (nth 4 (decode-time (current-time))))
+		  (month-of-item (string-to-number (match-string 2 buffer))))
+	      (when (> month-of-item month)
+		(decf year))
+	      (mixi-news-set-time
+	       news (encode-time 0 (string-to-number (match-string 5 buffer))
+				 (string-to-number (match-string 4 buffer))
+				 (string-to-number (match-string 3 buffer))
+				 month year))))
+	(mixi-realization-error 'cannot-find-media-time news))
       (if (string-match mixi-news-content-regexp buffer)
 	  (mixi-news-set-content news (match-string 1 buffer))
 	(mixi-realization-error 'cannot-find-content news)))
@@ -2696,46 +2699,60 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
   (aref (cdr news) 2))
 
-(defun mixi-news-time (news)
-  "Return the time of NEWS."
+(defun mixi-news-media (news)
+  "Return the media of NEWS."
   (unless (mixi-news-p news)
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
   (unless (aref (cdr news) 3)
     (mixi-realize-news news))
   (aref (cdr news) 3))
 
-(defun mixi-news-title (news)
-  "Return the title of NEWS."
+(defun mixi-news-time (news)
+  "Return the time of NEWS."
   (unless (mixi-news-p news)
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
   (unless (aref (cdr news) 4)
     (mixi-realize-news news))
   (aref (cdr news) 4))
 
+(defun mixi-news-title (news)
+  "Return the title of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (unless (aref (cdr news) 5)
+    (mixi-realize-news news))
+  (aref (cdr news) 5))
+
 (defun mixi-news-content (news)
   "Return the content of NEWS."
   (unless (mixi-news-p news)
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
   (mixi-realize-news news)
-  (aref (cdr news) 5))
+  (aref (cdr news) 6))
+
+(defun mixi-news-set-media (news media)
+  "Set the media of NEWS."
+  (unless (mixi-news-p news)
+    (signal 'wrong-type-argument (list 'mixi-news-p news)))
+  (aset (cdr news) 3 media))
 
 (defun mixi-news-set-time (news time)
   "Set the time of NEWS."
   (unless (mixi-news-p news)
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
-  (aset (cdr news) 3 time))
+  (aset (cdr news) 4 time))
 
 (defun mixi-news-set-title (news title)
   "Set the title of NEWS."
   (unless (mixi-news-p news)
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
-  (aset (cdr news) 4 title))
+  (aset (cdr news) 5 title))
 
 (defun mixi-news-set-content (news content)
   "Set the content of NEWS."
   (unless (mixi-news-p news)
     (signal 'wrong-type-argument (list 'mixi-news-p news)))
-  (aset (cdr news) 5 content))
+  (aset (cdr news) 6 content))
 
 (defconst mixi-news-category-list '(domestic politics economy area abroad
 					     sports entertainment IT))
@@ -2763,7 +2780,7 @@ Increase this value when unexpected error frequently occurs."
 \\(<IMG SRC=\"http://img\\.mixi\\.jp/img/news_camera3\\.gif\" WIDTH=\"11\" HEIGHT=\"12\">\\|\\)
 
 </td>
-<td WIDTH=\"1%\" nowrap CLASS=\"f08\"><A HREF=\"list_news_media\\.pl\\?id=[0-9]+\">.+</A></td>
+<td WIDTH=\"1%\" nowrap CLASS=\"f08\"><A HREF=\"list_news_media\\.pl\\?id=[0-9]+\">\\(.+\\)</A></td>
 <td WIDTH=\"1%\" nowrap CLASS=\"f08\">\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td></tr>")
 
 (defun mixi-get-news (category &optional range)
@@ -2776,15 +2793,15 @@ Increase this value when unexpected error frequently occurs."
 	  (year (nth 5 (decode-time (current-time))))
 	  (month (nth 4 (decode-time (current-time)))))
       (mapcar (lambda (item)
-		(let ((month-of-item (string-to-number (nth 5 item))))
+		(let ((month-of-item (string-to-number (nth 6 item))))
 		  (when (> month-of-item month)
 		    (decf year))
 		  (setq month month-of-item)
-		  (mixi-make-news (nth 2 item) (nth 1 item)
+		  (mixi-make-news (nth 2 item) (nth 1 item) (nth 5 item)
 				   (encode-time
-				    0 (string-to-number (nth 8 item))
+				    0 (string-to-number (nth 9 item))
+				    (string-to-number (nth 8 item))
 				    (string-to-number (nth 7 item))
-				    (string-to-number (nth 6 item))
 				    month year)
 				   (nth 3 item))))
 	      items)))

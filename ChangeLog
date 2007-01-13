@@ -8,14 +8,17 @@
 	(mixi-news-p): New macro.
 	(mixi-news-page): Ditto.
 	(mixi-news-title-regexp): New regexp.
-	(mixi-news-time-regexp): Ditto.
+	(mixi-news-media-regexp): Ditto.
+	(mixi-news-media-time-regexp): Ditto.
 	(mixi-news-content-regexp): Ditto.
 	(mixi-realize-news): New function.
 	(mixi-news-media-id): New accessor method.
 	(mixi-news-id): Ditto.
+	(mixi-news-media): Ditto.
 	(mixi-news-time): Ditto.
 	(mixi-news-title): Ditto.
 	(mixi-news-content): Ditto.
+	(mixi-news-set-media): Ditto.
 	(mixi-news-set-time): Ditto.
 	(mixi-news-set-title): Ditto.
 	(mixi-news-set-content): Ditto.

@@ -2787,24 +2787,24 @@ Increase this value when unexpected error frequently occurs."
   "Get news of CATEGORY."
   (unless (mixi-news-category-p category)
     (signal 'wrong-type-argument (list 'mixi-news-category-p category)))
-    (let ((items (mixi-get-matched-items (mixi-news-list-page category)
-					 mixi-news-list-regexp
-					 range))
-	  (year (nth 5 (decode-time (current-time))))
-	  (month (nth 4 (decode-time (current-time)))))
-      (mapcar (lambda (item)
-		(let ((month-of-item (string-to-number (nth 6 item))))
-		  (when (> month-of-item month)
-		    (decf year))
-		  (setq month month-of-item)
-		  (mixi-make-news (nth 2 item) (nth 1 item) (nth 5 item)
-				   (encode-time
-				    0 (string-to-number (nth 9 item))
-				    (string-to-number (nth 8 item))
-				    (string-to-number (nth 7 item))
-				    month year)
-				   (nth 3 item))))
-	      items)))
+  (let ((items (mixi-get-matched-items (mixi-news-list-page category)
+				       mixi-news-list-regexp
+				       range))
+	(year (nth 5 (decode-time (current-time))))
+	(month (nth 4 (decode-time (current-time)))))
+    (mapcar (lambda (item)
+	      (let ((month-of-item (string-to-number (nth 6 item))))
+		(when (> month-of-item month)
+		  (decf year))
+		(setq month month-of-item)
+		(mixi-make-news (nth 2 item) (nth 1 item) (nth 5 item)
+				(encode-time
+				 0 (string-to-number (nth 9 item))
+				 (string-to-number (nth 8 item))
+				 (string-to-number (nth 7 item))
+				 month year)
+				(nth 3 item))))
+	    items)))
 
 (provide 'mixi)
 

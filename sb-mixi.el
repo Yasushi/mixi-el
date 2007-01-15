@@ -36,35 +36,60 @@
   (luna-define-class shimbun-mixi (shimbun) (comment-cache))
   (luna-define-internal-accessors 'shimbun-mixi))
 
-(defcustom shimbun-mixi-group-alist '(("new-diaries" . mixi-get-new-diaries)
-				      ("new-comments" . mixi-get-new-comments)
-				      ("new-bbses" . mixi-get-new-bbses)
-				      ("messages" . mixi-get-messages)
-				      ("my-diaries" . "/home.pl")
-				      ("news.domestic" .
-				       (lambda (range)
-					 (mixi-get-news 'domestic range)))
-				      ("news.politics" .
-				       (lambda (range)
-					 (mixi-get-news 'politics range)))
-				      ("news.economy" .
-				       (lambda (range)
-					 (mixi-get-news 'economy range)))
-				      ("news.area" .
-				       (lambda (range)
-					 (mixi-get-news 'area range)))
-				      ("news.abroad" .
-				       (lambda (range)
-					 (mixi-get-news 'abroad range)))
-				      ("news.sports" .
-				       (lambda (range)
-					 (mixi-get-news 'sports range)))
-				      ("news.entertainment" .
-				       (lambda (range)
-					 (mixi-get-news 'entertainment range)))
-				      ("news.it" .
-				       (lambda (range)
-					 (mixi-get-news 'IT range))))
+(defcustom shimbun-mixi-group-alist
+  '(("new-diaries" . mixi-get-new-diaries)
+    ("new-comments" . mixi-get-new-comments)
+    ("new-bbses" . mixi-get-new-bbses)
+    ("messages" . mixi-get-messages)
+    ("my-diaries" . "/home.pl")
+    ("news.newest.domestic" .
+     (lambda (range)
+       (mixi-get-news 'domestic 'newest range)))
+    ("news.newest.politics" .
+     (lambda (range)
+       (mixi-get-news 'politics 'newest range)))
+    ("news.newest.economy" .
+     (lambda (range)
+       (mixi-get-news 'economy 'newest range)))
+    ("news.newest.area" .
+     (lambda (range)
+       (mixi-get-news 'area 'newest range)))
+    ("news.newest.abroad" .
+     (lambda (range)
+       (mixi-get-news 'abroad 'newest range)))
+    ("news.newest.sports" .
+     (lambda (range)
+       (mixi-get-news 'sports 'newest range)))
+    ("news.newest.entertainment" .
+     (lambda (range)
+       (mixi-get-news 'entertainment 'newest range)))
+    ("news.newest.it" .
+     (lambda (range)
+       (mixi-get-news 'IT 'newest range)))
+    ("news.pickup.domestic" .
+     (lambda (range)
+       (mixi-get-news 'domestic 'pickup range)))
+    ("news.pickup.politics" .
+     (lambda (range)
+       (mixi-get-news 'politics 'pickup range)))
+    ("news.pickup.economy" .
+     (lambda (range)
+       (mixi-get-news 'economy 'pickup range)))
+    ("news.pickup.area" .
+     (lambda (range)
+       (mixi-get-news 'area 'pickup range)))
+    ("news.pickup.abroad" .
+     (lambda (range)
+       (mixi-get-news 'abroad 'pickup range)))
+    ("news.pickup.sports" .
+     (lambda (range)
+       (mixi-get-news 'sports 'pickup range)))
+    ("news.pickup.entertainment" .
+     (lambda (range)
+       (mixi-get-news 'entertainment 'pickup range)))
+    ("news.pickup.it" .
+     (lambda (range)
+       (mixi-get-news 'IT 'pickup range))))
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
 NAME is a shimbun group name.

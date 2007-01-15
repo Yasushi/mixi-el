@@ -1,3 +1,16 @@
+2007-01-15  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-bbs-p): Simplify.
+	(mixi-message-box-p): Ditto.
+	(mixi-news-category-p): Ditto.
+	(mixi-news-sort-list): New constant.
+	(mixi-news-sort-p): New macro.
+	(mixi-news-sort-id): New function.
+	(mixi-news-list-page): Add SORT argument.
+	(mixi-get-news): Ditto.
+
+	* sb-mixi.el (shimbun-mixi-group-alist): Follow the change above.
+
 2007-01-14  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-mixi-group-alist): Add news groups.

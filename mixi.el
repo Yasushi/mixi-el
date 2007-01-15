@@ -2025,8 +2025,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-bbs-list '(mixi-topic mixi-event))
 
 (defmacro mixi-bbs-p (object)
-  `(when (memq (mixi-object-class ,object) mixi-bbs-list)
-     t))
+  `(memq (mixi-object-class ,object) mixi-bbs-list))
 
 (defun mixi-bbs-community (object)
   "Return the community of OBJECT."
@@ -2333,8 +2332,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-message-box-list '(inbox outbox savebox thrash)) ; thrash?
 
 (defmacro mixi-message-box-p (box)
-  `(when (memq ,box mixi-message-box-list)
-     t))
+  `(memq ,box mixi-message-box-list))
 
 (defun mixi-message-box-name (box)
   "Return the name of BOX."
@@ -2758,8 +2756,7 @@ Increase this value when unexpected error frequently occurs."
 					     sports entertainment IT))
 
 (defmacro mixi-news-category-p (category)
-  `(when (memq ,category mixi-news-category-list)
-     t))
+  `(memq ,category mixi-news-category-list))
 
 (defun mixi-news-category-id (category)
   "Return the id of CATEGORY."
@@ -2769,9 +2766,24 @@ Increase this value when unexpected error frequently occurs."
    (1+ (- (length mixi-news-category-list)
 	  (length (memq category mixi-news-category-list))))))
 
-(defmacro mixi-news-list-page (category)
-  `(concat "http://news.mixi.jp/list_news_category.pl?page=%d&sort=1"
-	   (concat "&id=" (mixi-news-category-id category) "&type=bn")))
+(defconst mixi-news-sort-list '(newest pickup))
+
+(defmacro mixi-news-sort-p (sort)
+  `(memq ,sort mixi-news-sort-list))
+
+(defun mixi-news-sort-id (sort)
+  "Return the id of SORT."
+  (unless (mixi-news-sort-p sort)
+    (signal 'wrong-type-argument (list 'mixi-news-sort-p sort)))
+  (number-to-string
+   (- (length mixi-news-sort-list)
+      (length (memq sort mixi-news-sort-list)))))
+
+(defmacro mixi-news-list-page (category sort)
+  `(concat "http://news.mixi.jp/list_news_category.pl?page=%d"
+	   "&sort=" (mixi-news-sort-id ,sort)
+	   "&id=" (mixi-news-category-id ,category)
+	   "&type=bn"))
 
 (defconst mixi-news-list-regexp
   "<tr bgcolor=\"\\(#FCF5EB\\|#FFFFFF\\)\">
@@ -2783,11 +2795,13 @@ Increase this value when unexpected error frequently occurs."
 <td WIDTH=\"1%\" nowrap CLASS=\"f08\"><A HREF=\"list_news_media\\.pl\\?id=[0-9]+\">\\(.+\\)</A></td>
 <td WIDTH=\"1%\" nowrap CLASS=\"f08\">\\([0-9]+\\)·î\\([0-9]+\\)Æü \\([0-9]+\\):\\([0-9]+\\)</td></tr>")
 
-(defun mixi-get-news (category &optional range)
-  "Get news of CATEGORY."
+(defun mixi-get-news (category sort &optional range)
+  "Get news of CATEGORY and SORT."
   (unless (mixi-news-category-p category)
     (signal 'wrong-type-argument (list 'mixi-news-category-p category)))
-  (let ((items (mixi-get-matched-items (mixi-news-list-page category)
+  (unless (mixi-news-sort-p sort)
+    (signal 'wrong-type-argument (list 'mixi-news-sort-p sort)))
+  (let ((items (mixi-get-matched-items (mixi-news-list-page category sort)
 				       mixi-news-list-regexp
 				       range))
 	(year (nth 5 (decode-time (current-time))))

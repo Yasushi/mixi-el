@@ -1,5 +1,10 @@
 2007-01-15  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-diary-list-regexp): Fix regexp.
+	(mixi-get-diaries): Follow the change above.
+
+2007-01-15  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-bbs-p): Simplify.
 	(mixi-message-box-p): Ditto.
 	(mixi-news-category-p): Ditto.

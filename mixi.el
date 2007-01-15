@@ -1211,21 +1211,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-list-regexp
   "<tr VALIGN=top>
 <td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#F2DDB7><font COLOR=#996600>\\([0-9]+\\)·î\\([0-9]+\\)Æü<br>\\([0-9]+\\):\\([0-9]+\\)</font>\\(<br><input type=\"checkbox\" name=\"diary_id\" value=\"[0-9]+\">\\|\\)</td>
-<td bgcolor=\"#FFF4E0\">&nbsp;<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a></td>
-</tr>
-<tr>
-<td ALIGN=center BGCOLOR=#FFFFFF>
-<table BORDER=0 CELLSPACING=0 CELLPADDING=3 WIDTH=410>
-<tr>
-<td CLASS=h120>
-
-\\(.*\\)
-
-?<br>
-
-</td></tr>
-</table>
-</td></tr>")
+<td bgcolor=\"#FFF4E0\">&nbsp;<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a></td>")
 
 (defun mixi-get-diaries (&rest friend-or-range)
   "Get diaries of FRIEND."
@@ -1255,7 +1241,7 @@ Increase this value when unexpected error frequently occurs."
 				    (string-to-number (nth 2 item))
 				    (string-to-number (nth 1 item))
 				    month year)
-				   (nth 6 item) (nth 7 item))))
+				   (nth 6 item))))
 	      items))))
 
 (defmacro mixi-new-diary-list-page ()

@@ -172,6 +172,11 @@
 		(symbol :tag "The other backend"))
   :group 'mixi)
 
+(defcustom mixi-login-use-ssl nil
+  "*If non-ni, login using SSL."
+  :type 'boolean
+  :group 'mixi)
+
 (defcustom mixi-default-email nil
   "*Default E-mail address that is used to login automatically."
   :type '(radio (string :tag "E-mail address")
@@ -381,17 +386,20 @@ Increase this value when unexpected error frequently occurs."
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
 		      (read-passwd (mixi-message "Login Password: ")))))
-    (let ((buffer (mixi-retrieve "/login.pl"
-				 (concat "email=" email
-					 "&password=" password
-					 "&next_url=/home.pl"
-					 "&sticky=on"))))
-      (unless (string-match "url=/check\\.pl\\?n=" buffer)
-	(error (mixi-message "Cannot login")))
-      (setq buffer (mixi-retrieve "/check.pl?n=home.pl"))
-      (if (string-match mixi-my-id-regexp buffer)
-	  (setq mixi-me (mixi-make-friend (match-string 1 buffer)))
-	(error (mixi-message "Cannot login"))))))
+    (let ((url "/login.pl"))
+      (when mixi-login-use-ssl
+	(setq url (concat "https://mixi.jp" url)))
+      (let ((buffer (mixi-retrieve url
+				   (concat "email=" email
+					   "&password=" password
+					   "&next_url=/home.pl"
+					   "&sticky=on"))))
+	(unless (string-match "url=/check\\.pl\\?n=" buffer)
+	  (error (mixi-message "Cannot login")))
+	(setq buffer (mixi-retrieve "/check.pl?n=home.pl"))
+	(if (string-match mixi-my-id-regexp buffer)
+	    (setq mixi-me (mixi-make-friend (match-string 1 buffer)))
+	  (error (mixi-message "Cannot login")))))))
 
 (defun mixi-logout ()
   (mixi-retrieve "/logout.pl"))

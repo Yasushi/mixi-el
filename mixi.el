@@ -119,6 +119,13 @@
 
 (eval-when-compile (require 'cl))
 
+;; Functions and variables which should be defined in the other module
+;; at run-time.
+(eval-when-compile
+  (defvar w3m-use-cookies)
+  (autoload 'w3m-decode-buffer "w3m")
+  (autoload 'w3m-retrieve "w3m"))
+
 (defgroup mixi nil
   "API library for accessing to mixi."
   :group 'hypermedia)

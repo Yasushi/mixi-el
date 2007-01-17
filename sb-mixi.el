@@ -156,10 +156,11 @@ of mixi object."
 	(concat prefix subject suffix)))))
 
 (defun shimbun-mixi-make-from (object)
-  (if (eq class 'mixi-news)
-      (mixi-news-media object)
-    (let ((owner (mixi-object-owner object)))
-      (mixi-friend-nick owner))))
+  (let ((class (mixi-object-class object)))
+    (if (eq class 'mixi-news)
+	(mixi-news-media object)
+      (let ((owner (mixi-object-owner object)))
+	(mixi-friend-nick owner)))))
 
 (defun shimbun-mixi-make-date (object)
   (let* ((time (mixi-object-time object))

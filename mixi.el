@@ -440,15 +440,19 @@ Increase this value when unexpected error frequently occurs."
 (put 'with-mixi-post-form 'lisp-indent-function 'defun)
 (put 'with-mixi-post-form 'edebug-form-spec '(body))
 
-(defun mixi-get-matched-items (url regexp &optional range)
+(defun mixi-get-matched-items (url regexp &optional range reverse)
   "Get matched items to REGEXP in URL."
   (let ((page 1)
 	ids)
     (catch 'end
       (while (or (null range) (< (length ids) range))
 	(with-mixi-retrieve (format url page)
-	  (let (found)
-	    (while (and (re-search-forward regexp nil t)
+	  (let ((func (if reverse (progn
+				    (goto-char (point-max))
+				    're-search-backward)
+			're-search-forward))
+		found)
+	    (while (and (funcall func regexp nil t)
 			(or (null range) (< (length ids) range)))
 	      (let ((num 1)
 		    list)
@@ -2249,16 +2253,7 @@ Increase this value when unexpected error frequently occurs."
 	 (regexp (eval (intern (concat mixi-object-prefix name
 				       "-comment-list-regexp")))))
     (let ((items (mixi-get-matched-items
-		  (funcall list-page parent) regexp)))
-      (let (list)
-	(catch 'stop
-	  (mapc (lambda (item)
-		  (when (and (numberp range)
-			     (>= (length list) range))
-		    (throw 'stop nil))
-		  (setq list (cons item list)))
-	        (reverse items)))
-	(setq items (reverse list)))
+		  (funcall list-page parent) regexp range t)))
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
 					   (nth 7 item) (nth 8 item))

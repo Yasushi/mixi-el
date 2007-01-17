@@ -1,5 +1,9 @@
 2007-01-17  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el: (mixi-realize-message): Follow the change of mixi.
+
+2007-01-17  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el: (with-mixi-retrieve): Don't bind `buffer' variable.
 	(with-mixi-post-form): Ditto.
 	(mixi-get-matched-items): Follow the change above.

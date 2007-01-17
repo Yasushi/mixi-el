@@ -2370,10 +2370,10 @@ Increase this value when unexpected error frequently occurs."
 
 (defconst mixi-message-owner-regexp
   "<font COLOR=#996600>\\(差出人\\|宛&nbsp;先\\)</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(</a>\\|</td>\\)")
-(defconst mixi-message-title-regexp
-"<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.+\\)\n?</td>")
 (defconst mixi-message-time-regexp
 "<font COLOR=#996600>日\\(　\\|&nbsp;\\)付</font>&nbsp;:&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分&nbsp;&nbsp;")
+(defconst mixi-message-title-regexp
+"<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.+\\)\n?</td>")
 (defconst mixi-message-content-regexp
   "<tr><td CLASS=h120>\\(.+\\)</td></tr>")
 
@@ -2386,9 +2386,6 @@ Increase this value when unexpected error frequently occurs."
 				  (mixi-make-friend (match-string 2)
 						    (match-string 3)))
 	(mixi-realization-error 'cannot-find-owner message))
-      (if (re-search-forward mixi-message-title-regexp nil t)
-	  (mixi-message-set-title message (match-string 2))
-	(mixi-realization-error 'cannot-find-title message))
       (if (re-search-forward mixi-message-time-regexp nil t)
 	  (mixi-message-set-time
 	   message (encode-time 0 (string-to-number (match-string 6))
@@ -2397,6 +2394,9 @@ Increase this value when unexpected error frequently occurs."
 				(string-to-number (match-string 3))
 				(string-to-number (match-string 2))))
 	(mixi-realization-error 'cannot-find-time message))
+      (if (re-search-forward mixi-message-title-regexp nil t)
+	  (mixi-message-set-title message (match-string 2))
+	(mixi-realization-error 'cannot-find-title message))
       (if (re-search-forward mixi-message-content-regexp nil t)
 	  (mixi-message-set-content message (match-string 1))
 	(mixi-realization-error 'cannot-find-content message)))

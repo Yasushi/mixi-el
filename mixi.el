@@ -224,7 +224,7 @@ Increase this value when unexpected error frequently occurs."
   :type 'boolean
   :group 'mixi)
 
-(defvar mixi-buffer-name " *mixi temp*")
+(defvar mixi-temp-buffer-name " *mixi temp*")
 (defvar mixi-me nil)
 
 ;; Utilities.
@@ -416,7 +416,7 @@ Increase this value when unexpected error frequently occurs."
   (mixi-retrieve "/logout.pl"))
 
 (defmacro with-mixi-retrieve (url &rest body)
-  `(with-current-buffer (get-buffer-create mixi-buffer-name)
+  `(with-current-buffer (get-buffer-create mixi-temp-buffer-name)
      (when ,url
        (erase-buffer)
        (insert (mixi-retrieve ,url))
@@ -432,7 +432,7 @@ Increase this value when unexpected error frequently occurs."
 (put 'with-mixi-retrieve 'edebug-form-spec '(body))
 
 (defmacro with-mixi-post-form (url fields &rest body)
-  `(with-current-buffer (get-buffer-create mixi-buffer-name)
+  `(with-current-buffer (get-buffer-create mixi-temp-buffer-name)
      (when ,url
        (erase-buffer)
        (insert (mixi-post-form ,url ,fields))

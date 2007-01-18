@@ -1,5 +1,11 @@
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-temp-buffer-name): Rename from `mixi-buffer-name'.
+	(with-mixi-retrieve): Follow the change above.
+	(with-mixi-post-form): Ditto.
+
+2007-01-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-buffer-name): New variable.
 	(with-mixi-retrieve): Use it.
 	(with-mixi-post-form): Ditto.

@@ -1,5 +1,10 @@
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-get-headers): Get headers of comments
+	before parent's.
+
+2007-01-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi-get-headers): Stop getting comment's
 	headers when it was already shown.
 

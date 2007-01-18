@@ -255,25 +255,7 @@ of mixi object."
       (catch 'stop
 	(mapc (lambda (object)
 		(when (mixi-object-p object)
-		  (let ((class (mixi-object-class object))
-			(id (shimbun-mixi-make-message-id object)))
-		    (when (and (eq class 'mixi-comment)
-			       (shimbun-search-id shimbun id))
-		      (throw 'stop nil))
-		    (push
-		     (shimbun-create-header
-		      0
-		      (shimbun-mixi-make-subject shimbun object)
-		      (shimbun-mixi-make-from object)
-		      (shimbun-mixi-make-date object)
-		      id
-		      (if (eq class 'mixi-comment)
-			  (shimbun-mixi-make-message-id
-			   (mixi-comment-parent object))
-			"")
-		      0 0
-		      (shimbun-mixi-make-xref object))
-		     headers)
+		  (let ((class (mixi-object-class object)))
 		    (when (or (eq class 'mixi-diary)
 			      (mixi-bbs-p object))
 		      (let ((comments (mixi-get-comments object range)))
@@ -281,10 +263,28 @@ of mixi object."
 				(push header headers))
 			      (shimbun-mixi-get-headers shimbun
 							comments))))
-		    (when (eq class 'mixi-comment)
-		      (puthash id (mixi-comment-content object)
-			       (shimbun-mixi-comment-cache-internal
-				shimbun))))))
+		    (let ((id (shimbun-mixi-make-message-id object)))
+		      (when (and (eq class 'mixi-comment)
+				 (shimbun-search-id shimbun id))
+			(throw 'stop nil))
+		      (push
+		       (shimbun-create-header
+			0
+			(shimbun-mixi-make-subject shimbun object)
+			(shimbun-mixi-make-from object)
+			(shimbun-mixi-make-date object)
+			id
+			(if (eq class 'mixi-comment)
+			    (shimbun-mixi-make-message-id
+			     (mixi-comment-parent object))
+			  "")
+			0 0
+			(shimbun-mixi-make-xref object))
+		       headers)
+		      (when (eq class 'mixi-comment)
+			(puthash id (mixi-comment-content object)
+				 (shimbun-mixi-comment-cache-internal
+				  shimbun)))))))
 	      objects))
       headers)))
 

@@ -1,5 +1,10 @@
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-get-headers): Stop getting comment's
+	headers when it was already shown.
+
+2007-01-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
 	(mixi-friend-page): Ditto.
 	(mixi-realize-friend): Ditto.

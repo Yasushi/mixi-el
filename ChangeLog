@@ -1,3 +1,9 @@
+2007-01-18  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
+	(mixi-friend-page): Ditto.
+	(mixi-realize-friend): Ditto.
+
 2007-01-17  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el: (mixi-get-matched-items): Add REVERSE argument.

@@ -769,10 +769,10 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,friend) 'mixi-friend))
 
 (defmacro mixi-friend-page (friend)
-  `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
+  `(concat "/show_profile.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<img alt=\"\\*\" src=\"http://img\\.mixi\\.jp/img/dot0\\.gif\" width=\"1\" height=\"5\"><br>?
+  "<img \\(alt=\"\\*\" \\)?src=\"?http://img\\.mixi\\.jp/img/dot0\\.gif\"? \\(width\\|WIDTH\\)=\"?1\"? \\(height\\|HEIGHT\\)=\"?5\"?><br>?
 \\(.*\\)さん([0-9]+)")
 (defconst mixi-friend-name-regexp
   "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>名\\(&nbsp;\\| \\)前</font></td>
@@ -805,47 +805,35 @@ Increase this value when unexpected error frequently occurs."
   "Realize a FRIEND."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p friend)
-    (let (buf)
-      (with-mixi-retrieve (mixi-friend-page friend)
-	(setq buf (buffer-string)))
-      (if (string-match mixi-friend-nick-regexp buf)
-	  (mixi-friend-set-nick friend (match-string 1 buf))
+    (with-mixi-retrieve (mixi-friend-page friend)
+      (if (re-search-forward mixi-friend-nick-regexp nil t)
+	  (mixi-friend-set-nick friend (match-string 4))
 	(mixi-realization-error 'cannot-find-nick friend))
-      ;; For getting my profile.
-      (unless (string-match mixi-friend-name-regexp buf)
-	(with-mixi-retrieve (concat "/show_profile.pl?id="
-				    (mixi-friend-id friend))
-	  (setq buf (buffer-string))))
-      (if (string-match mixi-friend-name-regexp buf)
-	    (mixi-friend-set-name friend (match-string 2 buf))
-	(mixi-realization-error 'cannot-find-name friend))
-      (if (string-match mixi-friend-sex-regexp buf)
-	  (mixi-friend-set-sex friend
-			       (if (string= (match-string 3 buf) "男")
-				   'male 'female))
-	(mixi-realization-error 'cannot-find-sex friend))
-      (when (string-match mixi-friend-address-regexp buf)
-	(mixi-friend-set-address friend (match-string 1 buf)))
-      (when (string-match mixi-friend-age-regexp buf)
-	(mixi-friend-set-age
-	 friend (string-to-number (match-string 2 buf))))
-      (when (string-match mixi-friend-birthday-regexp buf)
-	(mixi-friend-set-birthday
-	 friend (list (string-to-number (match-string 1 buf))
-		      (string-to-number (match-string 2 buf)))))
-      (when (string-match mixi-friend-blood-type-regexp buf)
-	(mixi-friend-set-blood-type friend (intern (match-string 1 buf))))
-      (when (string-match mixi-friend-birthplace-regexp buf)
-	(mixi-friend-set-birthplace friend (match-string 1 buf)))
-      (when (string-match mixi-friend-hobby-regexp buf)
-	(mixi-friend-set-hobby
-	 friend (split-string (match-string 2 buf) ", ")))
-      (when (string-match mixi-friend-job-regexp buf)
-	(mixi-friend-set-job friend (match-string 2 buf)))
-      (when (string-match mixi-friend-organization-regexp buf)
-	(mixi-friend-set-organization friend (match-string 2 buf)))
-      (when (string-match mixi-friend-profile-regexp buf)
-	(mixi-friend-set-profile friend (match-string 1 buf))))
+      (when (re-search-forward mixi-friend-name-regexp nil t)
+	(mixi-friend-set-name friend (match-string 2)))
+      (when (re-search-forward mixi-friend-sex-regexp nil t)
+	(mixi-friend-set-sex friend (if (string= (match-string 3) "男")
+					'male 'female)))
+      (when (re-search-forward mixi-friend-address-regexp nil t)
+	(mixi-friend-set-address friend (match-string 1)))
+      (when (re-search-forward mixi-friend-age-regexp nil t)
+	(mixi-friend-set-age friend (string-to-number (match-string 2))))
+      (when (re-search-forward mixi-friend-birthday-regexp nil t)
+	(mixi-friend-set-birthday friend
+				  (list (string-to-number (match-string 1))
+					(string-to-number (match-string 2)))))
+      (when (re-search-forward mixi-friend-blood-type-regexp nil t)
+	(mixi-friend-set-blood-type friend (intern (match-string 1))))
+      (when (re-search-forward mixi-friend-birthplace-regexp nil t)
+	(mixi-friend-set-birthplace friend (match-string 1)))
+      (when (re-search-forward mixi-friend-hobby-regexp nil t)
+	(mixi-friend-set-hobby friend (split-string (match-string 2) ", ")))
+      (when (re-search-forward mixi-friend-job-regexp nil t)
+	(mixi-friend-set-job friend (match-string 2)))
+      (when (re-search-forward mixi-friend-organization-regexp nil t)
+	(mixi-friend-set-organization friend (match-string 2)))
+      (when (re-search-forward mixi-friend-profile-regexp nil t)
+	(mixi-friend-set-profile friend (match-string 1))))
     (mixi-object-touch friend)))
 
 (defun mixi-friend-id (friend)
@@ -1158,8 +1146,7 @@ Increase this value when unexpected error frequently occurs."
     (with-mixi-retrieve (mixi-diary-page diary)
       (unless (re-search-forward mixi-diary-closed-regexp nil t)
 	(if (re-search-forward mixi-diary-owner-nick-regexp nil t)
-	    (mixi-friend-set-nick (mixi-diary-owner diary)
-				  (match-string 1))
+	    (mixi-friend-set-nick (mixi-diary-owner diary) (match-string 1))
 	  (mixi-realization-error 'cannot-find-owner-nick diary))
 	(if (re-search-forward mixi-diary-time-regexp nil t)
 	    (mixi-diary-set-time
@@ -1443,24 +1430,23 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-realization-error 'cannot-find-name community))
 	(if (re-search-forward mixi-community-birthday-regexp nil t)
 	    (mixi-community-set-birthday
-	     community
-	     (encode-time 0 0 0 (string-to-number (match-string 3))
-			  (string-to-number (match-string 2))
-			  (string-to-number (match-string 1))))
+	     community (encode-time 0 0 0 (string-to-number (match-string 3))
+				    (string-to-number (match-string 2))
+				    (string-to-number (match-string 1))))
 	  (mixi-realization-error 'cannot-find-birthday community))
 	(if (re-search-forward mixi-community-owner-regexp nil t)
 	    (if (string= (match-string 1) "home.pl")
 		(mixi-community-set-owner community (mixi-make-me))
-	      (mixi-community-set-owner
-	       community (mixi-make-friend (match-string 2)
-					   (match-string 3))))
+	      (mixi-community-set-owner community
+					(mixi-make-friend (match-string 2)
+							  (match-string 3))))
 	  (mixi-realization-error 'cannot-find-owner community))
 	(if (re-search-forward mixi-community-category-regexp nil t)
 	    (mixi-community-set-category community (match-string 1))
 	  (mixi-realization-error 'cannot-find-category community))
 	(if (re-search-forward mixi-community-members-regexp nil t)
-	    (mixi-community-set-members
-	     community (string-to-number (match-string 1)))
+	    (mixi-community-set-members community
+					(string-to-number (match-string 1)))
 	  (mixi-realization-error 'cannot-find-members community))
 	(if (re-search-forward mixi-community-open-level-regexp nil t)
 	    (mixi-community-set-open-level community (match-string 1))
@@ -1699,9 +1685,8 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-topic-set-title topic (match-string 1))
 	(mixi-realization-error 'cannot-find-title topic))
       (if (re-search-forward mixi-topic-owner-regexp nil t)
-	  (mixi-topic-set-owner topic
-				(mixi-make-friend (match-string 1)
-						  (match-string 2)))
+	  (mixi-topic-set-owner topic (mixi-make-friend (match-string 1)
+							(match-string 2)))
 	(mixi-realization-error 'cannot-find-owner topic))
       (if (re-search-forward mixi-topic-content-regexp nil t)
 	  (mixi-topic-set-content topic (match-string 2))
@@ -1888,9 +1873,8 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-event-set-title event (match-string 2))
 	(mixi-realization-error 'cannot-find-title event))
       (if (re-search-forward mixi-event-owner-regexp nil t)
-	  (mixi-event-set-owner event
-				(mixi-make-friend (match-string 2)
-						  (match-string 3)))
+	  (mixi-event-set-owner event (mixi-make-friend (match-string 2)
+							(match-string 3)))
 	(if (re-search-forward mixi-event-owner-seceded-regexp nil t)
 	    (mixi-event-set-owner event
 				  (mixi-make-friend nil (match-string 2)))

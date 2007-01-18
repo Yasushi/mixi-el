@@ -1,8 +1,7 @@
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-buffer-name): New variable.
-	(with-mixi-buffer): New macro.
-	(with-mixi-retrieve): Use them.
+	(with-mixi-retrieve): Use it.
 	(with-mixi-post-form): Ditto.
 	(mixi-get-matched-items): Follow the change above.
 

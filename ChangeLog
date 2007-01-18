@@ -1,5 +1,13 @@
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-buffer-name): New variable.
+	(with-mixi-buffer): New macro.
+	(with-mixi-retrieve): Use them.
+	(with-mixi-post-form): Ditto.
+	(mixi-get-matched-items): Follow the change above.
+
+2007-01-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* sb-mixi.el (shimbun-mixi-get-headers): Get headers of comments
 	before parent's.
 

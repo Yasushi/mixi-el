@@ -224,6 +224,7 @@ Increase this value when unexpected error frequently occurs."
   :type 'boolean
   :group 'mixi)
 
+(defvar mixi-buffer-name " *mixi temp*")
 (defvar mixi-me nil)
 
 ;; Utilities.
@@ -415,32 +416,34 @@ Increase this value when unexpected error frequently occurs."
   (mixi-retrieve "/logout.pl"))
 
 (defmacro with-mixi-retrieve (url &rest body)
-  `(when ,url
-     (with-temp-buffer
+  `(with-current-buffer (get-buffer-create mixi-buffer-name)
+     (when ,url
+       (erase-buffer)
        (insert (mixi-retrieve ,url))
        (goto-char (point-min))
        (when (search-forward
 	      "<form action=\"login.pl\" method=\"post\">" nil t)
 	 (mixi-login)
 	 (erase-buffer)
-	 (insert (mixi-retrieve ,url))
-	 (goto-char (point-min)))
-       ,@body)))
+	 (insert (mixi-retrieve ,url))))
+     (goto-char (point-min))
+     ,@body))
 (put 'with-mixi-retrieve 'lisp-indent-function 'defun)
 (put 'with-mixi-retrieve 'edebug-form-spec '(body))
 
 (defmacro with-mixi-post-form (url fields &rest body)
-  `(when ,url
-     (with-temp-buffer
+  `(with-current-buffer (get-buffer-create mixi-buffer-name)
+     (when ,url
+       (erase-buffer)
        (insert (mixi-post-form ,url ,fields))
        (goto-char (point-min))
        (when (search-forward
 	      "<form action=\"login.pl\" method=\"post\">" nil t)
 	 (mixi-login)
 	 (erase-buffer)
-	 (insert (mixi-post-form ,url ,fields))
-	 (goto-char (point-min)))
-       ,@body)))
+	 (insert (mixi-post-form ,url ,fields))))
+     (goto-char (point-min))
+     ,@body))
 (put 'with-mixi-post-form 'lisp-indent-function 'defun)
 (put 'with-mixi-post-form 'edebug-form-spec '(body))
 
@@ -450,7 +453,7 @@ Increase this value when unexpected error frequently occurs."
 	ids)
     (catch 'end
       (while (or (null range) (< (length ids) range))
-	(with-mixi-retrieve (format url page)
+	(with-mixi-retrieve (when url (format url page))
 	  (let ((func (if reverse (progn
 				    (goto-char (point-max))
 				    're-search-backward)

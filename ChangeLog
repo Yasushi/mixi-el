@@ -1,5 +1,13 @@
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-realize-object): New function.
+	(mixi-get-comments): Realize the parent before getting comments.
+	(mixi-realize-diary): Follow the change above.
+	(mixi-realize-topic): Ditto.
+	(mixi-realize-event): Ditto.
+
+2007-01-18  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-temp-buffer-name): Rename from `mixi-buffer-name'.
 	(with-mixi-retrieve): Follow the change above.
 	(with-mixi-post-form): Ditto.

@@ -546,6 +546,16 @@ Increase this value when unexpected error frequently occurs."
 	  object))
     exp))
 
+(defun mixi-realize-object (object &optional page)
+  "Realize a OBJECT."
+  (unless (mixi-object-p object)
+    (signal 'wrong-type-argument (list 'mixi-object-p object)))
+  (let ((func (intern (concat mixi-object-prefix "realize-"
+			      (mixi-object-name object)))))
+    (if page
+	(funcall func object page)
+      (funcall func object))))
+
 (defun mixi-object-timestamp (object)
   "Return the timestamp of OJBECT."
   (unless (mixi-object-p object)
@@ -1142,11 +1152,11 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-content-regexp
   "<td \\(class\\|CLASS\\)=\"?h12\"?>\\(.*\\)</td>")
 
-(defun mixi-realize-diary (diary)
+(defun mixi-realize-diary (diary &optional page)
   "Realize a DIARY."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p diary)
-    (with-mixi-retrieve (mixi-diary-page diary)
+    (with-mixi-retrieve (or page (mixi-diary-page diary))
       (unless (re-search-forward mixi-diary-closed-regexp nil t)
 	(if (re-search-forward mixi-diary-owner-nick-regexp nil t)
 	    (mixi-friend-set-nick (mixi-diary-owner diary) (match-string 1))
@@ -1667,11 +1677,11 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-topic-content-regexp
   "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\"><table><tr>\\(<td width=\"130\" height=\"140\" align=\"center\" valign=\"middle\"><a href=\"javascript:void(0)\" onClick=\"MM_openBrWindow('show_bbs_picture\\.pl\\?id=[0-9]+&comm_id=[0-9]+&number=[0-9]+','pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')\"><img src=\"http://ic[0-9]+\\.mixi\\.jp/[^.]+\\.jpg\" border=\"0\"></a></td>\n\\)*</tr></table>\\(.+\\)</td></tr></table>")
 
-(defun mixi-realize-topic (topic)
+(defun mixi-realize-topic (topic &optional page)
   "Realize a TOPIC."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p topic)
-    (with-mixi-retrieve (mixi-topic-page topic)
+    (with-mixi-retrieve (or page (mixi-topic-page topic))
       (if (re-search-forward mixi-topic-community-regexp nil t)
 	  (mixi-community-set-name (mixi-topic-community topic)
 				   (match-string 1))
@@ -1855,11 +1865,11 @@ Increase this value when unexpected error frequently occurs."
 
 ?<td>&nbsp;\\(.+\\)</td>")
 
-(defun mixi-realize-event (event)
+(defun mixi-realize-event (event &optional page)
   "Realize a EVENT."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p event)
-    (with-mixi-retrieve (mixi-event-page event)
+    (with-mixi-retrieve (or page (mixi-event-page event))
       (if (re-search-forward mixi-event-community-regexp nil t)
 	  (mixi-community-set-name (mixi-event-community event)
 				   (match-string 1))
@@ -2242,9 +2252,12 @@ Increase this value when unexpected error frequently occurs."
 	 (list-page (intern (concat mixi-object-prefix name
 				    "-comment-list-page")))
 	 (regexp (eval (intern (concat mixi-object-prefix name
-				       "-comment-list-regexp")))))
-    (let ((items (mixi-get-matched-items
-		  (funcall list-page parent) regexp range t)))
+				       "-comment-list-regexp"))))
+	 (page (funcall list-page parent)))
+    (unless (mixi-object-realized-p parent)
+      (mixi-realize-object parent page)
+      (setq page nil))
+    (let ((items (mixi-get-matched-items page regexp range t)))
       (mapcar (lambda (item)
 		(mixi-make-comment parent (mixi-make-friend
 					   (nth 7 item) (nth 8 item))

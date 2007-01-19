@@ -546,16 +546,6 @@ Increase this value when unexpected error frequently occurs."
 	  object))
     exp))
 
-(defun mixi-realize-object (object &optional page)
-  "Realize a OBJECT."
-  (unless (mixi-object-p object)
-    (signal 'wrong-type-argument (list 'mixi-object-p object)))
-  (let ((func (intern (concat mixi-object-prefix "realize-"
-			      (mixi-object-name object)))))
-    (if page
-	(funcall func object page)
-      (funcall func object))))
-
 (defun mixi-object-timestamp (object)
   "Return the timestamp of OJBECT."
   (unless (mixi-object-p object)
@@ -2113,6 +2103,19 @@ Increase this value when unexpected error frequently occurs."
 			   (nth 1 item)))))
 	    items)))
 
+;; Parent object.
+(defmacro mixi-parent-p (object)
+  `(or (eq (mixi-object-class ,object) 'mixi-diary)
+       (mixi-bbs-p object)))
+
+(defun mixi-realize-parent (parent &optional page)
+  "Realize a PARENT."
+  (unless (mixi-parent-p parent)
+    (signal 'wrong-type-argument (list 'mixi-parent-p parent)))
+  (let ((func (intern (concat mixi-object-prefix "realize-"
+			      (mixi-object-name parent)))))
+    (funcall func parent page)))
+
 ;; Comment object.
 (defun mixi-make-comment (parent owner time content)
   "Return a comment object."
@@ -2246,8 +2249,8 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-get-comments (parent &optional range)
   "Get comments of PARENT."
-  (unless (mixi-object-p parent)
-    (signal 'wrong-type-argument (list 'mixi-object-p parent)))
+  (unless (mixi-parent-p parent)
+    (signal 'wrong-type-argument (list 'mixi-parent-p parent)))
   (let* ((name (mixi-object-name parent))
 	 (list-page (intern (concat mixi-object-prefix name
 				    "-comment-list-page")))
@@ -2255,7 +2258,7 @@ Increase this value when unexpected error frequently occurs."
 				       "-comment-list-regexp"))))
 	 (page (funcall list-page parent)))
     (unless (mixi-object-realized-p parent)
-      (mixi-realize-object parent page)
+      (mixi-realize-parent parent page)
       (setq page nil))
     (let ((items (mixi-get-matched-items page regexp range t)))
       (mapcar (lambda (item)

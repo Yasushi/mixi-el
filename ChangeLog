@@ -1,3 +1,12 @@
+2007-01-19  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-realize-parent): Rename from `mixi-realize-object'.
+	(mixi-parent-p): New macro.
+	(mixi-get-comments): Use them.
+
+	* sb-mixi.el (shimbun-mixi-get-headers): Ditto.
+	(shimbun-get-headers): Ditto.
+
 2007-01-18  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-realize-object): New function.

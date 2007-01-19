@@ -1,5 +1,9 @@
 2007-01-19  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-community-birthday-regexp): Follow the change of mixi.
+
+2007-01-19  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-realize-parent): Rename from `mixi-realize-object'.
 	(mixi-parent-p): New macro.
 	(mixi-get-comments): Use them.

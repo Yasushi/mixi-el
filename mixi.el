@@ -1398,7 +1398,7 @@ Increase this value when unexpected error frequently occurs."
   "<td WIDTH=345>\\(.*\\)</td></tr>")
 (defconst mixi-community-birthday-regexp
   "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>開設日</font></td>
-<td WIDTH=345>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+<td WIDTH=345>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日")
 ;; FIXME: Care when the owner has seceded.
 (defconst mixi-community-owner-regexp
   "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>管理人</font></td>

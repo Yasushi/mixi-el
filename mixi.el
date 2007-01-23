@@ -2651,7 +2651,8 @@ Increase this value when unexpected error frequently occurs."
 	   "&media_id=" (mixi-news-media-id ,news)))
 
 (defconst mixi-news-title-regexp
-  "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)</td>")
+  "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)\\(
+\\)?</td>")
 (defconst mixi-news-media-time-regexp
   "<td COLSPAN=\"2\" ALIGN=\"right\">(\\(.+\\)&nbsp;-&nbsp;\\([0-9]+\\)·î\\([0-9]+\\)Æü \\([0-9]+\\):\\([0-9]+\\))</td></tr>")
 (defconst mixi-news-content-regexp
@@ -2659,8 +2660,8 @@ Increase this value when unexpected error frequently occurs."
 
 \\(.+\\)
 <br>
-
-?
+\\(.*
+\\)?
 
 \\(</td>\\|<br>\\)")
 

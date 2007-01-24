@@ -1,3 +1,51 @@
+2007-01-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-make-diary): Add comment-count argument.
+	(mixi-diary-url-regexp): Follow the change above.
+	(mixi-make-diary-from-url): Ditto.
+	(mixi-diary-comment-count): New accessor method.
+	(mixi-diary-time): Follow the change above.
+	(mixi-diary-title): Ditto.
+	(mixi-diary-content): Ditto.
+	(mixi-diary-set-comment-count): New accessor method.
+	(mixi-diary-set-time): Follow the change above.
+	(mixi-diary-set-title): Ditto.
+	(mixi-diary-set-content): Ditto.
+	(mixi-make-topic): Add comment-count argument.
+	(mixi-topic-url-regexp): Follow the change above.
+	(mixi-make-topic-from-url): Ditto.
+	(mixi-topic-comment-count): New accessor method.
+	(mixi-topic-time): Follow the change above.
+	(mixi-topic-title): Ditto.
+	(mixi-topic-owner): Ditto.
+	(mixi-topic-content): Ditto.
+	(mixi-topic-set-comment-count): New accessor method.
+	(mixi-topic-set-time): Follow the change above.
+	(mixi-topic-set-title): Ditto.
+	(mixi-topic-set-owner): Ditto.
+	(mixi-topic-set-content): Ditto.
+	(mixi-make-event): Add comment-count argument.
+	(mixi-event-url-regexp): Follow the change above.
+	(mixi-make-event-from-url): Ditto.
+	(mixi-event-comment-count): New accessor method.
+	(mixi-event-time): Follow the change above.
+	(mixi-event-title): Ditto.
+	(mixi-event-owner): Ditto.
+	(mixi-event-date): Ditto.
+	(mixi-event-place): Ditto.
+	(mixi-event-detail): Ditto.
+	(mixi-event-limit): Ditto.
+	(mixi-event-members): Ditto.
+	(mixi-event-set-comment-count): New accessor method.
+	(mixi-event-set-time): Follow the change above.
+	(mixi-event-set-title): Ditto.
+	(mixi-event-set-owner): Ditto.
+	(mixi-event-set-date): Ditto.
+	(mixi-event-set-place): Ditto.
+	(mixi-event-set-detail): Ditto.
+	(mixi-event-set-limit): Ditto.
+	(mixi-event-set-members): Ditto.
+
 2007-01-23  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-news-title-regexp): Follow the change of mixi.

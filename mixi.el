@@ -1106,23 +1106,24 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Diary object.
 (defvar mixi-diary-cache (make-hash-table :test 'equal))
-(defun mixi-make-diary (owner id &optional time title content)
+(defun mixi-make-diary (owner id &optional comment-count time title content)
   "Return a diary object."
   (let ((owner (or owner (mixi-make-me))))
     (mixi-make-cache (list (mixi-friend-id owner) id)
-		     (cons 'mixi-diary (vector nil owner id time title
-					       content))
+		     (cons 'mixi-diary (vector nil owner id comment-count time
+					       title content))
 		     mixi-diary-cache)))
 
 (defconst mixi-diary-url-regexp
-  "/view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)")
+  "/view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\\(&comment_count=\\([0-9]+\\)\\)?")
 
 (defun mixi-make-diary-from-url (url)
   "Return a diary object from URL."
   (when (string-match mixi-diary-url-regexp url)
     (let ((id (match-string 1 url))
-	  (owner-id (match-string 2 url)))
-      (mixi-make-diary (mixi-make-friend owner-id) id))))
+	  (owner-id (match-string 2 url))
+	  (comment-count (match-string 4 url)))
+      (mixi-make-diary (mixi-make-friend owner-id) id comment-count))))
 
 (defmacro mixi-diary-p (diary)
   `(eq (mixi-object-class ,diary) 'mixi-diary))
@@ -1179,13 +1180,21 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
   (aref (cdr diary) 2))
 
+(defun mixi-diary-comment-count (diary)
+  "Return the comment-count of DIARY."
+  (unless (mixi-diary-p diary)
+    (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
+  (unless (aref (cdr diary) 3)
+    (mixi-realize-diary diary))
+  (aref (cdr diary) 3))
+
 (defun mixi-diary-time (diary)
   "Return the time of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
   (unless (aref (cdr diary) 3)
     (mixi-realize-diary diary))
-  (aref (cdr diary) 3))
+  (aref (cdr diary) 4))
 
 (defun mixi-diary-title (diary)
   "Return the title of DIARY."
@@ -1193,32 +1202,38 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
   (unless (aref (cdr diary) 4)
     (mixi-realize-diary diary))
-  (aref (cdr diary) 4))
+  (aref (cdr diary) 5))
 
 (defun mixi-diary-content (diary)
   "Return the content of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
   (mixi-realize-diary diary)
-  (aref (cdr diary) 5))
+  (aref (cdr diary) 6))
+
+(defun mixi-diary-set-comment-count (diary comment-count)
+  "Set the comment-count of DIARY."
+  (unless (mixi-diary-p diary)
+    (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
+  (aset (cdr diary) 3 comment-count))
 
 (defun mixi-diary-set-time (diary time)
   "Set the time of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (aset (cdr diary) 3 time))
+  (aset (cdr diary) 4 time))
 
 (defun mixi-diary-set-title (diary title)
   "Set the title of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (aset (cdr diary) 4 title))
+  (aset (cdr diary) 5 title))
 
 (defun mixi-diary-set-content (diary content)
   "Set the content of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (aset (cdr diary) 5 content))
+  (aset (cdr diary) 6 content))
 
 (defmacro mixi-diary-list-page (&optional friend)
   `(concat "/list_diary.pl?page=%d"
@@ -1632,22 +1647,24 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Topic object.
 (defvar mixi-topic-cache (make-hash-table :test 'equal))
-(defun mixi-make-topic (community id &optional time title owner content)
+(defun mixi-make-topic (community id &optional comment-count time title owner
+				  content)
   "Return a topic object."
   (mixi-make-cache (list (mixi-community-id community) id)
-		   (cons 'mixi-topic (vector nil community id time title owner
-					     content))
+		   (cons 'mixi-topic (vector nil community id comment-count
+					     time title owner content))
 		   mixi-topic-cache))
 
 (defconst mixi-topic-url-regexp
-  "/view_bbs\\.pl\\?id=\\([0-9]+\\)\\(&comment_count=[0-9]+\\)?&comm_id=\\([0-9]+\\)")
+  "/view_bbs\\.pl\\?id=\\([0-9]+\\)\\(&comment_count=\\([0-9]+\\)\\)?&comm_id=\\([0-9]+\\)")
 
 (defun mixi-make-topic-from-url (url)
   "Return a topic object from URL."
   (when (string-match mixi-topic-url-regexp url)
     (let ((id (match-string 1 url))
-	  (community-id (match-string 3 url)))
-      (mixi-make-topic (mixi-make-community community-id) id))))
+	  (comment-count (match-string 3 url))
+	  (community-id (match-string 4 url)))
+      (mixi-make-topic (mixi-make-community community-id) id comment-count))))
 
 (defmacro mixi-topic-p (topic)
   `(eq (mixi-object-class ,topic) 'mixi-topic))
@@ -1708,45 +1725,58 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (aref (cdr topic) 2))
 
+(defun mixi-topic-comment-count (topic)
+  "Return the comment-count of TOPIC."
+  (unless (mixi-topic-p topic)
+    (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
+  (mixi-realize-topic topic)
+  (aref (cdr topic) 3))
+
 (defun mixi-topic-time (topic)
   "Return the time of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (mixi-realize-topic topic)
-  (aref (cdr topic) 3))
+  (aref (cdr topic) 4))
 
 (defun mixi-topic-title (topic)
   "Return the title of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (mixi-realize-topic topic)
-  (aref (cdr topic) 4))
+  (aref (cdr topic) 5))
 
 (defun mixi-topic-owner (topic)
   "Return the owner of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (mixi-realize-topic topic)
-  (aref (cdr topic) 5))
+  (aref (cdr topic) 6))
 
 (defun mixi-topic-content (topic)
   "Return the content of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (mixi-realize-topic topic)
-  (aref (cdr topic) 6))
+  (aref (cdr topic) 7))
+
+(defun mixi-topic-set-comment-count (topic comment-count)
+  "Set the comment-count of TOPIC."
+  (unless (mixi-topic-p topic)
+    (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
+  (aset (cdr topic) 3 comment-count))
 
 (defun mixi-topic-set-time (topic time)
   "Set the time of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (aset (cdr topic) 3 time))
+  (aset (cdr topic) 4 time))
 
 (defun mixi-topic-set-title (topic title)
   "Set the title of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (aset (cdr topic) 4 title))
+  (aset (cdr topic) 5 title))
 
 (defun mixi-topic-set-owner (topic owner)
   "Set the owner of TOPIC."
@@ -1754,13 +1784,13 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
   (unless (mixi-friend-p owner)
     (signal 'wrong-type-argument (list 'mixi-friend-p owner)))
-  (aset (cdr topic) 5 owner))
+  (aset (cdr topic) 6 owner))
 
 (defun mixi-topic-set-content (topic content)
   "Set the content of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (aset (cdr topic) 6 content))
+  (aset (cdr topic) 7 content))
 
 (defmacro mixi-post-topic-page (community)
   `(concat "/add_bbs.pl?id=" (mixi-community-id community)))
@@ -1792,23 +1822,25 @@ Increase this value when unexpected error frequently occurs."
 
 ;; Event object.
 (defvar mixi-event-cache (make-hash-table :test 'equal))
-(defun mixi-make-event (community id &optional time title owner date place
-				  detail limit members)
+(defun mixi-make-event (community id &optional comment-count time title owner
+				  date place detail limit members)
   "Return a event object."
   (mixi-make-cache (list (mixi-community-id community) id)
-		   (cons 'mixi-event (vector nil community id time title owner
-					     date place detail limit members))
+		   (cons 'mixi-event (vector nil community id comment-count
+					     time title owner date place
+					     detail limit members))
 		   mixi-event-cache))
 
 (defconst mixi-event-url-regexp
-  "/view_event\\.pl\\?id=\\([0-9]+\\)\\(&comment_count=[0-9]+\\)?&comm_id=\\([0-9]+\\)")
+  "/view_event\\.pl\\?id=\\([0-9]+\\)\\(&comment_count=\\([0-9]+\\)\\)?&comm_id=\\([0-9]+\\)")
 
 (defun mixi-make-event-from-url (url)
   "Return a event object from URL."
   (when (string-match mixi-event-url-regexp url)
     (let ((id (match-string 1 url))
-	  (community-id (match-string 3 url)))
-      (mixi-make-event (mixi-make-community community-id) id))))
+	  (comment-count (match-string 3 url))
+	  (community-id (match-string 4 url)))
+      (mixi-make-event (mixi-make-community community-id) id comment-count))))
 
 (defmacro mixi-event-p (event)
   `(eq (mixi-object-class ,event) 'mixi-event))
@@ -1913,73 +1945,86 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (aref (cdr event) 2))
 
+(defun mixi-event-comment-count (event)
+  "Return the comment-count of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (mixi-realize-event event)
+  (aref (cdr event) 3))
+
 (defun mixi-event-time (event)
   "Return the time of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 3))
+  (aref (cdr event) 4))
 
 (defun mixi-event-title (event)
   "Return the title of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 4))
+  (aref (cdr event) 5))
 
 (defun mixi-event-owner (event)
   "Return the owner of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 5))
+  (aref (cdr event) 6))
 
 (defun mixi-event-date (event)
   "Return the date of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 6))
+  (aref (cdr event) 7))
 
 (defun mixi-event-place (event)
   "Return the place of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 7))
+  (aref (cdr event) 8))
 
 (defun mixi-event-detail (event)
   "Return the detail of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 8))
+  (aref (cdr event) 9))
 
 (defun mixi-event-limit (event)
   "Return the limit of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 9))
+  (aref (cdr event) 10))
 
 (defun mixi-event-members (event)
   "Return the members of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (mixi-realize-event event)
-  (aref (cdr event) 10))
+  (aref (cdr event) 11))
+
+(defun mixi-event-set-comment-count (event comment-count)
+  "Set the comment-count of EVENT."
+  (unless (mixi-event-p event)
+    (signal 'wrong-type-argument (list 'mixi-event-p event)))
+  (aset (cdr event) 3 comment-count))
 
 (defun mixi-event-set-time (event time)
   "Set the time of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 3 time))
+  (aset (cdr event) 4 time))
 
 (defun mixi-event-set-title (event title)
   "Set the title of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 4 title))
+  (aset (cdr event) 5 title))
 
 (defun mixi-event-set-owner (event owner)
   "Set the owner of EVENT."
@@ -1987,37 +2032,37 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (unless (mixi-friend-p owner)
     (signal 'wrong-type-argument (list 'mixi-friend-p owner)))
-  (aset (cdr event) 5 owner))
+  (aset (cdr event) 6 owner))
 
 (defun mixi-event-set-date (event date)
   "Set the date of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 6 date))
+  (aset (cdr event) 7 date))
 
 (defun mixi-event-set-place (event place)
   "Set the place of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 7 place))
+  (aset (cdr event) 8 place))
 
 (defun mixi-event-set-detail (event detail)
   "Set the detail of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 8 detail))
+  (aset (cdr event) 9 detail))
 
 (defun mixi-event-set-limit (event limit)
   "Set the limit of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 9 limit))
+  (aset (cdr event) 10 limit))
 
 (defun mixi-event-set-members (event members)
   "Set the members of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (aset (cdr event) 10 members))
+  (aset (cdr event) 11 members))
 
 ;; Bbs object.
 (defconst mixi-bbs-list '(mixi-topic mixi-event))

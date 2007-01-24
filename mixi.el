@@ -1184,8 +1184,6 @@ Increase this value when unexpected error frequently occurs."
   "Return the comment-count of DIARY."
   (unless (mixi-diary-p diary)
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
-  (unless (aref (cdr diary) 3)
-    (mixi-realize-diary diary))
   (aref (cdr diary) 3))
 
 (defun mixi-diary-time (diary)
@@ -1729,7 +1727,6 @@ Increase this value when unexpected error frequently occurs."
   "Return the comment-count of TOPIC."
   (unless (mixi-topic-p topic)
     (signal 'wrong-type-argument (list 'mixi-topic-p topic)))
-  (mixi-realize-topic topic)
   (aref (cdr topic) 3))
 
 (defun mixi-topic-time (topic)
@@ -1949,7 +1946,6 @@ Increase this value when unexpected error frequently occurs."
   "Return the comment-count of EVENT."
   (unless (mixi-event-p event)
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
-  (mixi-realize-event event)
   (aref (cdr event) 3))
 
 (defun mixi-event-time (event)

@@ -1264,7 +1264,7 @@ Increase this value when unexpected error frequently occurs."
 		  (when (> month-of-item month)
 		    (decf year))
 		  (setq month month-of-item)
-		  (mixi-make-diary friend (nth 5 item)
+		  (mixi-make-diary friend (nth 5 item) nil
 				   (encode-time
 				    0 (string-to-number (nth 3 item))
 				    (string-to-number (nth 2 item))
@@ -1288,6 +1288,7 @@ Increase this value when unexpected error frequently occurs."
     (mapcar (lambda (item)
 	      (mixi-make-diary (mixi-make-friend (nth 6 item) (nth 8 item))
 			       (nth 5 item)
+			       nil
 			       (encode-time
 				0 (string-to-number (nth 4 item))
 				(string-to-number (nth 3 item))
@@ -1336,6 +1337,7 @@ Increase this value when unexpected error frequently occurs."
 		  (setq month month-of-item)
 		  (mixi-make-diary (mixi-make-friend (nth 8 item) (nth 0 item))
 				   (nth 7 item)
+				   nil
 				   (encode-time
 				    0 (string-to-number (nth 6 item))
 				    (string-to-number (nth 5 item))

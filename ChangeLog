@@ -26,6 +26,9 @@
 	(mixi-diary-set-time): Follow the change above.
 	(mixi-diary-set-title): Ditto.
 	(mixi-diary-set-content): Ditto.
+	(mixi-get-diaries): Ditto.
+	(mixi-get-new-diaries): Ditto.
+	(mixi-search-diaries): Ditto.
 	(mixi-make-topic): Add comment-count argument.
 	(mixi-topic-url-regexp): Follow the change above.
 	(mixi-make-topic-from-url): Ditto.

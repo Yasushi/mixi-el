@@ -2060,19 +2060,35 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-event-p event)))
   (aset (cdr event) 11 members))
 
-;; Bbs object.
+;; BBS object.
 (defconst mixi-bbs-list '(mixi-topic mixi-event))
 
-(defmacro mixi-bbs-p (object)
-  `(memq (mixi-object-class ,object) mixi-bbs-list))
+(defmacro mixi-bbs-p (bbs)
+  `(memq (mixi-object-class ,bbs) mixi-bbs-list))
 
-(defun mixi-bbs-community (object)
-  "Return the community of OBJECT."
-  (unless (mixi-bbs-p object)
-    (signal 'wrong-type-argument (list 'mixi-bbs-p object)))
+(defun mixi-bbs-community (bbs)
+  "Return the community of BBS."
+  (unless (mixi-bbs-p bbs)
+    (signal 'wrong-type-argument (list 'mixi-bbs-p bbs)))
   (let ((func (intern (concat mixi-object-prefix
-			      (mixi-object-name object) "-community"))))
-    (funcall func object)))
+			      (mixi-object-name bbs) "-community"))))
+    (funcall func bbs)))
+
+(defun mixi-bbs-comment-count (bbs)
+  "Return the comment-count of BBS."
+  (unless (mixi-bbs-p bbs)
+    (signal 'wrong-type-argument (list 'mixi-bbs-p bbs)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name bbs) "-comment-count"))))
+    (funcall func bbs)))
+
+(defun mixi-bbs-set-comment-count (bbs count)
+  "Set the comment-count of BBS."
+  (unless (mixi-bbs-p bbs)
+    (signal 'wrong-type-argument (list 'mixi-bbs-p bbs)))
+  (let ((func (intern (concat mixi-object-prefix
+			      (mixi-object-name bbs) "-set-comment-count"))))
+    (funcall func bbs count)))
 
 (defalias 'mixi-bbs-id 'mixi-object-id)
 (defalias 'mixi-bbs-time 'mixi-object-time)
@@ -2106,22 +2122,30 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/new_bbs.pl?page=%d"))
 
 (defconst mixi-new-bbs-list-regexp
-  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=[0-9]+&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
+  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
 
 (defun mixi-get-new-bbses (&optional range)
   "Get new topics."
   (let ((items (mixi-get-matched-items (mixi-new-bbs-list-page)
 				       mixi-new-bbs-list-regexp
 				       range)))
-    (mapcar (lambda (item)
-	      (let ((name (nth 0 item)))
-		(when (string= name "bbs")
-		  (setq name "topic"))
-		(let ((func (intern (concat "mixi-make-" name))))
-		  (funcall func (mixi-make-community (nth 2 item))
-			   (nth 1 item)))))
-	    items)))
-
+    (delq nil
+	  (mapcar (lambda (item)
+		    (let ((name (nth 0 item)))
+		      (when (string= name "bbs")
+			(setq name "topic"))
+		      (let* ((func (intern (concat "mixi-make-" name)))
+			     (bbs (funcall func
+					   (mixi-make-community (nth 3 item))
+					   (nth 1 item)))
+			     (comment-count (mixi-bbs-comment-count bbs))
+			     (count (string-to-number (nth 2 item))))
+			(when (or (null comment-count)
+				  (< comment-count count))
+			  (mixi-bbs-set-comment-count bbs count)
+			  bbs))))
+		  items))))
+ 
 (defmacro mixi-search-bbs-list-page (keyword)
   `(concat "/search_topic.pl?page=%d&type=top&submit=search"
 	   "&keyword=" (mixi-url-encode-and-quote-percent-string ,keyword)
@@ -2319,16 +2343,25 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/new_comment.pl?page=%d"))
 
 (defconst mixi-new-comment-list-regexp
-  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=[0-9]+\" class=\"new_link\">")
+  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)\" class=\"new_link\">")
 
 (defun mixi-get-new-comments (&optional range)
   "Get new comments."
   (let ((items (mixi-get-matched-items (mixi-new-comment-list-page)
-				       mixi-new-comment-list-regexp
-				       range)))
-    (mapcar (lambda (item)
-	      (mixi-make-diary (mixi-make-friend (nth 1 item)) (nth 0 item)))
-	    items)))
+                                       mixi-new-comment-list-regexp
+                                       range)))
+    (delq nil
+          (mapcar (lambda (item)
+                    (let* ((diary (mixi-make-diary
+                                   (mixi-make-friend (nth 1 item))
+				   (nth 0 item)))
+                           (comment-count (mixi-diary-comment-count diary))
+			   (count (string-to-number (nth 2 item))))
+                      (when (or (null comment-count)
+                                (< comment-count count))
+			(mixi-diary-set-comment-count diary count)
+                        diary)))
+                  items))))
 
 (defun mixi-post-diary-comment-page (diary)
   (concat "/add_comment.pl?&diary_id=" (mixi-diary-id diary)))

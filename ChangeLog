@@ -1,5 +1,15 @@
 2007-01-24  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-bbs-community): Rename `bbs' from `object'.
+	(mixi-bbs-comment-count): New accessor method.
+	(mixi-bbs-set-comment-count): Ditto.
+	(mixi-new-bbs-list-regexp): Fix regexp.
+	(mixi-get-new-bbses): Return only BBSes having unseen comments.
+	(mixi-new-comment-list-regexp): Fix regexp.
+	(mixi-get-new-comments): Return only diaries having unseen comments.
+
+2007-01-24  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-make-diary): Add comment-count argument.
 	(mixi-diary-url-regexp): Follow the change above.
 	(mixi-make-diary-from-url): Ditto.

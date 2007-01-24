@@ -1,5 +1,10 @@
 2007-01-24  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-group-alist): Add `messages.sent' and
+	`mixi-el' groups to default value.
+
+2007-01-24  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-bbs-community): Rename `bbs' from `object'.
 	(mixi-bbs-comment-count): New accessor method.
 	(mixi-bbs-set-comment-count): Ditto.

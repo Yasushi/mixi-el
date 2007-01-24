@@ -41,7 +41,11 @@
     ("new-comments" . mixi-get-new-comments)
     ("new-bbses" . mixi-get-new-bbses)
     ("messages" . mixi-get-messages)
+    ("messages.sent" .
+     (lambda (range)
+       (mixi-get-messages 'outbox range)))
     ("my-diaries" . "/home.pl")
+    ("mixi-el" . "/view_community.pl?id=1596390")
     ("news.newest.domestic" .
      (lambda (range)
        (mixi-get-news 'domestic 'newest range)))

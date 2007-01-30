@@ -111,6 +111,7 @@ of mixi object."
 			      (const :tag "New comments" mixi-get-new-comments)
 			      (const :tag "New BBSes" mixi-get-new-bbses)
 			      (const :tag "Messages" mixi-get-messages)
+			      (const :tag "Logs" mixi-get-logs)
 			      (function :tag "Other function")))))
 
 ;; FIXME: Don't use this user option.

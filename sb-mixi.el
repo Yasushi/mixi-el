@@ -44,6 +44,7 @@
     ("messages.sent" .
      (lambda (range)
        (mixi-get-messages 'outbox range)))
+    ("logs" . mixi-get-logs)
     ("my-diaries" . "/home.pl")
     ("mixi-el" . "/view_community.pl?id=1596390")
     ("news.newest.domestic" .
@@ -143,27 +144,33 @@ of mixi object."
 
 (defun shimbun-mixi-make-subject (shimbun object)
   (let ((class (mixi-object-class object)))
-    (if (eq class 'mixi-comment)
-        (concat "Re: " (shimbun-mixi-make-subject
-			shimbun (mixi-comment-parent object)))
-      (let ((prefix (when (eq class 'mixi-event) "[イベント]"))
-	    (subject (mixi-object-title object))
-	    (suffix (when (string-match
-			   "^new-" (shimbun-current-group-internal shimbun))
-		      (concat " ("
-			      (if (eq class 'mixi-diary)
-				  (mixi-friend-nick
-				   (mixi-diary-owner object))
-				(mixi-community-name
-				 (mixi-bbs-community object)))
-			      ")"))))
-	(concat prefix subject suffix)))))
+    (cond ((eq class 'mixi-comment)
+	   (concat "Re: " (shimbun-mixi-make-subject
+			   shimbun (mixi-comment-parent object))))
+	  ((eq class 'mixi-log)
+	   (mixi-friend-nick (mixi-log-friend object)))
+	  (t
+	   (let ((prefix (when (eq class 'mixi-event) "[イベント]"))
+		 (subject (mixi-object-title object))
+		 (suffix (when (string-match
+				"^new-"
+				(shimbun-current-group-internal shimbun))
+			   (concat " ("
+				   (if (eq class 'mixi-diary)
+				       (mixi-friend-nick
+					(mixi-diary-owner object))
+				     (mixi-community-name
+				      (mixi-bbs-community object)))
+				   ")"))))
+	     (concat prefix subject suffix))))))
 
 (defun shimbun-mixi-make-from (object)
   (let ((class (mixi-object-class object)))
     (if (eq class 'mixi-news)
 	(mixi-news-media object)
-      (let ((owner (mixi-object-owner object)))
+      (let ((owner (if (eq class 'mixi-log)
+		       (mixi-log-friend object)
+		     (mixi-object-owner object))))
 	(mixi-friend-nick owner)))))
 
 (defun shimbun-mixi-make-date (object)
@@ -178,19 +185,21 @@ of mixi object."
 
 (defun shimbun-mixi-make-message-id (object)
   (let ((class (mixi-object-class object)))
-    (concat "<"
-	    (format-time-string "%Y%m%d%H%M" (mixi-object-time object)) "."
-	    (if (eq class 'mixi-comment)
-		(concat (mixi-friend-id (mixi-comment-owner object)) "@"
-			(mixi-object-id (mixi-comment-parent object)) "."
-			(mixi-friend-id (mixi-object-owner
-					 (mixi-comment-parent object))) ".")
-	      (concat (mixi-object-id object) "@"
-		      (if (eq class 'mixi-news)
-			  (mixi-news-media-id object)
-			(mixi-object-id (mixi-object-owner object))) "."))
-	    (mixi-object-name object) ".mixi.jp"
-	    ">")))
+    (concat
+     (format-time-string "<%Y%m%d%H%M" (mixi-object-time object)) "."
+     (cond ((eq class 'mixi-comment)
+	    (concat (mixi-friend-id (mixi-comment-owner object)) "@"
+		    (mixi-object-id (mixi-comment-parent object)) "."
+		    (mixi-friend-id (mixi-object-owner
+				     (mixi-comment-parent object))) "."))
+	   ((eq class 'mixi-log)
+	    (concat (mixi-friend-id (mixi-log-friend object)) "@"))
+	   (t
+	    (concat (mixi-object-id object) "@"
+		    (if (eq class 'mixi-news)
+			(mixi-news-media-id object)
+		      (mixi-object-id (mixi-object-owner object))) ".")))
+     (mixi-object-name object) ".mixi.jp>")))
 
 (defun shimbun-mixi-make-xref (object)
   (let ((class (mixi-object-class object)))
@@ -206,7 +215,11 @@ of mixi object."
 	  ((eq class 'mixi-message)
 	   (mixi-expand-url (mixi-message-page object)))
 	  ((eq class 'mixi-news)
-	   (mixi-news-page object)))))
+	   (mixi-news-page object))
+	  ((eq class 'mixi-log)
+	   (mixi-expand-url (mixi-friend-page (mixi-log-friend object))))
+	  ((eq class 'mixi-friend)
+	   (mixi-expand-url (mixi-friend-page object))))))
 
 (defun shimbun-mixi-make-body (object)
   (let ((class (mixi-object-class object)))
@@ -215,16 +228,57 @@ of mixi object."
 	     (setq limit (if limit
 			     (format-time-string "%Y年%m月%d日" limit)
 			   "指定なし"))
-	     (concat "<dl><dt>開催日時：</dt>"
-		     "<dd>" (mixi-event-date object) "</dd>"
+	     (concat "<dl>"
+		     "<dt>開催日時：</dt>"
+		     "<dd>" (mixi-event-date object) "</dd>\n"
 		     "<dt>開催場所：</dt>"
-		     "<dd>" (mixi-event-place object) "</dd>"
+		     "<dd>" (mixi-event-place object) "</dd>\n"
 		     "<dt>詳細：</dt>"
-		     "<dd>" (mixi-event-detail object) "</dd>"
+		     "<dd>" (mixi-event-detail object) "</dd>\n"
 		     "<dt>募集期限：</dt>"
-		     "<dd>" limit "</dd>"
+		     "<dd>" limit "</dd>\n"
 		     "<dt>参加者：</dt>"
-		     "<dd>" (mixi-event-members object) "</dd></dl>")))
+		     "<dd>" (mixi-event-members object) "</dd>\n"
+		     "</dl>")))
+	  ((eq class 'mixi-friend)
+	   (if (mixi-object-realized-p object)
+	       (let ((sex (if (eq (mixi-friend-sex object) 'male) "男" "女"))
+		     (age (number-to-string (mixi-friend-age object)))
+		     (birthday
+		      (concat (mapconcat (lambda (number)
+					   (number-to-string number))
+					 (mixi-friend-birthday object) "月")
+			      "日"))
+		     (blood-type (symbol-name
+				  (mixi-friend-blood-type object)))
+		     (hobby (mapconcat 'identity
+				       (mixi-friend-hobby object) ", ")))
+		 (concat "<dl>"
+			 "<dt>名前：</dt>"
+			 "<dd>" (mixi-friend-name object) "</dd>\n"
+			 "<dt>性別：</dt>"
+			 "<dd>" sex "性</dd>\n"
+			 "<dt>現住所：</dt>"
+			 "<dd>" (mixi-friend-address object) "</dd>\n"
+			 "<dt>年齢：</dt>"
+			 "<dd>" age "歳</dd>\n"
+			 "<dt>誕生日：</dt>"
+			 "<dd>" birthday "</dd>\n"
+			 "<dt>血液型：</dt>"
+			 "<dd>" blood-type "型</dd>\n"
+			 "<dt>出身地：</dt>"
+			 "<dd>" (mixi-friend-birthplace object) "</dd>\n"
+			 "<dt>趣味：</dt>"
+			 "<dd>" hobby "</dd>\n"
+			 "<dt>職業：</dt>"
+			 "<dd>" (mixi-friend-job object) "</dd>\n"
+			 "<dt>所属：</dt>"
+			 "<dd>" (mixi-friend-organization object) "</dd>\n"
+			 "<dt>自己紹介：</dt>"
+			 "<dd>" (mixi-friend-profile object) "</dd>\n"
+			 "</dl>"))
+	     (concat "<a href=\"" (shimbun-mixi-make-xref object)
+		     "\">プロフィールを表示する</a>")))
 	  (t (mixi-object-content object)))))
 
 (defun shimbun-mixi-make-reply-to (object)

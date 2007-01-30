@@ -609,8 +609,10 @@ Increase this value when unexpected error frequently occurs."
   "Return a mixi object from URL."
   (if (string-match mixi-object-url-regexp url)
       (let ((name (match-string 2 url)))
-	(when (string= name "bbs")
-	  (setq name "topic"))
+	(cond ((string= name "bbs")
+	       (setq name "topic"))
+	      ((string= name "profile")
+	       (setq name "friend")))
 	(let ((func (intern (concat mixi-object-prefix "make-" name
 				    "-from-url"))))
 	  (funcall func url)))
@@ -758,12 +760,12 @@ Increase this value when unexpected error frequently occurs."
   mixi-me)
 
 (defconst mixi-friend-url-regexp
-  "/show_friend\\.pl\\?id=\\([0-9]+\\)")
+  "/show_\\(friend\\|profile\\)\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-make-friend-from-url (url)
   "Return a friend object from URL."
   (if (string-match mixi-friend-url-regexp url)
-      (let ((id (match-string 1 url)))
+      (let ((id (match-string 2 url)))
 	(mixi-make-friend id))
     (when (string-match "/home\\.pl" url)
       (mixi-make-me))))

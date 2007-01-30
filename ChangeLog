@@ -1,3 +1,16 @@
+2007-01-30  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-make-object-from-url): Support friend object.
+	(mixi-friend-url-regexp): Support profile page.
+	(mixi-make-friend-from-url): Follow the change above.
+
+	* sb-mixi.el (shimbun-mixi-group-alist): Add logs group.
+	(shimbun-mixi-make-subject): Support log object.
+	(shimbun-mixi-make-from): Ditto.
+	(shimbun-mixi-make-message-id): Ditto.
+	(shimbun-mixi-make-xref): Support log and friend object.
+	(shimbun-mixi-make-body): Support friend object.
+
 2007-01-24  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-mixi-group-alist): Add `messages.sent' and

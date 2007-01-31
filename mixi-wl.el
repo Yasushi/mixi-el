@@ -61,7 +61,7 @@
 						 (point-max))
 			       wl-mime-charset))
       (wl-draft-set-sent-message 'mail 'sent)
-      (wl-draft-write-sendlog 'ok 'mixi nil recipients id))))
+      (wl-draft-write-sendlog 'ok 'mixi nil (list recipients) id))))
 
 (defun mixi-wl-setup-draft-buffer ()
   (when (string-match shimbun-mixi-to-regexp

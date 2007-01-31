@@ -1,6 +1,7 @@
 2007-01-31  Yoichi NAKAYAMA  <yoichi@geiin.org>
 
 	* mixi-wl.el: Use wl-draft-send-hook.
+	(wl-draft-send-mail-with-mixi): Fix arg of wl-draft-write-sendlog.
 
 2007-01-30  OHASHI Akira  <bg66@koka-in.org>
 

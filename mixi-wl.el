@@ -37,39 +37,42 @@
 (require 'sb-mixi)
 (require 'wl-draft)
 
-(defvar wl-draft-send-mail-function-original nil)
+(defsubst mixi-wl-get-recipients-from-buffer ()
+  (or (std11-field-body "mixi-to")
+      (std11-field-body "to")))
 
 (defun wl-draft-send-mail-with-mixi ()
   "Send the prepared message buffer with mixi."
   (let* ((case-fold-search t)
 	 (default-case-fold-search t)
-	 (recipients (or (std11-field-body "mixi-to")
-			 (std11-field-body "to"))))
-    (if (string-match shimbun-mixi-to-regexp recipients)
-	(let ((delimline (save-excursion
-			   (goto-char (point-min))
-			   (re-search-forward
-			    (concat "^" (regexp-quote mail-header-separator)
-				    "$\\|^$") nil t)
-			   (point-marker)))
-	      (id (std11-field-body "message-id")))
-	  (shimbun-mixi-send-mail recipients
-				  (eword-decode-string
-				   (std11-field-body "subject"))
-				  (decode-mime-charset-string
-				   (buffer-substring (1+ delimline)
-						     (point-max))
-				   wl-mime-charset))
-	  (wl-draft-set-sent-message 'mail 'sent)
-	  (wl-draft-write-sendlog 'ok 'mixi nil recipients id))
-      (funcall wl-draft-send-mail-function-original))))
+	 (recipients (mixi-wl-get-recipients-from-buffer)))
+    (let ((delimline (save-excursion
+		       (goto-char (point-min))
+		       (re-search-forward
+			(concat "^" (regexp-quote mail-header-separator)
+				"$\\|^$") nil t)
+		       (point-marker)))
+	  (id (std11-field-body "message-id")))
+      (shimbun-mixi-send-mail recipients
+			      (eword-decode-string
+			       (std11-field-body "subject"))
+			      (decode-mime-charset-string
+			       (buffer-substring (1+ delimline)
+						 (point-max))
+			       wl-mime-charset))
+      (wl-draft-set-sent-message 'mail 'sent)
+      (wl-draft-write-sendlog 'ok 'mixi nil recipients id))))
+
+(defun mixi-wl-setup-draft-buffer ()
+  (when (string-match shimbun-mixi-to-regexp
+		      (mixi-wl-get-recipients-from-buffer))
+    (make-local-variable 'wl-draft-send-confirm-with-preview)
+    (setq wl-draft-send-confirm-with-preview nil)
+    (make-local-variable 'wl-draft-send-mail-function)
+    (setq wl-draft-send-mail-function 'wl-draft-send-mail-with-mixi)))
 
 (defun mixi-wl-setup ()
-  ;; FIXME: Don't set it.
-  (setq wl-draft-send-confirm-with-preview nil)
-  (unless wl-draft-send-mail-function-original
-    (setq wl-draft-send-mail-function-original wl-draft-send-mail-function)
-    (setq wl-draft-send-mail-function 'wl-draft-send-mail-with-mixi)))
+  (add-hook 'wl-draft-send-hook 'mixi-wl-setup-draft-buffer))
 
 (provide 'mixi-wl)
 

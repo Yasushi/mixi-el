@@ -777,68 +777,71 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_profile.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<img \\(alt=\"\\*\" \\)?src=\"?http://img\\.mixi\\.jp/img/dot0\\.gif\"? \\(width\\|WIDTH\\)=\"?1\"? \\(height\\|HEIGHT\\)=\"?5\"?><br>?
+  "<img \\(alt=\"\\*\" \\)?src=\"?http://img\\.mixi\\.jp/img/dot0\\.gif\"? width=\"?1\"? height=\"?5\"?\\( /\\)?><br\\( /\\)?>?
 \\(.*\\)¤µ¤ó([0-9]+)")
 (defconst mixi-friend-name-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80 NOWRAP><font COLOR=#996600>Ì¾\\(&nbsp;\\| \\)Á°</font></td>
+  "Ì¾\\(&nbsp;\\| \\)Á°</font></td>
 
-?<td WIDTH=345>\\(.+?\\)\\(</td>\\|<img\\)")
+?<td width=\"?345\"?>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-sex-regexp
-  "<td BGCOLOR=#F2DDB7\\( WIDTH=80 NOWRAP\\)?><font COLOR=#996600>À­\\(&nbsp;\\| \\)ÊÌ</font></td>
+  "À­\\(&nbsp;\\| \\)ÊÌ</font></td>
 
-?<td WIDTH=345>\\([ÃË½÷]\\)À­\\(</td>\\|<img\\)")
+?<td width=\"?345\"?>\\([ÃË½÷]\\)À­\\(</td>\\| <img\\)")
 (defconst mixi-friend-address-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¸½½»½ê</font></td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+  "¸½½»½ê</font></td>
+<td>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-age-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>Ç¯\\(&nbsp;\\| \\)Îð</font></td>\n<td>\\([0-9]+\\)ºÐ\\(\n.+\n\\)?</td></tr>")
+  "Ç¯\\(&nbsp;\\| \\)Îð</font></td>\n<td>\\([0-9]+\\)ºÐ\\(</td>\\| <img\\)")
 (defconst mixi-friend-birthday-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>ÃÂÀ¸Æü</font></td>\n<td>\\([0-9]+\\)·î\\([0-9]+\\)Æü\\(\n.+\n\\)?</td></tr>")
+  "ÃÂÀ¸Æü</font></td>\n<td>\\([0-9]+\\)·î\\([0-9]+\\)Æü\\(</td>\\| <img\\)")
 (defconst mixi-friend-blood-type-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>·ì±Õ·¿</font></td>\n<td>\\([ABO]B?\\)·¿\\(\n\n\\)?</td></tr>")
+  "·ì±Õ·¿</font></td>\n<td>\\([ABO]B?\\)·¿\\(</td>\\| <img\\)")
 (defconst mixi-friend-birthplace-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>½Ð¿ÈÃÏ</font>\n?</td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+  "½Ð¿ÈÃÏ</font>\n?</td>\n<td>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-hobby-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¼ñ\\(&nbsp;\\| \\)Ì£</font></td>\n<td>\\(.+?\\)\\(</td>\\|<img\\)")
+  "¼ñ\\(&nbsp;\\| \\)Ì£</font></td>\n<td>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-job-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¿¦\\(&nbsp;\\| \\)¶È</font></td>\n<td>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+  "¿¦\\(&nbsp;\\| \\)¶È</font></td>\n<td>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-organization-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>½ê\\(&nbsp;\\| \\)Â°</font></td>\n<td[^>]*>\\(.+\\)\\(\n.+\n\\)?</td></tr>")
+  "½ê\\(&nbsp;\\| \\)Â°</font></td>\n<td[^>]*>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-profile-regexp
-  "<td BGCOLOR=#F2DDB7><font COLOR=#996600>¼«¸Ê¾Ò²ð</font></td>\n<td CLASS=h120>\\(.+\\)</td></tr>")
+  "¼«¸Ê¾Ò²ð</font></td>
+<td class=\"?h120\"?>\\(.+\\)</td></tr>")
 
 (defun mixi-realize-friend (friend)
   "Realize a FRIEND."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p friend)
     (with-mixi-retrieve (mixi-friend-page friend)
-      (if (re-search-forward mixi-friend-nick-regexp nil t)
-	  (mixi-friend-set-nick friend (match-string 4))
-	(mixi-realization-error 'cannot-find-nick friend))
-      (when (re-search-forward mixi-friend-name-regexp nil t)
-	(mixi-friend-set-name friend (match-string 2)))
-      (when (re-search-forward mixi-friend-sex-regexp nil t)
-	(mixi-friend-set-sex friend (if (string= (match-string 3) "ÃË")
-					'male 'female)))
-      (when (re-search-forward mixi-friend-address-regexp nil t)
-	(mixi-friend-set-address friend (match-string 1)))
-      (when (re-search-forward mixi-friend-age-regexp nil t)
-	(mixi-friend-set-age friend (string-to-number (match-string 2))))
-      (when (re-search-forward mixi-friend-birthday-regexp nil t)
-	(mixi-friend-set-birthday friend
-				  (list (string-to-number (match-string 1))
-					(string-to-number (match-string 2)))))
-      (when (re-search-forward mixi-friend-blood-type-regexp nil t)
-	(mixi-friend-set-blood-type friend (intern (match-string 1))))
-      (when (re-search-forward mixi-friend-birthplace-regexp nil t)
-	(mixi-friend-set-birthplace friend (match-string 1)))
-      (when (re-search-forward mixi-friend-hobby-regexp nil t)
-	(mixi-friend-set-hobby friend (split-string (match-string 2) ", ")))
-      (when (re-search-forward mixi-friend-job-regexp nil t)
-	(mixi-friend-set-job friend (match-string 2)))
-      (when (re-search-forward mixi-friend-organization-regexp nil t)
-	(mixi-friend-set-organization friend (match-string 2)))
-      (when (re-search-forward mixi-friend-profile-regexp nil t)
-	(mixi-friend-set-profile friend (match-string 1))))
+      (let ((case-fold-search t))
+	(if (re-search-forward mixi-friend-nick-regexp nil t)
+	    (mixi-friend-set-nick friend (match-string 4))
+	  (mixi-realization-error 'cannot-find-nick friend))
+	(when (re-search-forward mixi-friend-name-regexp nil t)
+	  (mixi-friend-set-name friend (match-string 2)))
+	(when (re-search-forward mixi-friend-sex-regexp nil t)
+	  (mixi-friend-set-sex friend (if (string= (match-string 2) "ÃË")
+					  'male 'female)))
+	(when (re-search-forward mixi-friend-address-regexp nil t)
+	  (mixi-friend-set-address friend (match-string 1)))
+	(when (re-search-forward mixi-friend-age-regexp nil t)
+	  (mixi-friend-set-age friend (string-to-number (match-string 2))))
+	(when (re-search-forward mixi-friend-birthday-regexp nil t)
+	  (mixi-friend-set-birthday
+	   friend (list (string-to-number (match-string 1))
+			(string-to-number (match-string 2)))))
+	(when (re-search-forward mixi-friend-blood-type-regexp nil t)
+	  (mixi-friend-set-blood-type friend (intern (match-string 1))))
+	(when (re-search-forward mixi-friend-birthplace-regexp nil t)
+	  (mixi-friend-set-birthplace friend (match-string 1)))
+	(when (re-search-forward mixi-friend-hobby-regexp nil t)
+	  (mixi-friend-set-hobby friend (split-string (match-string 2) ", ")))
+	(when (re-search-forward mixi-friend-job-regexp nil t)
+	  (mixi-friend-set-job friend (match-string 2)))
+	(when (re-search-forward mixi-friend-organization-regexp nil t)
+	  (mixi-friend-set-organization friend (match-string 2)))
+	(when (re-search-forward mixi-friend-profile-regexp nil t)
+	  (mixi-friend-set-profile friend (match-string 1)))))
     (mixi-object-touch friend)))
 
 (defun mixi-friend-id (friend)

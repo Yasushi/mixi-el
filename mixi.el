@@ -1,4 +1,4 @@
-;; mixi.el --- API library for accessing to mixi
+;; mixi.el --- API libraries for accessing to mixi
 
 ;; Copyright (C) 2005,2006 OHASHI Akira
 
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; API for getting contents:
+;; APIs for getting contents:
 ;;
 ;;  * mixi-get-friends
 ;;  * mixi-get-favorites
@@ -43,7 +43,7 @@
 ;;  * mixi-get-introductions
 ;;  * mixi-get-news
 ;;
-;; API for posting:
+;; APIs for posting:
 ;;
 ;;  * mixi-post-diary
 ;;  * mixi-post-topic
@@ -54,7 +54,7 @@
 ;;
 ;;  * mixi-remove-markup
 
-;; Example:
+;; Examples:
 ;;
 ;; Display newest 3 diaries like a mail format.
 ;;
@@ -293,7 +293,7 @@ Increase this value when unexpected error frequently occurs."
        ,url
      (concat mixi-url ,url)))
 
-;; FIXME: Support file, checkbox and so on.
+;; FIXME: Support files.
 (defun mixi-make-form-data (fields)
   "Make form data and return (CONTENT-TYPE . FORM-DATA)."
   (let* ((boundary (apply 'format "--_%d_%d_%d" (current-time)))

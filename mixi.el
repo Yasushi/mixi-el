@@ -349,7 +349,7 @@ Increase this value when unexpected error frequently occurs."
   (let ((form-data (mixi-make-form-data fields)))
     (mixi-w3m-retrieve url form-data)))
 
-(defun mixi-curl-retrieve (url &optional post-data)
+(defun mixi-curl-retrieve (url &optional post-data form-data)
   "Retrieve the URL and return gotten strings."
   (with-temp-buffer
     (if (fboundp 'set-buffer-multibyte)
@@ -365,6 +365,7 @@ Increase this value when unexpected error frequently occurs."
 		  (apply #'start-process "curl" (current-buffer)
 			 mixi-curl-program
 			 (append (if post-data '("-d" "@-"))
+				 form-data
 				 (list "-i" "-L" "-s"
 				       "-b" mixi-curl-cookie-file
 				       "-c" mixi-curl-cookie-file
@@ -384,6 +385,17 @@ Increase this value when unexpected error frequently occurs."
       (delete-region (point) (re-search-forward "\r?\n\r?\n"))
       (setq ret (decode-coding-string (buffer-string) mixi-coding-system))
       (mixi-parse-buffer url ret post-data))))
+
+(defun mixi-curl-post-form (url fields)
+  (let (form-data)
+    (mapcar (lambda (field)
+	      (push "-F" form-data)
+	      (push (concat (car field) "="
+			    (encode-coding-string (cdr field)
+						  mixi-coding-system))
+		    form-data))
+	    fields)
+    (mixi-curl-retrieve url nil (reverse form-data))))
 
 (defconst mixi-my-id-regexp
   "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")
@@ -2456,9 +2468,9 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-message-time-regexp
 "<font COLOR=#996600>日\\(　\\|&nbsp;\\)付</font>&nbsp;:&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分&nbsp;&nbsp;")
 (defconst mixi-message-title-regexp
-"<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.+\\)\n?</td>")
+"<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.*\\)\n?</td>")
 (defconst mixi-message-content-regexp
-  "<tr><td CLASS=h120>\\(.+\\)</td></tr>")
+  "<tr><td CLASS=h120>\\(.*\\)</td></tr>")
 
 (defun mixi-realize-message (message)
   "Realize a MESSAGE."

@@ -1,3 +1,10 @@
+2007-02-05  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-curl-post-form): New function.
+	(mixi-curl-retrieve): Add the FORM-DATA argument.
+	(mixi-message-title-regexp): Fix regexp.
+	(mixi-message-content-regexp): Ditto.
+
 2007-02-01  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.

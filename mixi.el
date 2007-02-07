@@ -126,6 +126,7 @@
   (defvar url-request-method)
   (defvar url-request-data)
   (defvar url-request-extra-headers)
+  (defvar url-show-status)
   (autoload 'w3m-decode-buffer "w3m")
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
@@ -315,6 +316,7 @@ Increase this value when unexpected error frequently occurs."
 	 (url-request-data post-data)
 	 (url-request-extra-headers extra-headers)
 	 (url (mixi-expand-url url))
+	 url-show-status
 	 (buffer (url-retrieve-synchronously url))
 	 ret)
     (unless (bufferp buffer)

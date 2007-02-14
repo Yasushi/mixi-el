@@ -2192,7 +2192,7 @@ Increase this value when unexpected error frequently occurs."
 ;; Parent object.
 (defmacro mixi-parent-p (object)
   `(or (eq (mixi-object-class ,object) 'mixi-diary)
-       (mixi-bbs-p object)))
+       (mixi-bbs-p ,object)))
 
 (defun mixi-realize-parent (parent &optional page)
   "Realize a PARENT."

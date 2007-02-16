@@ -35,7 +35,18 @@
 ;;; Code:
 
 (require 'sb-mixi)
-(require 'message)
+
+;; Functions and variables which should be defined in the other module
+;; at run-time.
+(eval-when-compile
+  (defvar message-this-is-news)
+  (defvar message-sent-message-via)
+  (defvar message-send-method-alist)
+  (autoload 'message-narrow-to-headers "message")
+  (autoload 'message-fetch-field "message")
+  (autoload 'message-generate-new-buffer-clone-locals "message")
+  (autoload 'message-goto-body "message")
+  (autoload 'mml-buffer-substring-no-properties-except-hard-newlines "mml"))
 
 (defun message-mixi-p ()
   "Say whether the current buffer contains a mixi message."

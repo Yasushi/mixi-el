@@ -1,5 +1,17 @@
 2007-02-16  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el: Add autoload cookies.
+	* .cvsignore: New file.
+	* AUTHORS: Ditto.
+	* COMPILE: Ditto.
+	* Makefile.am: Ditto.
+	* NEWS: Ditto.
+	* README: Ditto.
+	* acinclude.m4: Ditto.
+	* configure.ac: Ditto.
+
+2007-02-16  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi-gnus.el: Avoid errors and warnings when compiling.
 
 	* mixi-wl.el: Ditto.

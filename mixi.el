@@ -1030,6 +1030,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-friend-list-nick-regexp
   "<td valign=middle>\\(.+\\)さん([0-9]+)<br />")
 
+;;;###autoload
 (defun mixi-get-friends (&rest friend-or-range)
   "Get friends of FRIEND."
   (when (> (length friend-or-range) 2)
@@ -1066,6 +1067,7 @@ Increase this value when unexpected error frequently occurs."
   "<td BGCOLOR=#FDF9F2><font COLOR=#996600>名&nbsp;&nbsp;前</font></td>
 <td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.+\\)</td></tr>")
 
+;;;###autoload
 (defun mixi-get-favorites (&optional range)
   "Get favorites."
   (let ((ids (mixi-get-matched-items (mixi-favorite-list-page)
@@ -1108,6 +1110,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-log-list-regexp
   "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></li>")
 
+;;;###autoload
 (defun mixi-get-logs (&optional range)
   "Get logs."
   (let ((items (mixi-get-matched-items (mixi-log-list-page)
@@ -1261,6 +1264,7 @@ Increase this value when unexpected error frequently occurs."
 <td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#F2DDB7><font COLOR=#996600>\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</font>\\(<br><input type=\"checkbox\" name=\"diary_id\" value=\"[0-9]+\">\\|\\)</td>
 <td bgcolor=\"#FFF4E0\">&nbsp;<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a></td>")
 
+;;;###autoload
 (defun mixi-get-diaries (&rest friend-or-range)
   "Get diaries of FRIEND."
   (when (> (length friend-or-range) 2)
@@ -1299,6 +1303,7 @@ Increase this value when unexpected error frequently occurs."
   "<td WIDTH=180><img src=http://img\\.mixi\\.jp/img/pen\\.gif ALIGN=left WIDTH=14 HEIGHT=16>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td>
 <td WIDTH=450><a class=\"new_link\" href=view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)>\\(.+\\)</a> (\\(.*\\)) ")
 
+;;;###autoload
 (defun mixi-get-new-diaries (&optional range)
   "Get new diaries."
   (let ((items (mixi-get-matched-items (mixi-new-diary-list-page)
@@ -1343,6 +1348,7 @@ Increase this value when unexpected error frequently occurs."
 </table>
 </td></tr></table>")
 
+;;;###autoload
 (defun mixi-search-diaries (keyword &optional range)
   (let ((items (mixi-get-matched-items (mixi-search-diary-list-page keyword)
 				       mixi-search-diary-list-regexp
@@ -1375,6 +1381,7 @@ Increase this value when unexpected error frequently occurs."
   "<b>\\(作成\\|書き込み\\)が完了しました。反映に時間がかかることがありますので、表示されていない場合は少々お待ちください。</b>")
 
 ;; FIXME: Support photos.
+;;;###autoload
 (defun mixi-post-diary (title content)
   "Post a diary."
   (unless (stringp title)
@@ -1618,6 +1625,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-list-name-regexp
   "<td valign=middle>\\(.+\\)([0-9]+)</td>")
 
+;;;###autoload
 (defun mixi-get-communities (&rest friend-or-range)
   "Get communities of FRIEND."
   (when (> (length friend-or-range) 2)
@@ -1655,6 +1663,7 @@ Increase this value when unexpected error frequently occurs."
 <td COLSPAN=2 WIDTH=370 BGCOLOR=#FFFFFF>\\([^<]+\\)</td></tr>")
 
 ;; FIXME: Support category.
+;;;###autoload
 (defun mixi-search-communities (keyword &optional range)
   (let ((items (mixi-get-matched-items (mixi-search-community-list-page
 					keyword)
@@ -1814,6 +1823,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/add_bbs.pl?id=" (mixi-community-id community)))
 
 ;; FIXME: Support photos.
+;;;###autoload
 (defun mixi-post-topic (community title content)
   "Post a topic to COMMUNITY."
   (unless (mixi-community-p community)
@@ -2124,6 +2134,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-bbs-list-regexp
   "<a href=view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)")
 
+;;;###autoload
 (defun mixi-get-bbses (community &optional range)
   "Get bbese of COMMUNITY."
   (unless (mixi-community-p community)
@@ -2145,6 +2156,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-new-bbs-list-regexp
   "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
 
+;;;###autoload
 (defun mixi-get-new-bbses (&optional range)
   "Get new topics."
   (let ((items (mixi-get-matched-items (mixi-new-bbs-list-page)
@@ -2176,6 +2188,7 @@ Increase this value when unexpected error frequently occurs."
   "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\"><img src=http://img\\.mixi\\.jp/img/shbtn\\.gif ALT=詳細を見る BORDER=0 WIDTH=104 HEIGHT=19></a>")
 
 ;; FIXME: Support community and category.
+;;;###autoload
 (defun mixi-search-bbses (keyword &optional range)
   (let ((items (mixi-get-matched-items (mixi-search-bbs-list-page keyword)
 				       mixi-search-bbs-list-regexp
@@ -2333,6 +2346,7 @@ Increase this value when unexpected error frequently occurs."
 </td>
 </tr>")
 
+;;;###autoload
 (defun mixi-get-comments (parent &optional range)
   "Get comments of PARENT."
   (unless (mixi-parent-p parent)
@@ -2366,23 +2380,24 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-new-comment-list-regexp
   "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)\" class=\"new_link\">")
 
+;;;###autoload
 (defun mixi-get-new-comments (&optional range)
   "Get new comments."
   (let ((items (mixi-get-matched-items (mixi-new-comment-list-page)
-                                       mixi-new-comment-list-regexp
-                                       range)))
+				       mixi-new-comment-list-regexp
+				       range)))
     (delq nil
-          (mapcar (lambda (item)
-                    (let* ((diary (mixi-make-diary
-                                   (mixi-make-friend (nth 1 item))
+	  (mapcar (lambda (item)
+		    (let* ((diary (mixi-make-diary
+				   (mixi-make-friend (nth 1 item))
 				   (nth 0 item)))
-                           (comment-count (mixi-diary-comment-count diary))
+			   (comment-count (mixi-diary-comment-count diary))
 			   (count (string-to-number (nth 2 item))))
-                      (when (or (null comment-count)
-                                (< comment-count count))
+		      (when (or (null comment-count)
+				(< comment-count count))
 			(mixi-diary-set-comment-count diary count)
-                        diary)))
-                  items))))
+			diary)))
+		  items))))
 
 (defun mixi-post-diary-comment-page (diary)
   (concat "/add_comment.pl?&diary_id=" (mixi-diary-id diary)))
@@ -2396,6 +2411,7 @@ Increase this value when unexpected error frequently occurs."
 	  "&comm_id=" (mixi-community-id (mixi-event-community event))))
 
 ;; FIXME: Support photos.
+;;;###autoload
 (defun mixi-post-comment (parent content)
   "Post a comment to PARENT."
   (unless (mixi-object-p parent)
@@ -2570,6 +2586,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-message-list-regexp
   "<td><a HREF=\"view_message\\.pl\\?id=\\(.+\\)&box=\\(.+\\)\">")
 
+;;;###autoload
 (defun mixi-get-messages (&rest box-or-range)
   "Get messages of BOX."
   (when (> (length box-or-range) 2)
@@ -2599,6 +2616,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-post-message-succeed-regexp
   "<b>送信完了</b>しました。")
 
+;;;###autoload
 (defun mixi-post-message (friend title content)
   "Post a message to FRIEND."
   (unless (mixi-friend-p friend)
@@ -2695,6 +2713,7 @@ Increase this value when unexpected error frequently occurs."
 </td>
 </tr>")
 
+;;;###autoload
 (defun mixi-get-introductions (&rest friend-or-range)
   "Get introductions of FRIEND."
   (when (> (length friend-or-range) 2)
@@ -2897,6 +2916,7 @@ Increase this value when unexpected error frequently occurs."
 <td WIDTH=\"1%\" nowrap CLASS=\"f08\"><A HREF=\"list_news_media\\.pl\\?id=[0-9]+\">\\(.+\\)</A></td>
 <td WIDTH=\"1%\" nowrap CLASS=\"f08\">\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td></tr>")
 
+;;;###autoload
 (defun mixi-get-news (category sort &optional range)
   "Get news of CATEGORY and SORT."
   (unless (mixi-news-category-p category)

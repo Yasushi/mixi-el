@@ -2764,6 +2764,9 @@ Increase this value when unexpected error frequently occurs."
   `(concat "http://news.mixi.jp/view_news.pl?id=" (mixi-news-id ,news)
 	   "&media_id=" (mixi-news-media-id ,news)))
 
+
+(defconst mixi-news-finished-regexp
+  "<td ALIGN=center background=http://img\\.mixi\\.jp/img/bg_line\\.gif> 申し訳ございませんが、このニュースは掲載終了しました。</td>")
 (defconst mixi-news-title-regexp
   "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)\\(
 \\)?</td>")
@@ -2784,26 +2787,28 @@ Increase this value when unexpected error frequently occurs."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p news)
     (with-mixi-retrieve (mixi-news-page news)
-      (if (re-search-forward mixi-news-title-regexp nil t)
-	  (mixi-news-set-title news (match-string 1))
-	(mixi-realization-error 'cannot-find-title news))
-      (if (re-search-forward mixi-news-media-time-regexp nil t)
-	  (progn
-	    (mixi-news-set-media news (match-string 1))
-	    (let ((year (nth 5 (decode-time (current-time))))
-		  (month (nth 4 (decode-time (current-time))))
-		  (month-of-item (string-to-number (match-string 2))))
-	      (when (> month-of-item month)
-		(decf year))
-	      (mixi-news-set-time
-	       news (encode-time 0 (string-to-number (match-string 5))
-				 (string-to-number (match-string 4))
-				 (string-to-number (match-string 3))
-				 month year))))
-	(mixi-realization-error 'cannot-find-media-time news))
-      (if (re-search-forward mixi-news-content-regexp nil t)
-	  (mixi-news-set-content news (match-string 1))
-	(mixi-realization-error 'cannot-find-content news)))
+      (if (re-search-forward mixi-news-finished-regexp nil t)
+	  (mixi-news-set-content news (match-string 0))
+	(if (re-search-forward mixi-news-title-regexp nil t)
+	    (mixi-news-set-title news (match-string 1))
+	  (mixi-realization-error 'cannot-find-title news))
+	(if (re-search-forward mixi-news-media-time-regexp nil t)
+	    (progn
+	      (mixi-news-set-media news (match-string 1))
+	      (let ((year (nth 5 (decode-time (current-time))))
+		    (month (nth 4 (decode-time (current-time))))
+		    (month-of-item (string-to-number (match-string 2))))
+		(when (> month-of-item month)
+		  (decf year))
+		(mixi-news-set-time
+		 news (encode-time 0 (string-to-number (match-string 5))
+				   (string-to-number (match-string 4))
+				   (string-to-number (match-string 3))
+				   month year))))
+	  (mixi-realization-error 'cannot-find-media-time news))
+	(if (re-search-forward mixi-news-content-regexp nil t)
+	    (mixi-news-set-content news (match-string 1))
+	  (mixi-realization-error 'cannot-find-content news))))
     (mixi-object-touch news)))
 
 (defun mixi-news-media-id (news)

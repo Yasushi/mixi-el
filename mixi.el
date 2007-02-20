@@ -1108,7 +1108,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_log.pl"))
 
 (defconst mixi-log-list-regexp
-  "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
+  "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)</a>")
 
 ;;;###autoload
 (defun mixi-get-logs (&optional range)

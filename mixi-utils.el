@@ -41,17 +41,17 @@
 (put 'with-mixi-class 'lisp-indent-function 'defun)
 (put 'with-mixi-class 'edebug-form-spec '(body))
 
-(defun mixi-make-title (object &optional add-suffix)
+(defun mixi-make-title (object &optional add-parent)
   (with-mixi-class object
     (cond ((eq class 'mixi-comment)
 	   (concat "Re: " (mixi-make-title
-			   (mixi-comment-parent object) add-suffix)))
+			   (mixi-comment-parent object) add-parent)))
 	  ((eq class 'mixi-log)
 	   (mixi-friend-nick (mixi-log-friend object)))
 	  (t
 	   (let ((prefix (when (eq class 'mixi-event) "[イベント]"))
 		 (subject (mixi-object-title object))
-		 (suffix (when add-suffix
+		 (suffix (when add-parent
 			   (concat " ("
 				   (if (eq class 'mixi-diary)
 				       (mixi-friend-nick

@@ -1,3 +1,9 @@
+2007-02-22  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-utils.el: New file.
+	* sb-mixi.el: Use it.
+	* Makefile.am (MODULES_MIXI): Add it.
+
 2007-02-19  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-log-list-regexp): Follow the change of mixi.

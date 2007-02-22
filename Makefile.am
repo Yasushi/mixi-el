@@ -1,4 +1,4 @@
-MODULES_MIXI = mixi.el
+MODULES_MIXI = mixi.el mixi-utils.el
 MODULES_ALL = $(MODULES_MIXI) sb-mixi.el mixi-gnus.el mixi-wl.el
 EXTRA_DIST = COMPILE ChangeLog $(MODULES_ALL)
 CLEANFILES = auto-autoloads.el custom-load.el *.elc

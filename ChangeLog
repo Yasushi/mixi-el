@@ -1,3 +1,22 @@
+2007-02-23  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-atom.el: New file.
+	* Makefile.am (MODULES_MIXI): Add it.
+	
+	* mixi-utils.el (mixi-make-content): Support mixi-log object.
+
+	* mixi.el (mixi-url-encode-string): New function.
+	(mixi-url-encode-and-quote-percent-string) Use it.
+	* mixi-utils.el: (mixi-make-encoded-url): New function.
+	(mixi-make-objects): Ditto.
+
+	* mixi-utils.el: (mixi-make-id-1): New function.
+	(mixi-make-message-id): Use it.
+	(mixi-make-tag-uri): New function.
+	* sb-mixi.el (shimbun-get-headers): Use it.
+
+	* configure.ac: Change PACKAGE to mixi-el.
+
 2007-02-22  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-utils.el: New file.

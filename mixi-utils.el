@@ -41,6 +41,20 @@
 (put 'with-mixi-class 'lisp-indent-function 'defun)
 (put 'with-mixi-class 'edebug-form-spec '(body))
 
+(defun mixi-make-objects (url-or-function &optional range)
+  (if (stringp url-or-function)
+      (let ((object (mixi-make-object-from-url url-or-function)))
+	(with-mixi-class object
+	  (cond ((eq class 'mixi-friend)
+		 (mixi-get-diaries object range))
+		((eq class 'mixi-community)
+		 (mixi-get-bbses object range))
+		((mixi-parent-p object)
+		 (mixi-get-comments object range))
+		(t (error (concat (symbol-name class)
+				  " is not supported yet."))))))
+    (funcall url-or-function range)))
+
 (defun mixi-make-title (object &optional add-parent)
   (with-mixi-class object
     (cond ((eq class 'mixi-comment)
@@ -80,10 +94,10 @@
 	    month " "
 	    (format-time-string "%Y %H:%M:%S %z" time))))
 
-(defun mixi-make-message-id (object)
+(defun mixi-make-id-1 (object)
   (with-mixi-class object
     (concat
-     (format-time-string "<%Y%m%d%H%M" (mixi-object-time object)) "."
+     (format-time-string "%Y%m%d%H%M" (mixi-object-time object)) "."
      (cond ((eq class 'mixi-comment)
 	    (concat (mixi-friend-id (mixi-comment-owner object)) "@"
 		    (mixi-object-id (mixi-comment-parent object)) "."
@@ -96,7 +110,15 @@
 		    (if (eq class 'mixi-news)
 			(mixi-news-media-id object)
 		      (mixi-object-id (mixi-object-owner object))) ".")))
-     (mixi-object-name object) ".mixi.jp>")))
+     (mixi-object-name object))))
+
+(defun mixi-make-message-id (object)
+  (format "<%s.mixi.jp>" (mixi-make-id-1 object)))
+
+(defun mixi-make-tag-uri (object)
+  (format "tag:mixi.jp,%s:%s"
+	  (format-time-string "%Y-%m-%d" (mixi-object-time object))
+	  (mixi-make-id-1 object)))
 
 (defun mixi-make-url (object)
   (with-mixi-class object
@@ -117,6 +139,9 @@
 	   (mixi-expand-url (mixi-friend-page (mixi-log-friend object))))
 	  ((eq class 'mixi-friend)
 	   (mixi-expand-url (mixi-friend-page object))))))
+
+(defun mixi-make-encoded-url (object)
+  (mixi-url-encode-string (mixi-make-url object)))
 
 (defun mixi-make-content (object)
   (with-mixi-class object
@@ -176,6 +201,8 @@
 			 "</dl>"))
 	     (concat "<a href=\"" (mixi-make-url object)
 		     "\">プロフィールを表示する</a>")))
+	  ((eq class 'mixi-log)
+	   (mixi-make-content (mixi-log-friend object)))
 	  (t (mixi-object-content object)))))
 
 (defun mixi-make-reply-to (object)

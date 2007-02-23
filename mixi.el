@@ -509,23 +509,30 @@ Increase this value when unexpected error frequently occurs."
     (buffer-string)))
 
 ;; stolen (and modified) from w3m.el
-;; FIXME: Hmm.
-(defun mixi-url-encode-and-quote-percent-string (string)
+(defun mixi-url-encode-string (string)
   (apply (function concat)
 	 (mapcar
 	  (lambda (char)
 	    (cond
 	     ((eq char ?\n)		; newline
-	      "%%0D%%0A")
+	      "%0D%0A")
 	     ((string-match "[-a-zA-Z0-9_:/.]" (char-to-string char)) ; xxx?
 	      (char-to-string char))	; printable
 	     ((char-equal char ?\x20)	; space
 	      "+")
 	     (t
-	      (format "%%%%%02x" char))))	; escape
+	      (format "%%%02x" char))))	; escape
 	  ;; Coerce a string into a list of chars.
 	  (append (encode-coding-string (or string "") mixi-coding-system)
 		  nil))))
+
+(defun mixi-url-encode-and-quote-percent-string (string)
+  (let ((string (mixi-url-encode-string string))
+	(pos 0))
+    (while (string-match "%" string pos)
+      (setq string (replace-match "%%" nil nil string))
+      (setq pos (+ (match-end 0) 1)))
+    string))
 
 ;; Object.
 (defconst mixi-object-prefix "mixi-")

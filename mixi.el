@@ -1068,28 +1068,19 @@ Increase this value when unexpected error frequently occurs."
 (defmacro mixi-favorite-list-page ()
   `(concat "/list_bookmark.pl?page=%d"))
 
-(defconst mixi-favorite-list-id-regexp
-  "<td ALIGN=center BGCOLOR=#FDF9F2 width=330><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">")
-(defconst mixi-favorite-list-nick-regexp
-  "<td BGCOLOR=#FDF9F2><font COLOR=#996600>名&nbsp;&nbsp;前</font></td>
-<td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.+\\)</td></tr>")
+(defconst mixi-favorite-list-regexp
+  "<td bgcolor=\"#FDF9F2\"><font color=\"#996600\">名前</font></td>
+<td colspan=\"2\" bgcolor=\"#FFFFFF\"><a href=\"show_friend.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></td>")
 
 ;;;###autoload
 (defun mixi-get-favorites (&optional range)
   "Get favorites."
-  (let ((ids (mixi-get-matched-items (mixi-favorite-list-page)
-				     mixi-favorite-list-id-regexp
-				     range))
-	(nicks (mixi-get-matched-items (mixi-favorite-list-page)
-				       mixi-favorite-list-nick-regexp
+  (let ((items (mixi-get-matched-items (mixi-favorite-list-page)
+				       mixi-favorite-list-regexp
 				       range)))
-    (let ((index 0)
-	  ret)
-      (while (< index (length ids))
-	(setq ret (cons (mixi-make-friend (nth 0 (nth index ids))
-					  (nth 0 (nth index nicks))) ret))
-	(incf index))
-      (reverse ret))))
+    (mapcar (lambda (item)
+	      (mixi-make-friend (nth 0 item) (nth 1 item)))
+	    items)))
 
 ;; Log object.
 (defun mixi-make-log (friend time)

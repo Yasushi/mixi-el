@@ -1,8 +1,15 @@
+2007-03-01  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-favorite-list-id-regexp): Abolish.
+	(mixi-favorite-list-nick-regexp): Ditto.
+	(mixi-favorite-list-regexp): New regexp.
+	(mixi-get-favorites): Follow the change above.
+
 2007-02-23  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-atom.el: New file.
 	* Makefile.am (MODULES_MIXI): Add it.
-	
+
 	* mixi-utils.el (mixi-make-content): Support mixi-log object.
 
 	* mixi.el (mixi-url-encode-string): New function.
@@ -788,7 +795,7 @@
 
 	* sb-mixi.el (shimbun-mixi-make-subject): Follow the change above.
 	(shimbun-mixi-make-body): Ditto.
-	
+
 2006-11-27  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-event-cache): New variable.

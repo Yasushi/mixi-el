@@ -1070,7 +1070,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defconst mixi-favorite-list-regexp
   "<td bgcolor=\"#FDF9F2\"><font color=\"#996600\">Ì¾Á°</font></td>
-<td colspan=\"2\" bgcolor=\"#FFFFFF\"><a href=\"show_friend.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></td>")
+<td colspan=\"2\" bgcolor=\"#FFFFFF\"><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></td>")
 
 ;;;###autoload
 (defun mixi-get-favorites (&optional range)

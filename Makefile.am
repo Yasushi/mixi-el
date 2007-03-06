@@ -1,15 +1,21 @@
 MODULES_MIXI = mixi.el mixi-utils.el mixi-atom.el
-MODULES_ALL = $(MODULES_MIXI) sb-mixi.el mixi-gnus.el mixi-wl.el
-EXTRA_DIST = COMPILE ChangeLog $(MODULES_ALL)
+MODULES_SHIMBUN = sb-mixi.el mixi-gnus.el mixi-wl.el
+MODULES_RIECE = riece-mixi.el
+EXTRA_DIST = COMPILE ChangeLog $(MODULES_MIXI) $(MODULES_SHIMBUN) \
+             $(MODULES_RIECE)
 CLEANFILES = auto-autoloads.el custom-load.el *.elc
 AUTOMAKE_OPTIONS = no-dependencies
 
 FLAGS ?= -batch -q -no-site-file
 
-if HAVE_SHIMBUN
-MODULES = $(MODULES_ALL)
-else
 MODULES = $(MODULES_MIXI)
+
+if HAVE_SHIMBUN
+MODULES += $(MODULES_SHIMBUN)
+endif
+
+if HAVE_RIECE
+MODULES += $(MODULES_RIECE)
 endif
 
 all: elc

@@ -1,3 +1,16 @@
+2007-03-06  OHASHI Akira  <bg66@koka-in.org>
+
+	* riece-mixi.el: New file.
+	* configure.ac: Add AC_CHECK_RIECE and HAVE_RIECE.
+	* acinclude.m4 Add AC_CHECK_RIECE.
+	* Makefile.am (MODULES_ALL): Abolish.
+	(MODULES_SHIMBUN): New variable.
+	(MODULES_RIECE): Ditto.
+	(EXTRA_DIST): Follow the change above.
+	(MODULES): Ditto.
+
+	* mixi-utils.el (mixi-make-title): Support a suffix of news.
+
 2007-03-01  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-favorite-list-id-regexp): Abolish.
@@ -13,7 +26,7 @@
 	* mixi-utils.el (mixi-make-content): Support mixi-log object.
 
 	* mixi.el (mixi-url-encode-string): New function.
-	(mixi-url-encode-and-quote-percent-string) Use it.
+	(mixi-url-encode-and-quote-percent-string): Use it.
 	* mixi-utils.el: (mixi-make-encoded-url): New function.
 	(mixi-make-objects): Ditto.
 

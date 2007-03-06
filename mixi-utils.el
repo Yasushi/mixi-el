@@ -67,11 +67,14 @@
 		 (subject (mixi-object-title object))
 		 (suffix (when add-parent
 			   (concat " ("
-				   (if (eq class 'mixi-diary)
-				       (mixi-friend-nick
-					(mixi-diary-owner object))
-				     (mixi-community-name
-				      (mixi-bbs-community object)))
+				   (cond ((eq class 'mixi-diary)
+					  (mixi-friend-nick
+					   (mixi-diary-owner object)))
+					 ((eq class 'mixi-news)
+					  (mixi-news-media object))
+					 (t
+					  (mixi-community-name
+					   (mixi-bbs-community object))))
 				   ")"))))
 	     (concat prefix subject suffix))))))
 

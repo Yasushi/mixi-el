@@ -114,7 +114,7 @@ dnl
 dnl Perform sanity checking and try to locate the Shimbun package
 dnl
 AC_DEFUN([AC_CHECK_SHIMBUN], [
-  AC_MSG_CHECKING(for shimbun)
+  AC_MSG_CHECKING(have shimbun)
 
   dnl Ignore cache.
   unset EMACS_cv_SYS_shimbun_dir;
@@ -139,6 +139,38 @@ AC_DEFUN([AC_CHECK_SHIMBUN], [
     AC_MSG_RESULT(not found)
   else
     AC_MSG_RESULT(${HAVE_SHIMBUN})
+ fi
+])
+
+dnl
+dnl Perform sanity checking and try to locate the Riece package
+dnl
+AC_DEFUN([AC_CHECK_RIECE], [
+  AC_MSG_CHECKING(have riece)
+
+  dnl Ignore cache.
+  unset EMACS_cv_SYS_riece_dir;
+
+  AC_ARG_WITH(riece,[  --with-riece[[=ARG]]      Use riece [[ARG=yes]]],
+    [if test "$withval" = yes -o -z "$withval"; then
+       HAVE_RIECE=yes
+     else
+       HAVE_RIECE=$withval
+     fi], HAVE_RIECE=yes)
+  AC_SUBST(HAVE_RIECE)
+
+  if test "${HAVE_RIECE}" = yes; then
+    AC_EMACS_LISP(riece_dir,(file-name-directory (locate-library \"riece\")),"noecho")
+    RIECE_DIR=$EMACS_cv_SYS_riece_dir
+  fi
+
+  if test "${HAVE_RIECE}" != yes; then
+    AC_MSG_RESULT(no)
+  elif test -z "${RIECE_DIR}"; then
+    HAVE_RIECE=no
+    AC_MSG_RESULT(not found)
+  else
+    AC_MSG_RESULT(${HAVE_RIECE})
  fi
 ])
 

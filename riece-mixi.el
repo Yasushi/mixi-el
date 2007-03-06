@@ -43,6 +43,7 @@
   (autoload 'riece-display-message "riece-message")
   (autoload 'riece-make-message "riece-message")
   (autoload 'riece-current-nickname "riece-misc")
+  (autoload 'riece-message-own-p "riece-message")
   (autoload 'riece-message-text "riece-message")
   (autoload 'riece-message-target "riece-message")
   (autoload 'riece-parse-identity "riece-identity"))

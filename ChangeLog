@@ -1,8 +1,19 @@
 2007-03-06  OHASHI Akira  <bg66@koka-in.org>
 
+	* riece-mixi.el	(riece-mixi-reply-to-only-me): New user option.
+	(riece-mixi-display-message-function): Use it.
+
+	* riece-mixi.el	(riece-mixi-enabled): Abolish.
+	(riece-mixi-display-message-function): Follow the change above.
+	(riece-mixi-check): Ditto.
+	(riece-mixi-enable): Ditto.
+	(riece-mixi-disable): Ditto.
+
+2007-03-06  OHASHI Akira  <bg66@koka-in.org>
+
 	* riece-mixi.el: New file.
 	* configure.ac: Add AC_CHECK_RIECE and HAVE_RIECE.
-	* acinclude.m4 Add AC_CHECK_RIECE.
+	* acinclude.m4: Add AC_CHECK_RIECE.
 	* Makefile.am (MODULES_ALL): Abolish.
 	(MODULES_SHIMBUN): New variable.
 	(MODULES_RIECE): Ditto.

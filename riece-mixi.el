@@ -25,6 +25,9 @@
 
 ;; NOTE: This is an add-on module for Riece.
 
+;; If you have bug reports and/or suggestions for improvement, please
+;; send them via <URL:http://mixi.jp/view_community.pl?id=1596390>.
+
 ;;; Code:
 
 (require 'mixi)
@@ -52,6 +55,11 @@
 (defcustom riece-mixi-regexp "\\(https?://\\([^.]+.\\)?mixi.jp[^ ]+\\)"
   "*Pattern of string to retrieving to mixi."
   :type 'string
+  :group 'riece-mixi)
+
+(defcustom riece-mixi-reply-to-only-me nil
+  "*If non-nil, reply to only my messages."
+  :type 'boolean
   :group 'riece-mixi)
 
 (defcustom riece-mixi-check-alist nil
@@ -82,8 +90,6 @@ of mixi object."
 (defvar riece-mixi-timer nil)
 (defvar riece-mixi-last-check nil)
 
-(defvar riece-mixi-enabled nil)
-
 (defconst riece-mixi-description
   "Riece integration for mixi.")
 
@@ -100,7 +106,10 @@ of mixi object."
     (error nil)))
 
 (defun riece-mixi-display-message-function (message)
-  (when (and riece-mixi-enabled
+  (when (and (get 'riece-mixi 'riece-addon-enabled)
+	     (or (not riece-mixi-reply-to-only-me)
+		 (and riece-mixi-reply-to-only-me
+		      (riece-message-own-p message)))
 	     (string-match riece-mixi-regexp (riece-message-text message)))
     (let* ((url (match-string 1 (riece-message-text message)))
 	   (object (mixi-make-object-from-url url)))
@@ -119,7 +128,7 @@ of mixi object."
 (defun riece-mixi-check ()
   "Check to detect new articles.
 If they exist, send them as notice to the corresponding channel."
-  (when riece-mixi-enabled
+  (when (get 'riece-mixi 'riece-addon-enabled)
     (mapc (lambda (list)
 	    (let ((target (riece-parse-identity (car list)))
 		  (url-or-function (cdr list)))
@@ -151,7 +160,6 @@ If they exist, send them as notice to the corresponding channel."
 	    'riece-mixi-display-message-function))
 
 (defun riece-mixi-enable ()
-  (setq riece-mixi-enabled t)
   (when riece-mixi-check-alist
     (setq riece-mixi-timer
 	  (run-at-time riece-mixi-timer-step riece-mixi-timer-step
@@ -159,7 +167,6 @@ If they exist, send them as notice to the corresponding channel."
     (setq riece-mixi-last-check (current-time))))
 
 (defun riece-mixi-disable ()
-  (setq riece-mixi-enabled nil)
   (when (timerp riece-mixi-timer)
     (cancel-timer riece-mixi-timer)
     (setq riece-mixi-timer nil)))

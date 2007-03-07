@@ -143,46 +143,43 @@ of mixi object."
   mixi-reply-to)
 
 (defun shimbun-mixi-get-headers (shimbun objects &optional range)
-  (when objects
-    (let (headers)
-      (catch 'stop
-	(mapc (lambda (object)
-		(when (mixi-object-p object)
-		  (let ((class (mixi-object-class object)))
-		    (when (mixi-parent-p object)
-		      (let ((comments (mixi-get-comments object range)))
-			(mapc (lambda (header)
-				(push header headers))
-			      (shimbun-mixi-get-headers shimbun
-							comments))))
-		    (let ((id (mixi-make-message-id object)))
-		      (when (and (eq class 'mixi-comment)
-				 (shimbun-search-id shimbun id))
-			(throw 'stop nil))
-		      (push
-		       (shimbun-create-header
-			0
-			(mixi-make-title object
-					 (string-match
-					  "^new-"
-					  (shimbun-current-group-internal
-					   shimbun)))
-			(mixi-make-author object)
-			(mixi-make-date object)
-			id
-			(if (eq class 'mixi-comment)
-			    (mixi-make-message-id
-			     (mixi-comment-parent object))
-			  "")
-			0 0
-			(mixi-make-url object))
-		       headers)
-		      (when (eq class 'mixi-comment)
-			(puthash id (mixi-comment-content object)
-				 (shimbun-mixi-comment-cache-internal
-				  shimbun)))))))
-	      objects))
-      headers)))
+  (let (headers)
+    (catch 'stop
+      (while objects
+	(let ((object (car objects)))
+	  (when (mixi-parent-p object)
+	    (let* ((comments (mixi-get-comments object range))
+		   (comment-headers (shimbun-mixi-get-headers shimbun
+							      comments)))
+	      (while comment-headers
+		(push (car comment-headers) headers)
+		(setq comment-headers (cdr comment-headers)))))
+	  (let ((class (mixi-object-class object))
+		(id (mixi-make-message-id object)))
+	    (when (and (eq class 'mixi-comment)
+		       (shimbun-search-id shimbun id))
+	      (throw 'stop nil))
+	    (push
+	     (shimbun-create-header
+	      0
+	      (mixi-make-title object (string-match
+				       "^new-"
+				       (shimbun-current-group-internal
+					shimbun)))
+	      (mixi-make-author object)
+	      (mixi-make-date object)
+	      id
+	      (if (eq class 'mixi-comment)
+		  (mixi-make-message-id (mixi-comment-parent object))
+		"")
+	      0 0
+	      (mixi-make-url object))
+	     headers)
+	    (when (eq class 'mixi-comment)
+	      (puthash id (mixi-comment-content object)
+		       (shimbun-mixi-comment-cache-internal shimbun)))))
+	(setq objects (cdr objects))))
+    headers))
 
 (luna-define-method shimbun-get-headers ((shimbun shimbun-mixi)
 					 &optional range)
@@ -199,14 +196,15 @@ of mixi object."
 	 (cache (shimbun-mixi-comment-cache-internal shimbun))
 	 (article (gethash message-id cache)))
     (unless (stringp article)
-      (let ((parent (mixi-make-object-from-url url)))
-	(mapc (lambda (comment)
-		(let ((id (mixi-make-message-id comment))
-		      (content (mixi-comment-content comment)))
-		  (puthash id content cache)
-		  (when (string= id message-id)
-		    (setq article content))))
-	      (mixi-get-comments parent))))
+      (let* ((parent (mixi-make-object-from-url url))
+	     (comments (mixi-get-comments parent)))
+	(while comments
+	  (let ((id (mixi-make-message-id (car comments)))
+		(content (mixi-comment-content (car comments))))
+	    (puthash id content cache)
+	    (when (string= id message-id)
+	      (setq article content)))
+	  (setq comments (cdr comments)))))
     article))
 
 (luna-define-method shimbun-article ((shimbun shimbun-mixi)

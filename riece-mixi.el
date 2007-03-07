@@ -108,9 +108,8 @@ of mixi object."
 
 (defun riece-mixi-display-message-function (message)
   (when (and (get 'riece-mixi 'riece-addon-enabled)
-	     (or (not riece-mixi-reply-to-only-me)
-		 (and riece-mixi-reply-to-only-me
-		      (riece-message-own-p message)))
+	     (or (riece-message-own-p message)
+		 (not riece-mixi-reply-to-only-me))
 	     (string-match riece-mixi-regexp (riece-message-text message)))
     (let* ((url (match-string 1 (riece-message-text message)))
 	   (object (mixi-make-object-from-url url)))
@@ -136,23 +135,22 @@ If they exist, send them as notice to the corresponding channel."
 	      (when (member target riece-current-channels)
 		(let ((objects (mixi-make-objects url-or-function
 						  riece-mixi-check-range)))
-		  (mapc (lambda (object)
-			  (when (mixi-parent-p object)
-			    (let ((comments (mixi-get-comments
-					     object riece-mixi-check-range)))
-			      (mapc (lambda (comment)
-				      (let ((time (mixi-object-time comment)))
-					(when (mixi-time-less-p
-					       riece-mixi-last-check time)
-					  (riece-mixi-send-object-with-url
-					   target comment))))
-				    comments)))
-			  (let ((time (mixi-object-time object)))
-			    (when (mixi-time-less-p riece-mixi-last-check
-						    time)
-			      (riece-mixi-send-object-with-url target
-							       object))))
-			objects)))))
+		  (while objects
+		    (let ((object (car objects)))
+		      (when (mixi-parent-p object)
+			(let ((comments (mixi-get-comments
+					 object riece-mixi-check-range)))
+			  (while comments
+			    (let ((time (mixi-object-time (car comments))))
+			      (when (mixi-time-less-p riece-mixi-last-check
+						      time)
+				(riece-mixi-send-object-with-url
+				 target (car comments))))
+			    (setq comments (cdr comments)))))
+		      (let ((time (mixi-object-time object)))
+			(when (mixi-time-less-p riece-mixi-last-check time)
+			  (riece-mixi-send-object-with-url target object))))
+		    (setq objects (cdr objects)))))))
 	  riece-mixi-check-alist)
     (setq riece-mixi-last-check (current-time))))
 

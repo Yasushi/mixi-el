@@ -1,3 +1,14 @@
+2007-03-07  OHASHI Akira  <bg66@koka-in.org>
+
+	* riece-mixi.el (riece-mixi-display-message-function): Simplify.
+
+	* mixi.el (mixi-save-cache): Use while-loop instead of `mapc'.
+	(mixi-load-cache): Ditto.
+	* sb-mixi.el (shimbun-mixi-get-headers): Ditto.
+	(shimbun-mixi-comment-article): Ditto.
+	* mixi-atom.el (mixi-make-atom-entries): Ditto.
+	* riece-mixi.el (riece-mixi-check): Ditto.
+
 2007-03-06  OHASHI Akira  <bg66@koka-in.org>
 
 	* riece-mixi.el	(riece-mixi-reply-to-only-me): New user option.

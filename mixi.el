@@ -62,16 +62,18 @@
 ;;       (buffer (get-buffer-create "*temp*"))
 ;;       (format "%Y/%m/%d %H:%M"))
 ;;   (pop-to-buffer buffer)
-;;   (mapc (lambda (diary)
-;; 	  (let ((subject (mixi-diary-title diary))
-;; 		(from (mixi-friend-nick (mixi-diary-owner diary)))
-;; 		(date (format-time-string format (mixi-diary-time diary)))
-;; 		(body (mixi-remove-markup (mixi-diary-content diary))))
-;; 	    (insert "From: " from "\n"
-;; 		    "Subject: " subject "\n"
-;; 		    "Date: " date "\n\n"
-;; 		    body "\n\n")))
-;; 	(mixi-get-new-diaries range))
+;;   (let ((diaries (mixi-get-new-diaries range)))
+;;     (while diaries
+;;       (let* ((diary (car diaries))
+;; 	     (subject (mixi-diary-title diary))
+;; 	     (from (mixi-friend-nick (mixi-diary-owner diary)))
+;; 	     (date (format-time-string format (mixi-diary-time diary)))
+;; 	     (body (mixi-remove-markup (mixi-diary-content diary))))
+;; 	(insert "From: " from "\n"
+;; 		"Subject: " subject "\n"
+;; 		"Date: " date "\n\n"
+;; 		body "\n\n"))
+;;       (setq diaries (cdr diaries))))
 ;;   (set-buffer-modified-p nil)
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
@@ -83,29 +85,31 @@
 ;;       (buffer (get-buffer-create "*temp*"))
 ;;       (format "%Y/%m/%d %H:%M"))
 ;;   (pop-to-buffer buffer)
-;;   (mapc (lambda (diary)
-;; 	  (let ((subject (mixi-diary-title diary))
-;;  		(from (mixi-friend-nick (mixi-diary-owner diary)))
-;; 		(date (format-time-string format (mixi-diary-time diary)))
-;; 		(body (mixi-remove-markup (mixi-diary-content diary))))
-;; 	    (insert "From: " from "\n"
-;; 		    "Subject: " subject "\n"
-;; 		    "Date: " date "\n\n"
-;; 		    body "\n\n")
-;; 	    (mapc (lambda (comment)
-;; 		    (let ((from (mixi-friend-nick
-;; 				 (mixi-comment-owner comment)))
-;; 			  (subject (concat "Re: " subject))
-;; 			  (date (format-time-string
-;; 				 format (mixi-comment-time comment)))
-;; 			  (body (mixi-remove-markup
-;; 				 (mixi-comment-content comment))))
-;; 		      (insert "From: " from "\n"
-;; 			      "Subject: " subject "\n"
-;; 			      "Date: " date "\n\n"
-;; 			      body "\n\n")))
-;; 		  (mixi-get-comments diary range))))
-;; 	(mixi-get-new-diaries range))
+;;   (let ((diaries (mixi-get-new-diaries range)))
+;;     (while diaries
+;;       (let* ((diary (car diaries))
+;; 	     (subject (mixi-diary-title diary))
+;; 	     (from (mixi-friend-nick (mixi-diary-owner diary)))
+;; 	     (date (format-time-string format (mixi-diary-time diary)))
+;; 	     (body (mixi-remove-markup (mixi-diary-content diary))))
+;; 	(insert "From: " from "\n"
+;; 		"Subject: " subject "\n"
+;; 		"Date: " date "\n\n"
+;; 		body "\n\n")
+;; 	(let ((comments (mixi-get-comments diary range)))
+;; 	  (while comments
+;; 	    (let* ((comment (car comments))
+;; 		   (from (mixi-friend-nick (mixi-comment-owner comment)))
+;; 		   (subject (concat "Re: " subject))
+;; 		   (date (format-time-string format
+;; 					     (mixi-comment-time comment)))
+;; 		   (body (mixi-remove-markup (mixi-comment-content comment))))
+;; 	      (insert "From: " from "\n"
+;; 		      "Subject: " subject "\n"
+;; 		      "Date: " date "\n\n"
+;; 		      body "\n\n"))
+;; 	    (setq comments (cdr comments)))))
+;;       (setq diaries (cdr diaries))))
 ;;   (set-buffer-modified-p nil)
 ;;   (setq buffer-read-only t)
 ;;   (goto-char (point-min)))
@@ -694,24 +698,24 @@ Increase this value when unexpected error frequently occurs."
     (unless (file-directory-p cache-directory)
       (make-directory cache-directory t))
     (let ((caches (apropos-internal mixi-cache-regexp 'boundp)))
-      (mapc (lambda (symbol)
-	      (with-temp-file (expand-file-name
-			       (substring (symbol-name symbol)
-					  (length mixi-object-prefix))
-			       cache-directory)
-		(let ((coding-system-for-write mixi-coding-system)
-		      (cache (symbol-value symbol)))
-		  (insert "#s(hash-table size "
-			  (number-to-string (hash-table-count cache))
-			  " test equal data (\n")
-		  (maphash
-		   (lambda (key value)
-		     (let (print-level print-length)
-		       (insert (prin1-to-string key) " "
-			       (prin1-to-string value) "\n")))
-		   cache))
-		(insert "))")))
-	    caches))))
+      (while caches
+	(with-temp-file (expand-file-name
+			 (substring (symbol-name (car caches))
+				    (length mixi-object-prefix))
+			 cache-directory)
+	  (let ((coding-system-for-write mixi-coding-system)
+		(cache (symbol-value (car caches))))
+	    (insert "#s(hash-table size "
+		    (number-to-string (hash-table-count cache))
+		    " test equal data (\n")
+	    (maphash
+	     (lambda (key value)
+	       (let (print-level print-length)
+		 (insert (prin1-to-string key) " "
+			 (prin1-to-string value) "\n")))
+	     cache))
+	  (insert "))"))
+	(setq caches (cdr caches))))))
 
 ;; stolen (and modified) from lsdb.el
 (defun mixi-read-cache (&optional marker)
@@ -747,17 +751,17 @@ Increase this value when unexpected error frequently occurs."
       ;; FIXME: Load friend and community first.
       (let ((files (directory-files cache-directory t
 				    mixi-cache-file-regexp)))
-	(mapc (lambda (file)
-		(let ((buffer (find-file-noselect file)))
-		  (unwind-protect
-		      (save-excursion
-			(set-buffer buffer)
-			(goto-char (point-min))
-			(re-search-forward "^#s(")
-			(goto-char (match-beginning 0))
-			(mixi-read-cache (point-marker)))
-		    (kill-buffer buffer))))
-	      files)))))
+	(while files
+	  (let ((buffer (find-file-noselect (car files))))
+	    (unwind-protect
+		(save-excursion
+		  (set-buffer buffer)
+		  (goto-char (point-min))
+		  (re-search-forward "^#s(")
+		  (goto-char (match-beginning 0))
+		  (mixi-read-cache (point-marker)))
+	      (kill-buffer buffer)))
+	  (setq files (cdr files)))))))
 
 ;; Friend object.
 (defvar mixi-friend-cache (make-hash-table :test 'equal))

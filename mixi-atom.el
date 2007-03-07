@@ -103,12 +103,12 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 		    (concat entries (mixi-make-atom-entry object)))
 	      (when (mixi-parent-p object)
 		(let ((comments (mixi-get-comments object range)))
-		  (mapc (lambda (comment)
-			  (setq entries
-				(concat entries
-					(mixi-make-atom-entry comment))))
-			comments))))
-	  objects)
+		  (while comments
+		    (setq entries
+			  (concat entries
+				  (mixi-make-atom-entry (car comments))))
+		    (setq comments (cdr comments))))))
+	    objects)
     entries))
 
 ;;;###autoload

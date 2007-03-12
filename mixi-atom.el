@@ -71,6 +71,11 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 		  (radio (integer :tag "Range")
 			 (const :tag "All" nil)))))
 
+(defcustom mixi-atom-file "~/atom.xml"
+  "*File name for `mixi-make-atom-file'."
+  :group 'mixi
+  :type 'string)
+
 (defmacro mixi-atom-make-date (time)
   `(let ((date (format-time-string "%Y-%m-%dT%T%z" ,time)))
      (if (string-match "[+-][0-9][0-9][0-9][0-9]$" date)
@@ -141,11 +146,11 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 	  "</feed>\n"))
 
 ;;;###autoload
-(defun mixi-atom-write-file (file)
+(defun mixi-make-atom-file ()
   (with-temp-buffer
     (mixi-make-atom)
     (let ((coding-system-for-write mixi-atom-coding-system)
-	  (file (expand-file-name file)))
+	  (file (expand-file-name mixi-atom-file)))
       (write-region (point-min) (point-max) file))))
 
 (provide 'mixi-atom)

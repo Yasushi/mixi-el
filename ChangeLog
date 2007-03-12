@@ -1,5 +1,13 @@
 2007-03-12  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-atom.el (mixi-atom-file): New use option.
+	(mixi-make-atom-file): Use it.
+
+	* mixi-atom.el (mixi-make-atom-file): Rename from
+	`mixi-atom-write-file'.
+
+2007-03-12  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-login): Simplify.
 
 2007-03-07  OHASHI Akira  <bg66@koka-in.org>

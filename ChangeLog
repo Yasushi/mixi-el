@@ -1,6 +1,6 @@
 2007-03-12  OHASHI Akira  <bg66@koka-in.org>
 
-	* mixi-atom.el (mixi-atom-file): New use option.
+	* mixi-atom.el (mixi-atom-file): New user option.
 	(mixi-make-atom-file): Use it.
 
 	* mixi-atom.el (mixi-make-atom-file): Rename from

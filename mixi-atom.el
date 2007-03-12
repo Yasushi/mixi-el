@@ -49,6 +49,11 @@
   :type 'string
   :group 'mixi)
 
+(defcustom mixi-atom-file "~/atom.xml"
+  "*File name for `mixi-make-atom-file'."
+  :group 'mixi
+  :type 'string)
+
 (defcustom mixi-atom-syndication-list
   '((mixi-get-diaries . 10))
   "*A list of atom syndication definition.
@@ -70,11 +75,6 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 			 (function :tag "Other function"))
 		  (radio (integer :tag "Range")
 			 (const :tag "All" nil)))))
-
-(defcustom mixi-atom-file "~/atom.xml"
-  "*File name for `mixi-make-atom-file'."
-  :group 'mixi
-  :type 'string)
 
 (defmacro mixi-atom-make-date (time)
   `(let ((date (format-time-string "%Y-%m-%dT%T%z" ,time)))

@@ -415,9 +415,9 @@ Increase this value when unexpected error frequently occurs."
 		   (read-from-minibuffer (mixi-message "Login Email: "))))
 	(password (or password mixi-default-password
 		      (read-passwd (mixi-message "Login Password: ")))))
-    (let ((url "/login.pl"))
-      (when mixi-login-use-ssl
-	(setq url (concat "https://mixi.jp" url)))
+    (let ((url (mixi-expand-url "/login.pl")))
+      (when (and mixi-login-use-ssl (string-match "^http:" url))
+	(setq url (replace-match "https:" nil nil url)))
       (let ((buffer (mixi-retrieve url
 				   (concat "email=" email
 					   "&password=" password

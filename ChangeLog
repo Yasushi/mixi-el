@@ -1,3 +1,7 @@
+2007-03-12  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-login): Simplify.
+
 2007-03-07  OHASHI Akira  <bg66@koka-in.org>
 
 	* riece-mixi.el (riece-mixi-display-message-function): Simplify.

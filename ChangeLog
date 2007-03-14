@@ -1,3 +1,9 @@
+2007-03-14  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-atom.el (mixi-make-atom): Use `concat' instead of `insert'.
+	(mixi-atom-cgi): New function.
+	(mixi-atom-file): Rename from `mixi-make-atom-file'.
+
 2007-03-12  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-atom.el (mixi-atom-file): New user option.

@@ -116,10 +116,9 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 	    objects)
     entries))
 
-;;;###autoload
 (defun mixi-make-atom ()
   "Make Atom Syndication Format"
-  (insert "<?xml version=\"1.0\" encoding=\""
+  (concat "<?xml version=\"1.0\" encoding=\""
 	  (symbol-name mixi-atom-coding-system) "\"?>\n"
 	  "<feed xmlns=\"" mixi-atom-namespace "\">\n"
 	  "\n"
@@ -146,9 +145,17 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 	  "</feed>\n"))
 
 ;;;###autoload
-(defun mixi-make-atom-file ()
+(defun mixi-atom-cgi ()
+  (princ (concat "Content-Type: application/atom+xml; charset="
+		 (symbol-name mixi-atom-coding-system) "\n"
+		 "\n"
+		 (encode-coding-string (mixi-make-atom)
+				       mixi-atom-coding-system))))
+
+;;;###autoload
+(defun mixi-atom-file ()
   (with-temp-buffer
-    (mixi-make-atom)
+    (insert (mixi-make-atom))
     (let ((coding-system-for-write mixi-atom-coding-system)
 	  (file (expand-file-name mixi-atom-file)))
       (write-region (point-min) (point-max) file))))

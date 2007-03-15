@@ -2,6 +2,8 @@
 
 	* contrib/atom.cgi: New file.
 	* contrib/atom.sh: Ditto.
+	* Makefile.am (CONTRIB): New variable.
+	(EXTRA_DIST): Use it.
 
 2007-03-14  OHASHI Akira  <bg66@koka-in.org>
 

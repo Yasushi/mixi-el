@@ -1,8 +1,9 @@
 MODULES_MIXI = mixi.el mixi-utils.el mixi-atom.el
 MODULES_SHIMBUN = sb-mixi.el mixi-gnus.el mixi-wl.el
 MODULES_RIECE = riece-mixi.el
+CONTRIB = contrib/atom.cgi contrib/atom.sh
 EXTRA_DIST = COMPILE ChangeLog $(MODULES_MIXI) $(MODULES_SHIMBUN) \
-             $(MODULES_RIECE)
+             $(MODULES_RIECE) $(CONTRIB)
 CLEANFILES = auto-autoloads.el custom-load.el *.elc
 AUTOMAKE_OPTIONS = no-dependencies
 

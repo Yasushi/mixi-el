@@ -1,3 +1,8 @@
+2007-03-15  OHASHI Akira  <bg66@koka-in.org>
+
+	* contrib/atom.cgi: New file.
+	* contrib/atom.sh: Ditto.
+
 2007-03-14  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-atom.el (mixi-make-atom): Use `concat' instead of `insert'.

@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; To use, add the following lines to your ~/.emacs:
+;; To use, add the following line to your ~/.emacs:
 ;;
 ;; (autoload 'mixi-ticker-start "mixi-ticker")
 ;;

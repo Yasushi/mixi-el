@@ -1,4 +1,4 @@
-MODULES_MIXI = mixi.el mixi-utils.el mixi-atom.el
+MODULES_MIXI = mixi.el mixi-utils.el mixi-atom.el mixi-ticker.el
 MODULES_SHIMBUN = sb-mixi.el mixi-gnus.el mixi-wl.el
 MODULES_RIECE = riece-mixi.el
 CONTRIB = contrib/atom.cgi contrib/atom.sh

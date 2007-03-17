@@ -1,3 +1,11 @@
+2007-03-17  Hiroya Murata  <lapis-lazuli@pop06.odn.ne.jp>
+
+	* mixi-utils.el (toplevel): Specify the file coding system.
+
+	* mixi.el (toplevel): Ditto.
+	(mixi-my-id-regexp): Use `show_profile' instead of `add_diary'.
+	(mixi-make-me): Call `re-search-forward' with 3rd argument.
+
 2007-03-16  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-ticker.el: New file.

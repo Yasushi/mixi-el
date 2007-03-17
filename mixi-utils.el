@@ -1,4 +1,4 @@
-;; mixi-utils.el --- Utilities for mixi object
+;; mixi-utils.el --- Utilities for mixi object -*- coding: euc-jp -*-
 
 ;; Copyright (C) 2007 OHASHI Akira
 

@@ -1,4 +1,4 @@
-;; mixi.el --- API libraries for accessing to mixi
+;; mixi.el --- API libraries for accessing to mixi -*- coding: euc-jp -*-
 
 ;; Copyright (C) 2005,2006 OHASHI Akira
 
@@ -404,7 +404,7 @@ Increase this value when unexpected error frequently occurs."
     (mixi-curl-retrieve url nil (reverse form-data))))
 
 (defconst mixi-my-id-regexp
-  "<a href=\"add_diary\\.pl\\?id=\\([0-9]+\\)")
+  "<a href=\"show_profile\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-login (&optional email password)
   "Login to mixi."
@@ -779,7 +779,7 @@ Increase this value when unexpected error frequently occurs."
   "Return a my object."
   (unless mixi-me
     (with-mixi-retrieve "/home.pl"
-      (if (re-search-forward mixi-my-id-regexp)
+      (if (re-search-forward mixi-my-id-regexp nil t)
 	  (setq mixi-me (mixi-make-friend (match-string 1)))
 	(signal 'error (list 'who-am-i)))))
   mixi-me)

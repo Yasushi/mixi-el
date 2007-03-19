@@ -1,3 +1,20 @@
+2007-03-19  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-gnus.el: Use `require' instead of `autoload'.
+	* mixi-wl.el: Ditto.
+	* riece-mixi.el: Ditto.
+
+	* acinclude.m4 (AC_CHECK_GNUS): New function.
+	(AC_CHECK_WL): Ditto.
+	* configure.ac: Use them.
+	(HAVE_GNUS): New condition.
+	(HAVE_WL): Ditto.
+	* Makefile.am (MODULES_GNUS): New variable.
+	(MODULES_WL): Ditto.
+	(MODULES_SHIMBUN): Follow the change above.
+	(EXTRA_DIST): Ditto.
+	(MODULES): Ditto.
+
 2007-03-17  Hiroya Murata  <lapis-lazuli@pop06.odn.ne.jp>
 
 	* mixi-utils.el (toplevel): Specify the file coding system.

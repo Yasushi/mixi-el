@@ -35,19 +35,7 @@
 ;;; Code:
 
 (require 'sb-mixi)
-
-;; Functions and variables which should be defined in the other module
-;; at run-time.
-(eval-when-compile
-  (defvar mail-header-separator)
-  (defvar wl-mime-charset)
-  (defvar wl-draft-send-confirm-with-preview)
-  (defvar wl-draft-send-mail-function)
-  (autoload 'std11-field-body "std11")
-  (autoload 'eword-decode-string "eword-decode")
-  (autoload 'wl-draft-set-sent-message "wl-draft")
-  (autoload 'wl-draft-write-sendlog "wl-draft")
-  (autoload 'decode-mime-charset-string "mcharset"))
+(require 'wl-draft)
 
 (defsubst mixi-wl-get-recipients-from-buffer ()
   (or (std11-field-body "mixi-to")

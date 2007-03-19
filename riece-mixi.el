@@ -33,20 +33,7 @@
 (require 'mixi)
 (require 'mixi-utils)
 (require 'timer)
-
-;; Functions and variables which should be defined in the other module
-;; at run-time.
-(eval-when-compile
-  (defvar riece-current-channels)
-  (autoload 'riece-send-string "riece-server")
-  (autoload 'riece-identity-prefix "riece-identity")
-  (autoload 'riece-display-message "riece-message")
-  (autoload 'riece-make-message "riece-message")
-  (autoload 'riece-current-nickname "riece-misc")
-  (autoload 'riece-message-own-p "riece-message")
-  (autoload 'riece-message-text "riece-message")
-  (autoload 'riece-message-target "riece-message")
-  (autoload 'riece-parse-identity "riece-identity"))
+(require 'riece-message)
 
 (defgroup riece-mixi nil
   "Riece integration for mixi."

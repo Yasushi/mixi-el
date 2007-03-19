@@ -143,6 +143,70 @@ AC_DEFUN([AC_CHECK_SHIMBUN], [
 ])
 
 dnl
+dnl Perform sanity checking and try to locate the Gnus package
+dnl
+AC_DEFUN([AC_CHECK_GNUS], [
+  AC_MSG_CHECKING(have gnus)
+
+  dnl Ignore cache.
+  unset EMACS_cv_SYS_gnus_dir;
+
+  AC_ARG_WITH(gnus,[  --with-gnus[[=ARG]]       Use gnus [[ARG=yes]]],
+    [if test "$withval" = yes -o -z "$withval"; then
+       HAVE_GNUS=yes
+     else
+       HAVE_GNUS=$withval
+     fi], HAVE_GNUS=yes)
+  AC_SUBST(HAVE_GNUS)
+
+  if test "${HAVE_GNUS}" = yes; then
+    AC_EMACS_LISP(gnus_dir,(file-name-directory (locate-library \"gnus\")),"noecho")
+    GNUS_DIR=$EMACS_cv_SYS_gnus_dir
+  fi
+
+  if test "${HAVE_GNUS}" != yes; then
+    AC_MSG_RESULT(no)
+  elif test -z "${GNUS_DIR}"; then
+    HAVE_GNUS=no
+    AC_MSG_RESULT(not found)
+  else
+    AC_MSG_RESULT(${HAVE_GNUS})
+ fi
+])
+
+dnl
+dnl Perform sanity checking and try to locate the Wanderlust package
+dnl
+AC_DEFUN([AC_CHECK_WL], [
+  AC_MSG_CHECKING(have wanderlust)
+
+  dnl Ignore cache.
+  unset EMACS_cv_SYS_wl_dir;
+
+  AC_ARG_WITH(wl,[  --with-wl[[=ARG]]         Use wanderlust [[ARG=yes]]],
+    [if test "$withval" = yes -o -z "$withval"; then
+       HAVE_WL=yes
+     else
+       HAVE_WL=$withval
+     fi], HAVE_WL=yes)
+  AC_SUBST(HAVE_WL)
+
+  if test "${HAVE_WL}" = yes; then
+    AC_EMACS_LISP(wl_dir,(file-name-directory (locate-library \"wl\")),"noecho")
+    WL_DIR=$EMACS_cv_SYS_wl_dir
+  fi
+
+  if test "${HAVE_WL}" != yes; then
+    AC_MSG_RESULT(no)
+  elif test -z "${WL_DIR}"; then
+    HAVE_WL=no
+    AC_MSG_RESULT(not found)
+  else
+    AC_MSG_RESULT(${HAVE_WL})
+ fi
+])
+
+dnl
 dnl Perform sanity checking and try to locate the Riece package
 dnl
 AC_DEFUN([AC_CHECK_RIECE], [

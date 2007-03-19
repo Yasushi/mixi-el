@@ -1,5 +1,9 @@
 2007-03-19  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-diary-content-regexp): Fix regexp.
+
+2007-03-19  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi-gnus.el: Use `require' instead of `autoload'.
 	* mixi-wl.el: Ditto.
 	* riece-mixi.el: Ditto.

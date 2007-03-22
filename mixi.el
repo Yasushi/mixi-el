@@ -1438,71 +1438,73 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-nodata-regexp
   "^データがありません")
 (defconst mixi-community-name-regexp
-  "<td WIDTH=345>\\(.*\\)</td></tr>")
+  "<td width=\"?345\"?>\\(.*\\)</td></tr>")
 (defconst mixi-community-birthday-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>開設日</font></td>
-<td WIDTH=345>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日")
+  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>開設日</font></td>
+<td width=\"?345\"?>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日")
 ;; FIXME: Care when the owner has seceded.
 (defconst mixi-community-owner-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>管理人</font></td>
-<td WIDTH=345>
+  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>管理人</font></td>
+<td width=\"?345\"?>
 <table style=\"width: 100%;\"><tr><td>
 <a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\\(.*\\)</a>")
 (defconst mixi-community-category-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>カテゴリ</font></td>
-<td WIDTH=345>\\([^<]+\\)</td>")
+  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>カテゴリ</font></td>
+<td width=\"?345\"?>\\([^<]+\\)</td>")
 (defconst mixi-community-members-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>メンバー数</font></td>
-<td WIDTH=345>\\([0-9]+\\)人</td></tr>")
+  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>メンバー数</font></td>
+<td width=\"?345\"?>\\([0-9]+\\)人</td></tr>")
 (defconst mixi-community-open-level-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>参加条件と<br>公開レベル</font></td>
-<td WIDTH=345>\\(.+\\)</td></tr>")
+  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>参加条件と<br />公開レベル</font></td>
+<td width=\"?345\"?>\\(.+\\)</td></tr>")
 (defconst mixi-community-authority-regexp
-  "<td BGCOLOR=#F2DDB7 WIDTH=80><font COLOR=#996600>トピック作成の権限</font></td>
-<td WIDTH=345>\\(.+\\)</td></tr>")
+  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>トピック作成の権限</font></td>
+<td width=\"?345\"?>\\(.+\\)</td></tr>")
 (defconst mixi-community-description-regexp
-  "<td CLASS=h120 WIDTH=345>\\(.+\\)</td>")
+  "<td class=\"?h120\"? width=\"?345\"?>\\(.+\\)</td>")
 
 (defun mixi-realize-community (community)
   "Realize a COMMUNITY."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p community)
     (with-mixi-retrieve (mixi-community-page community)
-      (if (re-search-forward mixi-community-nodata-regexp nil t)
-	  ;; FIXME: Set all members?
-	  (mixi-community-set-name community "データがありません")
-	(if (re-search-forward mixi-community-name-regexp nil t)
-	    (mixi-community-set-name community (match-string 1))
-	  (mixi-realization-error 'cannot-find-name community))
-	(if (re-search-forward mixi-community-birthday-regexp nil t)
-	    (mixi-community-set-birthday
-	     community (encode-time 0 0 0 (string-to-number (match-string 3))
-				    (string-to-number (match-string 2))
-				    (string-to-number (match-string 1))))
-	  (mixi-realization-error 'cannot-find-birthday community))
-	(if (re-search-forward mixi-community-owner-regexp nil t)
-	    (if (string= (match-string 1) "home.pl")
-		(mixi-community-set-owner community (mixi-make-me))
-	      (mixi-community-set-owner community
-					(mixi-make-friend (match-string 2)
-							  (match-string 3))))
-	  (mixi-realization-error 'cannot-find-owner community))
-	(if (re-search-forward mixi-community-category-regexp nil t)
-	    (mixi-community-set-category community (match-string 1))
-	  (mixi-realization-error 'cannot-find-category community))
-	(if (re-search-forward mixi-community-members-regexp nil t)
-	    (mixi-community-set-members community
-					(string-to-number (match-string 1)))
-	  (mixi-realization-error 'cannot-find-members community))
-	(if (re-search-forward mixi-community-open-level-regexp nil t)
-	    (mixi-community-set-open-level community (match-string 1))
-	  (mixi-realization-error 'cannot-find-open-level community))
-	(if (re-search-forward mixi-community-authority-regexp nil t)
-	    (mixi-community-set-authority community (match-string 1))
-	  (mixi-realization-error 'cannot-find-authority community))
-	(if (re-search-forward mixi-community-description-regexp nil t)
-	    (mixi-community-set-description community (match-string 1))
-	  (mixi-realization-error 'cannot-find-description community))))
+      (let ((case-fold-search t))
+	(if (re-search-forward mixi-community-nodata-regexp nil t)
+	    ;; FIXME: Set all members?
+	    (mixi-community-set-name community "データがありません")
+	  (if (re-search-forward mixi-community-name-regexp nil t)
+	      (mixi-community-set-name community (match-string 1))
+	    (mixi-realization-error 'cannot-find-name community))
+	  (if (re-search-forward mixi-community-birthday-regexp nil t)
+	      (mixi-community-set-birthday
+	       community (encode-time 0 0 0
+				      (string-to-number (match-string 3))
+				      (string-to-number (match-string 2))
+				      (string-to-number (match-string 1))))
+	    (mixi-realization-error 'cannot-find-birthday community))
+	  (if (re-search-forward mixi-community-owner-regexp nil t)
+	      (if (string= (match-string 1) "home.pl")
+		  (mixi-community-set-owner community (mixi-make-me))
+		(mixi-community-set-owner community (mixi-make-friend
+						     (match-string 2)
+						     (match-string 3))))
+	    (mixi-realization-error 'cannot-find-owner community))
+	  (if (re-search-forward mixi-community-category-regexp nil t)
+	      (mixi-community-set-category community (match-string 1))
+	    (mixi-realization-error 'cannot-find-category community))
+	  (if (re-search-forward mixi-community-members-regexp nil t)
+	      (mixi-community-set-members community
+					  (string-to-number (match-string 1)))
+	    (mixi-realization-error 'cannot-find-members community))
+	  (if (re-search-forward mixi-community-open-level-regexp nil t)
+	      (mixi-community-set-open-level community (match-string 1))
+	    (mixi-realization-error 'cannot-find-open-level community))
+	  (if (re-search-forward mixi-community-authority-regexp nil t)
+	      (mixi-community-set-authority community (match-string 1))
+	    (mixi-realization-error 'cannot-find-authority community))
+	  (if (re-search-forward mixi-community-description-regexp nil t)
+	      (mixi-community-set-description community (match-string 1))
+	    (mixi-realization-error 'cannot-find-description community)))))
     (mixi-object-touch community)))
 
 (defun mixi-community-id (community)

@@ -1,3 +1,15 @@
+2007-03-22  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-community-name-regexp): Fix regexp.
+	(mixi-community-birthday-regexp): Ditto.
+	(mixi-community-owner-regexp): Ditto.
+	(mixi-community-category-regexp): Ditto.
+	(mixi-community-members-regexp): Ditto.
+	(mixi-community-open-level-regexp): Ditto.
+	(mixi-community-authority-regexp): Ditto.
+	(mixi-community-description-regexp): Ditto.
+	(mixi-realize-community): Follow the change above.
+
 2007-03-19  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-content-regexp): Fix regexp.

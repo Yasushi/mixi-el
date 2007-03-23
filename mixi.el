@@ -954,7 +954,7 @@ Increase this value when unexpected error frequently occurs."
   (aref (cdr friend) 12))
 
 (defun mixi-friend-profile (friend)
-  "Return the pforile of FRIEND."
+  "Return the profile of FRIEND."
   (unless (mixi-friend-p friend)
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
   (mixi-realize-friend friend)

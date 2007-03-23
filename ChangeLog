@@ -1,3 +1,23 @@
+2007-03-23  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-closed-regexp): Fix regexp.
+	(mixi-diary-owner-nick-regexp): Ditto.
+	(mixi-diary-time-regexp): Ditto.
+	(mixi-diary-title-regexp): Ditto.
+	(mixi-diary-content-regexp): Ditto.
+	(mixi-realize-diary): Follow the change above.
+	(mixi-event-community-regexp): Fix regexp.
+	(mixi-event-time-regexp): Ditto.
+	(mixi-event-title-regexp): Ditto.
+	(mixi-event-owner-regexp): Ditto.
+	(mixi-event-owner-seceded-regexp): Ditto.
+	(mixi-event-date-regexp): Ditto.
+	(mixi-event-place-regexp): Ditto.
+	(mixi-event-detail-regexp): Ditto.
+	(mixi-event-limit-regexp): Ditto.
+	(mixi-event-members-regexp): Ditto.
+	(mixi-realize-event): Follow the change above.
+
 2007-03-22  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-community-name-regexp): Fix regexp.

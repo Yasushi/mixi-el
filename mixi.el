@@ -1157,39 +1157,41 @@ Increase this value when unexpected error frequently occurs."
 	   "&owner_id=" (mixi-friend-id (mixi-diary-owner ,diary))))
 
 (defconst mixi-diary-closed-regexp
-  "<td>友人\\(の友人\\)?まで公開のため読むことが出来ません。</td></tr>")
+  "<td>友人\\(の友人\\)?まで公開のため読むことが出来ません。</td>")
 (defconst mixi-diary-owner-nick-regexp
-  "<td WIDTH=490 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b><font COLOR=#605048>\\(.+?\\)\\(さん\\)?の日記</font></b></td>")
+  "<td width=\"?490\"? background=\"?http://img\\.mixi\\.jp/img/bg_w\\.gif\"?><b><font color=\"?#605048\"?>\\(.+?\\)\\(さん\\)?の日記</font></b></td>")
 (defconst mixi-diary-time-regexp
-  "<td \\(align\\|ALIGN\\)=\"?center\"? \\(rowspan\\|ROWSPAN\\)=\"?[23]\"? \\(nowrap=\"nowrap\"\\|NOWRAP\\) \\(width\\|WIDTH\\)=\"?95\"? bgcolor=\"?#FFD8B0\"?>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日\\(<br />\\|<br>\\)\\([0-9]+\\):\\([0-9]+\\)</td>")
+  "<td align=\"?center\"? rowspan=\"?[23]\"? nowrap\\(=\"?nowrap\"?\\)? width=\"?95\"? bgcolor=\"?#FFD8B0\"?>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br\\( /\\)?>\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-diary-title-regexp
-  "<td \\(bgcolor\\|BGCOLOR\\)=\"?#FFF4E0\"? width=\"?430\"?>&nbsp;\\([^<]+\\)</td>")
+  "<td bgcolor=\"?#FFF4E0\"? width=\"?430\"?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-diary-content-regexp
-  "<td \\(class\\|CLASS\\)=\"?h12\"?>\\(\\(.\\|\n\\)*?\\)</td>")
+  "<td class=\"?h12\"?>\\(\\(.\\|\r?\n\\)*?\\)</td>")
 
 (defun mixi-realize-diary (diary &optional page)
   "Realize a DIARY."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p diary)
     (with-mixi-retrieve (or page (mixi-diary-page diary))
-      (unless (re-search-forward mixi-diary-closed-regexp nil t)
-	(if (re-search-forward mixi-diary-owner-nick-regexp nil t)
-	    (mixi-friend-set-nick (mixi-diary-owner diary) (match-string 1))
-	  (mixi-realization-error 'cannot-find-owner-nick diary))
-	(if (re-search-forward mixi-diary-time-regexp nil t)
-	    (mixi-diary-set-time
-	     diary (encode-time 0 (string-to-number (match-string 10))
-				(string-to-number (match-string 9))
-				(string-to-number (match-string 7))
-				(string-to-number (match-string 6))
-				(string-to-number (match-string 5))))
-	  (mixi-realization-error 'cannot-find-time diary))
-	(if (re-search-forward mixi-diary-title-regexp nil t)
-	    (mixi-diary-set-title diary (match-string 2))
-	  (mixi-realization-error 'cannot-find-title diary))
-	(if (re-search-forward mixi-diary-content-regexp nil t)
-	    (mixi-diary-set-content diary (match-string 2))
-	  (mixi-realization-error 'cannot-find-content diary))))
+      (let ((case-fold-search t))
+	(unless (re-search-forward mixi-diary-closed-regexp nil t)
+	  (if (re-search-forward mixi-diary-owner-nick-regexp nil t)
+	      (mixi-friend-set-nick (mixi-diary-owner diary)
+				    (match-string 1))
+	    (mixi-realization-error 'cannot-find-owner-nick diary))
+	  (if (re-search-forward mixi-diary-time-regexp nil t)
+	      (mixi-diary-set-time
+	       diary (encode-time 0 (string-to-number (match-string 7))
+				  (string-to-number (match-string 6))
+				  (string-to-number (match-string 4))
+				  (string-to-number (match-string 3))
+				  (string-to-number (match-string 2))))
+	    (mixi-realization-error 'cannot-find-time diary))
+	  (if (re-search-forward mixi-diary-title-regexp nil t)
+	      (mixi-diary-set-title diary (match-string 1))
+	    (mixi-realization-error 'cannot-find-title diary))
+	  (if (re-search-forward mixi-diary-content-regexp nil t)
+	      (mixi-diary-set-content diary (match-string 1))
+	    (mixi-realization-error 'cannot-find-content diary)))))
     (mixi-object-touch diary)))
 
 (defun mixi-diary-owner (diary)
@@ -1882,39 +1884,39 @@ Increase this value when unexpected error frequently occurs."
 	   "&comm_id=" (mixi-community-id (mixi-event-community ,event))))
 
 (defconst mixi-event-community-regexp
-  "<td WIDTH=595 background=http://img\\.mixi\\.jp/img/bg_w\\.gif><b>\\[\\(.+\\)\\] イベント</b></td>")
+  "<td width=\"?595\"? background=\"?http://img\\.mixi\\.jp/img/bg_w\\.gif\"?><b>\\[\\(.+\\)\\] イベント</b></td>")
 (defconst mixi-event-time-regexp
-  "<td ROWSPAN=11 \\(BGCOLOR\\|bgcolor\\)=#FFD8B0 \\(ALIGN\\|align\\)=center \\(VALIGN\\|Valign\\)=top WIDTH=110>
+  "<td rowspan=\"?11\"? bgcolor=\"?#FFD8B0\"? align=\"?center\"? valign=\"?top\"? width=\"?110\"?>
 ?\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
 ?\\([0-9]+\\):\\([0-9]+\\)</td>")
 (defconst mixi-event-title-regexp
-  "<td bgcolor=#FFF4E0\\( width=410\\)?>&nbsp;\\([^<]+\\)</td>")
+  "<td bgcolor=\"?#FFF4E0\"?\\( width=\"?410\"?\\)?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-event-owner-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=#FDF9F2>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
+  "<td bgcolor=\"?#FDF9F2\"?>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
 (defconst mixi-event-owner-seceded-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=#FDF9F2>&nbsp;\\((mixi 退会済)\\)")
+  "<td bgcolor=\"?#FDF9F2\"?>&nbsp;\\((mixi 退会済)\\)")
 (defconst mixi-event-date-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>開催日時</td>
-<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
+  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>開催日時</td>
+<td bgcolor=\"?#FFFFFF\"?>
 &nbsp;\\(.+\\)
 </td>")
 (defconst mixi-event-place-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>開催場所</td>
-<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
+  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>開催場所</td>
+<td bgcolor=\"?#FFFFFF\"?>
 &nbsp;\\(.+\\)
 </td>")
 (defconst mixi-event-detail-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>詳細</td>
-<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)><table BORDER=0 CELLSPACING=0 CELLPADDING=5><tr><td CLASS=h120>\\(.+\\)</td></tr></table></td>")
+  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>詳細</td>
+<td bgcolor=\"?#FFFFFF\"?><table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?5\"?><tr><td class=\"?h120\"?>\\(.+\\)</td></tr></table></td>")
 (defconst mixi-event-limit-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=\"?#\\(FFFFFF\\|ffffff\\)\"? \\(ALIGN\\|align\\)=\"?center\"? NOWRAP>募集期限</td>
-?<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>募集期限</td>
+?<td bgcolor=\"?#FFFFFF\"?>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
 (defconst mixi-event-members-regexp
-  "<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\) \\(ALIGN\\|align\\)=center NOWRAP>参加者</td>
-<td \\(BGCOLOR\\|bgcolor\\)=#\\(FFFFFF\\|ffffff\\)>
+  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>参加者</td>
+<td bgcolor=\"?#FFFFFF\"?>
 
 ?
-?<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=100%>
+?<table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?0\"? width=\"?100%\"?>
 <tr>
 
 ?<td>&nbsp;\\(.+\\)</td>")
@@ -1924,45 +1926,46 @@ Increase this value when unexpected error frequently occurs."
   ;; FIXME: Check a expiration of cache?
   (unless (mixi-object-realized-p event)
     (with-mixi-retrieve (or page (mixi-event-page event))
-      (if (re-search-forward mixi-event-community-regexp nil t)
-	  (mixi-community-set-name (mixi-event-community event)
-				   (match-string 1))
-	(mixi-realization-error 'cannot-find-community event))
-      (if (re-search-forward mixi-event-time-regexp nil t)
-	  (mixi-event-set-time
-	   event (encode-time 0 (string-to-number (match-string 8))
-			      (string-to-number (match-string 7))
-			      (string-to-number (match-string 6))
-			      (string-to-number (match-string 5))
-			      (string-to-number (match-string 4))))
-	(mixi-realization-error 'cannot-find-time event))
-      (if (re-search-forward mixi-event-title-regexp nil t)
-	  (mixi-event-set-title event (match-string 2))
-	(mixi-realization-error 'cannot-find-title event))
-      (if (re-search-forward mixi-event-owner-regexp nil t)
-	  (mixi-event-set-owner event (mixi-make-friend (match-string 2)
-							(match-string 3)))
-	(if (re-search-forward mixi-event-owner-seceded-regexp nil t)
-	    (mixi-event-set-owner event
-				  (mixi-make-friend nil (match-string 2)))
-	  (mixi-realization-error 'cannot-find-owner event)))
-      (if (re-search-forward mixi-event-date-regexp nil t)
-	  (mixi-event-set-date event (match-string 6))
-	(mixi-realization-error 'cannot-find-date event))
-      (if (re-search-forward mixi-event-place-regexp nil t)
-	  (mixi-event-set-place event (match-string 6))
-	(mixi-realization-error 'cannot-find-place event))
-      (if (re-search-forward mixi-event-detail-regexp nil t)
-	  (mixi-event-set-detail event (match-string 6))
-	(mixi-realization-error 'cannot-find-detail event))
-      (when (re-search-forward mixi-event-limit-regexp nil t)
-	(mixi-event-set-limit
-	 event (encode-time 0 0 0 (string-to-number (match-string 8))
-			    (string-to-number (match-string 7))
-			    (string-to-number (match-string 6)))))
-      (if (re-search-forward mixi-event-members-regexp nil t)
-	  (mixi-event-set-members event (match-string 6))
-	(mixi-realization-error 'cannot-find-members event)))
+      (let ((case-fold-search t))
+	(if (re-search-forward mixi-event-community-regexp nil t)
+	    (mixi-community-set-name (mixi-event-community event)
+				     (match-string 1))
+	  (mixi-realization-error 'cannot-find-community event))
+	(if (re-search-forward mixi-event-time-regexp nil t)
+	    (mixi-event-set-time
+	     event (encode-time 0 (string-to-number (match-string 5))
+				(string-to-number (match-string 4))
+				(string-to-number (match-string 3))
+				(string-to-number (match-string 2))
+				(string-to-number (match-string 1))))
+	  (mixi-realization-error 'cannot-find-time event))
+	(if (re-search-forward mixi-event-title-regexp nil t)
+	    (mixi-event-set-title event (match-string 2))
+	  (mixi-realization-error 'cannot-find-title event))
+	(if (re-search-forward mixi-event-owner-regexp nil t)
+	    (mixi-event-set-owner event (mixi-make-friend (match-string 1)
+							  (match-string 2)))
+	  (if (re-search-forward mixi-event-owner-seceded-regexp nil t)
+	      (mixi-event-set-owner event
+				    (mixi-make-friend nil (match-string 1)))
+	    (mixi-realization-error 'cannot-find-owner event)))
+	(if (re-search-forward mixi-event-date-regexp nil t)
+	    (mixi-event-set-date event (match-string 1))
+	  (mixi-realization-error 'cannot-find-date event))
+	(if (re-search-forward mixi-event-place-regexp nil t)
+	    (mixi-event-set-place event (match-string 1))
+	  (mixi-realization-error 'cannot-find-place event))
+	(if (re-search-forward mixi-event-detail-regexp nil t)
+	    (mixi-event-set-detail event (match-string 1))
+	  (mixi-realization-error 'cannot-find-detail event))
+	(when (re-search-forward mixi-event-limit-regexp nil t)
+	  (mixi-event-set-limit
+	   event (encode-time 0 0 0 (string-to-number (match-string 3))
+			      (string-to-number (match-string 2))
+			      (string-to-number (match-string 1)))))
+	(if (re-search-forward mixi-event-members-regexp nil t)
+	    (mixi-event-set-members event (match-string 1))
+	  (mixi-realization-error 'cannot-find-members event))))
     (mixi-object-touch event)))
 
 (defun mixi-event-community (event)

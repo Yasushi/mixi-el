@@ -1,3 +1,12 @@
+2007-03-25  Hiroya Murata  <lapis-lazuli@pop06.odn.ne.jp>
+
+	* sb-mixi.el (shimbun-mixi-default-group-alist): New constant;
+	rename from `shimbun-mixi-group-alist'.
+	(shimbun-mixi-group-alist): Change the default value to nil.
+	(shimbun-mixi-group-alist): New function.
+	(shimbun-groups): Use it instead of the same name variable.
+	(shimbun-get-headers): Ditto.
+
 2007-03-25  OHASHI Akira  <bg66@koka-in.org>
 
 	* INSTALL-CVS: New file.

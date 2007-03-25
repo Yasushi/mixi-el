@@ -37,7 +37,7 @@
   (luna-define-class shimbun-mixi (shimbun) (comment-cache))
   (luna-define-internal-accessors 'shimbun-mixi))
 
-(defcustom shimbun-mixi-group-alist
+(defconst shimbun-mixi-default-group-alist
   '(("new-diaries" . mixi-get-new-diaries)
     ("new-comments" . mixi-get-new-comments)
     ("new-bbses" . mixi-get-new-bbses)
@@ -96,6 +96,9 @@
     ("news.pickup.it" .
      (lambda (range)
        (mixi-get-news 'IT 'pickup range))))
+  "An alist of mixi shimbun group default definition.")
+
+(defcustom shimbun-mixi-group-alist nil
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
 NAME is a shimbun group name.
@@ -126,6 +129,10 @@ of mixi object."
  h.d+'g\\I{D>Ocy?Rc4uYUyOZj2%2Kl>,x-!MCSsyi3!L}psrrC1jlF,O?Ui>qf)X;sBz`/}\\066X%$
  siG'|4K!2?==|oB&#E'5GGH\\#z[muyQ")))
 
+(defun shimbun-mixi-group-alist ()
+  (append shimbun-mixi-default-group-alist
+	  shimbun-mixi-group-alist))
+
 (luna-define-method initialize-instance :after ((shimbun shimbun-mixi)
 						&rest init-args)
   (shimbun-mixi-set-comment-cache-internal shimbun
@@ -137,7 +144,7 @@ of mixi object."
   (mixi-logout))
 
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
-  (mapcar 'car shimbun-mixi-group-alist))
+  (mapcar 'car (shimbun-mixi-group-alist)))
 
 (luna-define-method shimbun-reply-to ((shimbun shimbun-mixi))
   mixi-reply-to)
@@ -184,7 +191,7 @@ of mixi object."
 (luna-define-method shimbun-get-headers ((shimbun shimbun-mixi)
 					 &optional range)
   (let ((url-or-function (cdr (assoc (shimbun-current-group-internal shimbun)
-				     shimbun-mixi-group-alist)))
+				     (shimbun-mixi-group-alist))))
 	(range (when (integerp range) (* range shimbun-mixi-page-articles))))
     (shimbun-sort-headers
      (shimbun-mixi-get-headers shimbun

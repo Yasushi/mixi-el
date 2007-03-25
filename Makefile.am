@@ -4,7 +4,7 @@ MODULES_GNUS = mixi-gnus.el
 MODULES_WL = mixi-wl.el
 MODULES_RIECE = riece-mixi.el
 CONTRIB = contrib/atom.cgi contrib/atom.sh
-EXTRA_DIST = COMPILE ChangeLog $(MODULES_MIXI) $(MODULES_SHIMBUN) \
+EXTRA_DIST = INSTALL-CVS COMPILE ChangeLog $(MODULES_MIXI) $(MODULES_SHIMBUN) \
              $(MODULES_GNUS) $(MODULES_WL) $(MODULES_RIECE) $(CONTRIB)
 CLEANFILES = auto-autoloads.el custom-load.el *.elc
 AUTOMAKE_OPTIONS = no-dependencies

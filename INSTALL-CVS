@@ -1,0 +1,11 @@
+To build mixi-el checked out from CVS, you will need newer versions of
+autoconf & automake.
+
+(0) checkout modules
+
+  % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root checkout mixi
+
+(1) create ./configure
+
+  % autoreconf -f -i
+        ^^

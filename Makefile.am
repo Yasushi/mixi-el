@@ -19,3 +19,11 @@ package:
 
 install-package: package
 	$(XEMACS) $(FLAGS) -l COMPILE -f mixi-install-package $(PACKAGEDIR)
+
+compile-individually:
+	@for i in `$(EMACS) $(FLAGS) -l COMPILE -f mixi-examine`; do \
+		echo $(EMACS) $(FLAGS) -l COMPILE \
+			-f mixi-compile-module $$i; \
+		$(EMACS) $(FLAGS) -l COMPILE \
+			-f mixi-compile-module $$i; \
+	done

@@ -1,5 +1,11 @@
 2007-03-26  OHASHI Akira  <bg66@koka-in.org>
 
+	* Makefile.am (compile-individually): New target.
+	* COMPILE.in (mixi-compile-module): New function.
+	(mixi-examine): Ditto.
+
+2007-03-26  OHASHI Akira  <bg66@koka-in.org>
+
 	* COMPILE.in: Rename from `COMPILE'.
 	(mixi-modules): New variable.
 	(mixi-compile): Use it.

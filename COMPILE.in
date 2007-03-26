@@ -7,7 +7,8 @@
   (let ((load-path (cons nil load-path))
 	error-modules)
     (while modules
-      (let ((source (expand-file-name (symbol-name (car modules)))))
+      (let ((source (expand-file-name
+		     (symbol-name (car modules)))))
 	(if (file-newer-than-file-p source (concat source "c"))
 	    (condition-case error
 		(byte-compile-file source)
@@ -24,6 +25,13 @@
   WARNING: You should probably stop here, try \"make distclean\" to clear
   WARNING: the last build, and then reconfigure.
   WARNING: ---------------------------------------------------------\n\n")))))
+
+(defun mixi-compile-module ()
+  (let ((load-path (cons nil load-path)))
+    (let ((source (expand-file-name
+		   (car command-line-args-left))))
+      (if (file-newer-than-file-p source (concat source "c"))
+	  (byte-compile-file source)))))
 
 (defun mixi-install-modules (modules dest just-print)
   (unless (or just-print (file-exists-p dest))
@@ -50,6 +58,9 @@
 	case-fold-search)
     (if flag
 	(string-match "^\\(\\(--[^ ]+ \\)+-\\|[^ =-]\\)*n" flag))))
+
+(defun mixi-examine ()
+  (princ (mapconcat #'symbol-name mixi-modules " ")))
 
 (defun mixi-compile ()
   (mixi-compile-modules mixi-modules))

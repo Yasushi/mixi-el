@@ -1,46 +1,21 @@
-MODULES_MIXI = mixi.el mixi-utils.el mixi-atom.el mixi-ticker.el
-MODULES_SHIMBUN = sb-mixi.el
-MODULES_GNUS = mixi-gnus.el
-MODULES_WL = mixi-wl.el
-MODULES_RIECE = riece-mixi.el
 CONTRIB = contrib/atom.cgi contrib/atom.sh
-EXTRA_DIST = INSTALL-CVS COMPILE ChangeLog $(MODULES_MIXI) $(MODULES_SHIMBUN) \
-             $(MODULES_GNUS) $(MODULES_WL) $(MODULES_RIECE) $(CONTRIB)
+EXTRA_DIST = INSTALL-CVS ChangeLog @MODULES_ALL@ $(CONTRIB)
 CLEANFILES = auto-autoloads.el custom-load.el *.elc
+DISTCLEANFILES = COMPILE
 AUTOMAKE_OPTIONS = no-dependencies
 
 FLAGS ?= -batch -q -no-site-file
 
-MODULES = $(MODULES_MIXI)
-
-if HAVE_SHIMBUN
-MODULES += $(MODULES_SHIMBUN)
-
-if HAVE_GNUS
-MODULES += $(MODULES_GNUS)
-endif
-
-if HAVE_WL
-MODULES += $(MODULES_WL)
-endif
-
-endif
-
-if HAVE_RIECE
-MODULES += $(MODULES_RIECE)
-endif
-
 all: elc
 
 elc:
-	$(EMACS) $(FLAGS) -l COMPILE -f mixi-compile $(MODULES)
+	$(EMACS) $(FLAGS) -l COMPILE -f mixi-compile
 
 install: elc
-	$(EMACS) $(FLAGS) -l COMPILE -f mixi-install $(lispdir) $(MODULES)
+	$(EMACS) $(FLAGS) -l COMPILE -f mixi-install $(lispdir)
 
 package:
-	$(XEMACS) $(FLAGS) -l COMPILE -f mixi-compile-package $(MODULES)
+	$(XEMACS) $(FLAGS) -l COMPILE -f mixi-compile-package
 
 install-package: package
-	$(XEMACS) $(FLAGS) -l COMPILE -f mixi-install-package $(PACKAGEDIR) \
-		$(MODULES)
+	$(XEMACS) $(FLAGS) -l COMPILE -f mixi-install-package $(PACKAGEDIR)

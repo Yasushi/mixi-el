@@ -125,7 +125,6 @@ AC_DEFUN([AC_CHECK_SHIMBUN], [
      else
        HAVE_SHIMBUN=$withval
      fi], HAVE_SHIMBUN=yes)
-  AC_SUBST(HAVE_SHIMBUN)
 
   if test "${HAVE_SHIMBUN}" = yes; then
     AC_EMACS_LISP(shimbun_dir,(file-name-directory (locate-library \"shimbun\")),"noecho")
@@ -157,7 +156,6 @@ AC_DEFUN([AC_CHECK_GNUS], [
      else
        HAVE_GNUS=$withval
      fi], HAVE_GNUS=yes)
-  AC_SUBST(HAVE_GNUS)
 
   if test "${HAVE_GNUS}" = yes; then
     AC_EMACS_LISP(gnus_dir,(file-name-directory (locate-library \"gnus\")),"noecho")
@@ -189,7 +187,6 @@ AC_DEFUN([AC_CHECK_WL], [
      else
        HAVE_WL=$withval
      fi], HAVE_WL=yes)
-  AC_SUBST(HAVE_WL)
 
   if test "${HAVE_WL}" = yes; then
     AC_EMACS_LISP(wl_dir,(file-name-directory (locate-library \"wl\")),"noecho")
@@ -221,7 +218,6 @@ AC_DEFUN([AC_CHECK_RIECE], [
      else
        HAVE_RIECE=$withval
      fi], HAVE_RIECE=yes)
-  AC_SUBST(HAVE_RIECE)
 
   if test "${HAVE_RIECE}" = yes; then
     AC_EMACS_LISP(riece_dir,(file-name-directory (locate-library \"riece\")),"noecho")
@@ -291,3 +287,30 @@ AC_DEFUN([AC_ADD_LOAD_PATH],
     ADDITIONAL_LOAD_PATH=)
   AC_SUBST(ADDITIONAL_LOAD_PATH)])
 
+AC_DEFUN([AC_EXAMINE_MODULES],
+ [dnl Examine install files.
+
+  MODULES_MIXI="mixi.el mixi-utils.el mixi-atom.el mixi-ticker.el"
+  MODULES_SHIMBUN="sb-mixi.el"
+  MODULES_GNUS="mixi-gnus.el"
+  MODULES_WL="mixi-wl.el"
+  MODULES_RIECE="riece-mixi.el"
+
+  MODULES=${MODULES_MIXI}
+  MODULES_ALL="${MODULES} ${MODULES_SHIMBUN} ${MODULES_GNUS} ${MODULES_WL} ${MODULES_RIECE}"
+
+  if test ${HAVE_SHIMBUN} = yes; then
+    MODULES="${MODULES} ${MODULES_SHIMBUN}"
+    if test ${HAVE_GNUS} = yes; then
+      MODULES="${MODULES} ${MODULES_GNUS}"
+    fi
+    if test ${HAVE_WL} = yes; then
+      MODULES="${MODULES} ${MODULES_WL}"
+    fi
+  fi
+  if test ${HAVE_RIECE} = yes; then
+    MODULES="${MODULES} ${MODULES_RIECE}"
+  fi
+
+  AC_SUBST(MODULES)
+  AC_SUBST(MODULES_ALL)])

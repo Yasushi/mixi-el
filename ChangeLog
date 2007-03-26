@@ -1,3 +1,38 @@
+2007-03-26  OHASHI Akira  <bg66@koka-in.org>
+
+	* COMPILE.in: Rename from `COMPILE'.
+	(mixi-modules): New variable.
+	(mixi-compile): Use it.
+	(mixi-install): Ditto.
+	(mixi-compile-package): Ditto.
+	(mixi-install-package): Ditto.
+	(mixi-compile-modules): Follow the change above.
+	(mixi-install-modules): Ditto.
+	* .cvsignore: Add COMPILE.
+	* acinclude.m4 (AC_EXAMINE_MODULES): New function.
+	(AC_CHECK_SHIMBUN): Don't use AC_SUBST.
+	(AC_CHECK_GNUS): Ditto.
+	(AC_CHECK_WL): Ditto.
+	(AC_CHECK_RIECE): Ditto.
+	* configure.ac: Use AC_EXAMINE_MODULES.
+	(HAVE_SHIMBUN): Abolish.
+	(HAVE_GNUS): Ditto.
+	(HAVE_WL): Ditto.
+	(HAVE_RIECE): Ditto.
+	(AC_CONFIG_FILES): Add COMPILE.
+	* Makefile.am (MODULES_MIXI): Abolish.
+	(MODULES_SHIMBUN): Ditto.
+	(MODULES_GNUS): Ditto.
+	(MODULES_WL): Ditto.
+	(MODULES_RIECE): Ditto.
+	(MODULES): Ditto.
+	(DISTCLEANFILES): New variable.
+	(EXTRA_DIST): Follow the change above.
+	(elc): Ditto.
+	(install): Ditto.
+	(package): Ditto.
+	(install-package): Ditto.
+
 2007-03-25  Hiroya Murata  <lapis-lazuli@pop06.odn.ne.jp>
 
 	* sb-mixi.el (shimbun-mixi-default-group-alist): New constant;

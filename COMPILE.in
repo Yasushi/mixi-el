@@ -1,10 +1,13 @@
 ;;; -*- Emacs-Lisp -*-
 
+(defvar mixi-modules
+  '(@MODULES@))
+
 (defun mixi-compile-modules (modules)
   (let ((load-path (cons nil load-path))
 	error-modules)
     (while modules
-      (let ((source (expand-file-name (car modules))))
+      (let ((source (expand-file-name (symbol-name (car modules)))))
 	(if (file-newer-than-file-p source (concat source "c"))
 	    (condition-case error
 		(byte-compile-file source)
@@ -16,7 +19,7 @@
   WARNING: ---------------------------------------------------------
   WARNING: Couldn't compile following modules:
   WARNING: 
-  WARNING:   " (mapconcat #'identity error-modules ", ") "\n\
+  WARNING:   " (mapconcat #'symbol-name error-modules ", ") "\n\
   WARNING: 
   WARNING: You should probably stop here, try \"make distclean\" to clear
   WARNING: the last build, and then reconfigure.
@@ -26,7 +29,7 @@
   (unless (or just-print (file-exists-p dest))
     (make-directory dest t))
   (while modules
-    (let ((name (car modules)))
+    (let ((name (symbol-name (car modules))))
       (princ (format "%s -> %s\n" name dest))
       (unless just-print
 	(copy-file (expand-file-name name)
@@ -49,29 +52,27 @@
 	(string-match "^\\(\\(--[^ ]+ \\)+-\\|[^ =-]\\)*n" flag))))
 
 (defun mixi-compile ()
-  (mixi-compile-modules command-line-args-left))
+  (mixi-compile-modules mixi-modules))
 
 (defun mixi-install ()
   (mixi-install-modules
-   (cdr command-line-args-left)
+   mixi-modules
    (expand-file-name "mixi" (car command-line-args-left))
    (mixi-install-just-print-p)))
 
 (defun mixi-compile-package ()
-  (let ((modules (cdr command-line-args-left))
-	command-line-args-left)
-    (setq autoload-package-name "mixi")
-    (add-to-list 'command-line-args-left ".")
-    (batch-update-directory)
-    (add-to-list 'command-line-args-left ".")
-    (Custom-make-dependencies)
-    (mixi-compile-modules
-     (append modules
-	     '("auto-autoloads.el" "custom-load.el")))))
+  (setq autoload-package-name "mixi")
+  (add-to-list 'command-line-args-left ".")
+  (batch-update-directory)
+  (add-to-list 'command-line-args-left ".")
+  (Custom-make-dependencies)
+  (mixi-compile-modules
+   (append mixi-modules
+	   '(auto-autoloads.el custom-load.el))))
 
 (defun mixi-install-package ()
   (mixi-install-modules
-   (append (cdr command-line-args-left)
-	   '("auto-autoloads.el" "custom-load.el"))
+   (append mixi-modules
+	   '(auto-autoloads.el custom-load.el))
    (expand-file-name "lisp/mixi" (car command-line-args-left))
    (mixi-install-just-print-p)))

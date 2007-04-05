@@ -1037,9 +1037,9 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-friend-list-id-regexp
-  "<a href=show_friend\\.pl\\?id=\\([0-9]+\\)")
+  "<a href=\"?show_friend\\.pl\\?id=\\([0-9]+\\)\"?")
 (defconst mixi-friend-list-nick-regexp
-  "<td valign=middle>\\(.+\\)さん([0-9]+)<br />")
+  "<td valign=\"?top\"?>\\(.+\\)さん([0-9]+)")
 
 ;;;###autoload
 (defun mixi-get-friends (&rest friend-or-range)
@@ -1452,16 +1452,26 @@ Increase this value when unexpected error frequently occurs."
 <a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\\(.*\\)</a>")
 (defconst mixi-community-category-regexp
   "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>カテゴリ</font></td>
-<td width=\"?345\"?>\\([^<]+\\)</td>")
+<td width=\"?345\"?>
+\\(.+\\)
+</td>")
 (defconst mixi-community-members-regexp
   "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>メンバー数</font></td>
-<td width=\"?345\"?>\\([0-9]+\\)人</td></tr>")
+<td width=\"?345\"?>
+\\([0-9]+\\)人
+</td>")
 (defconst mixi-community-open-level-regexp
   "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>参加条件と<br />公開レベル</font></td>
-<td width=\"?345\"?>\\(.+\\)</td></tr>")
+<td width=\"?345\"?>
+\\(.+\\)
+</td>")
 (defconst mixi-community-authority-regexp
   "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>トピック作成の権限</font></td>
-<td width=\"?345\"?>\\(.+\\)</td></tr>")
+<td width=\"?345\"?>
+\\(.+\\)
+
+
+</td>")
 (defconst mixi-community-description-regexp
   "<td class=\"?h120\"? width=\"?345\"?>\\(.+\\)</td>")
 
@@ -1627,9 +1637,9 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-community-list-id-regexp
-  "<a href=view_community\\.pl\\?id=\\([0-9]+\\)")
+  "<a href=\"?view_community\\.pl\\?id=\\([0-9]+\\)\"?")
 (defconst mixi-community-list-name-regexp
-  "<td valign=middle>\\(.+\\)([0-9]+)</td>")
+  "<td valign=\"?top\"?>\\(.+\\)([0-9]+)")
 
 ;;;###autoload
 (defun mixi-get-communities (&rest friend-or-range)

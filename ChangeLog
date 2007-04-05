@@ -1,3 +1,14 @@
+2007-04-05  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-friend-list-id-regexp): Follow the change of mixi.
+	(mixi-friend-list-nick-regexp): Ditto.
+	(mixi-community-category-regexp): Ditto.
+	(mixi-community-members-regexp): Ditto.
+	(mixi-community-open-level-regexp): Ditto.
+	(mixi-community-authority-regexp): Ditto.
+	(mixi-community-list-id-regexp): Ditto.
+	(mixi-community-list-name-regexp): Ditto.
+
 2007-03-26  OHASHI Akira  <bg66@koka-in.org>
 
 	* Makefile.am (compile-individually): New target.

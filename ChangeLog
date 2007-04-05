@@ -168,10 +168,10 @@
 
 2007-03-06  OHASHI Akira  <bg66@koka-in.org>
 
-	* riece-mixi.el	(riece-mixi-reply-to-only-me): New user option.
+	* riece-mixi.el (riece-mixi-reply-to-only-me): New user option.
 	(riece-mixi-display-message-function): Use it.
 
-	* riece-mixi.el	(riece-mixi-enabled): Abolish.
+	* riece-mixi.el (riece-mixi-enabled): Abolish.
 	(riece-mixi-display-message-function): Follow the change above.
 	(riece-mixi-check): Ditto.
 	(riece-mixi-enable): Ditto.
@@ -206,10 +206,10 @@
 
 	* mixi.el (mixi-url-encode-string): New function.
 	(mixi-url-encode-and-quote-percent-string): Use it.
-	* mixi-utils.el: (mixi-make-encoded-url): New function.
+	* mixi-utils.el (mixi-make-encoded-url): New function.
 	(mixi-make-objects): Ditto.
 
-	* mixi-utils.el: (mixi-make-id-1): New function.
+	* mixi-utils.el (mixi-make-id-1): New function.
 	(mixi-make-message-id): Use it.
 	(mixi-make-tag-uri): New function.
 	* sb-mixi.el (shimbun-get-headers): Use it.
@@ -421,16 +421,16 @@
 
 2007-01-17  OHASHI Akira  <bg66@koka-in.org>
 
-	* mixi.el: (mixi-get-matched-items): Add REVERSE argument.
+	* mixi.el (mixi-get-matched-items): Add REVERSE argument.
 	(mixi-get-comments): Follow the change above.
 
 2007-01-17  OHASHI Akira  <bg66@koka-in.org>
 
-	* mixi.el: (mixi-realize-message): Follow the change of mixi.
+	* mixi.el (mixi-realize-message): Follow the change of mixi.
 
 2007-01-17  OHASHI Akira  <bg66@koka-in.org>
 
-	* mixi.el: (with-mixi-retrieve): Don't bind `buffer' variable.
+	* mixi.el (with-mixi-retrieve): Don't bind `buffer' variable.
 	(with-mixi-post-form): Ditto.
 	(mixi-get-matched-items): Follow the change above.
 	(mixi-make-me): Ditto.

@@ -1,3 +1,8 @@
+2007-04-16  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-wl.el (wl-draft-send-mail-with-mixi): Check that title is not
+	nil.
+
 2007-04-05  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-friend-list-id-regexp): Follow the change of mixi.

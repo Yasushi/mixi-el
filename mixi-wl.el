@@ -55,7 +55,7 @@
 	  (id (std11-field-body "message-id")))
       (shimbun-mixi-send-mail recipients
 			      (eword-decode-string
-			       (std11-field-body "subject"))
+			       (or (std11-field-body "subject") ""))
 			      (decode-mime-charset-string
 			       (buffer-substring (1+ delimline)
 						 (point-max))

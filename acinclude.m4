@@ -301,12 +301,12 @@ AC_DEFUN([AC_EXAMINE_MODULES],
 
   if test ${HAVE_SHIMBUN} = yes; then
     MODULES="${MODULES} ${MODULES_SHIMBUN}"
-    if test ${HAVE_GNUS} = yes; then
-      MODULES="${MODULES} ${MODULES_GNUS}"
-    fi
-    if test ${HAVE_WL} = yes; then
-      MODULES="${MODULES} ${MODULES_WL}"
-    fi
+  fi
+  if test ${HAVE_GNUS} = yes; then
+    MODULES="${MODULES} ${MODULES_GNUS}"
+  fi
+  if test ${HAVE_WL} = yes; then
+    MODULES="${MODULES} ${MODULES_WL}"
   fi
   if test ${HAVE_RIECE} = yes; then
     MODULES="${MODULES} ${MODULES_RIECE}"

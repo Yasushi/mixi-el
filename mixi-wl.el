@@ -34,7 +34,7 @@
 
 ;;; Code:
 
-(require 'sb-mixi)
+(require 'mixi-utils)
 (require 'wl-draft)
 
 (defsubst mixi-wl-get-recipients-from-buffer ()
@@ -53,19 +53,17 @@
 				"$\\|^$") nil t)
 		       (point-marker)))
 	  (id (std11-field-body "message-id")))
-      (shimbun-mixi-send-mail recipients
-			      (eword-decode-string
-			       (or (std11-field-body "subject") ""))
-			      (decode-mime-charset-string
-			       (buffer-substring (1+ delimline)
-						 (point-max))
-			       wl-mime-charset))
+      (mixi-send-mail recipients
+		      (eword-decode-string (or (std11-field-body "subject")
+					       ""))
+		      (decode-mime-charset-string
+		       (buffer-substring (1+ delimline) (point-max))
+		       wl-mime-charset))
       (wl-draft-set-sent-message 'mail 'sent)
       (wl-draft-write-sendlog 'ok 'mixi nil (list recipients) id))))
 
 (defun mixi-wl-setup-draft-buffer ()
-  (when (string-match shimbun-mixi-to-regexp
-		      (mixi-wl-get-recipients-from-buffer))
+  (when (string-match mixi-to-regexp (mixi-wl-get-recipients-from-buffer))
     (make-local-variable 'wl-draft-send-confirm-with-preview)
     (setq wl-draft-send-confirm-with-preview nil)
     (make-local-variable 'wl-draft-send-mail-function)

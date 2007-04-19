@@ -234,6 +234,33 @@
 		  (concat mixi-reply-to "message;"
 			  (mixi-friend-id object))))))))
 
+(defconst mixi-to-regexp
+  "^mixi;\\([a-z]+\\);?\\([a-z0-9]+\\)?;?\\([0-9]+\\)?;?\\([0-9]+\\)?")
+
+(defun mixi-send-mail (to title content)
+  (when (string-match mixi-to-regexp to)
+    (let ((method (match-string 1 to)))
+      (cond ((string= method "comment")
+	     (let ((parent (match-string 2 to))
+		   (owner-id (match-string 3 to))
+		   (id (match-string 4 to)))
+	       (if (string= parent "diary")
+		   (mixi-post-comment
+		    (mixi-make-diary (mixi-make-friend owner-id) id) content)
+		 (let ((func (intern
+			      (concat mixi-object-prefix "make-" parent))))
+		   (mixi-post-comment
+		    (funcall func (mixi-make-community owner-id) id)
+		    content)))))
+	    ((string= method "topic")
+	     (mixi-post-topic (mixi-make-community (match-string 2 to))
+			      title content))
+	    ((string= method "diary")
+	     (mixi-post-diary title content))
+	    ((string= method "message")
+	     (mixi-post-message (mixi-make-friend (match-string 2 to))
+				title content))))))
+
 (provide 'mixi-utils)
 
 ;;; mixi-utils.el ends here

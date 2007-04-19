@@ -1,3 +1,15 @@
+2007-04-19  OHASHI Akira  <bg66@koka-in.org>
+
+	* sb-mixi.el (shimbun-mixi-to-regexp): Abolish.
+	(shimbun-mixi-send-mail): Ditto.
+	* mixi-utils.el (mixi-to-regexp): New constant.
+	(mixi-send-mail): New function.
+	* mixi-gnus.el (message-mixi-p): Follow the change above.
+	(message-send-via-mixi): Ditto.
+	* mixi-wl.el (wl-draft-send-mail-with-mixi): Ditto.
+	(mixi-wl-setup-draft-buffer): Ditto.
+	* acinclude.m4 (AC_EXAMINE_MODULES): Ditto.
+
 2007-04-16  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-wl.el (wl-draft-send-mail-with-mixi): Check that title is not

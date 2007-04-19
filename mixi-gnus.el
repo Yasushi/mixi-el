@@ -34,7 +34,7 @@
 
 ;;; Code:
 
-(require 'sb-mixi)
+(require 'mixi-utils)
 (require 'message)
 
 (defun message-mixi-p ()
@@ -44,8 +44,7 @@
 	 (save-restriction
 	   (message-narrow-to-headers)
 	   (or (message-fetch-field "mixi-to")
-	       (string-match shimbun-mixi-to-regexp
-			     (message-fetch-field "to")))))))
+	       (string-match mixi-to-regexp (message-fetch-field "to")))))))
 
 (defun message-send-via-mixi (arg)
   "Send the current message via mixi."
@@ -66,10 +65,10 @@
 	  (insert (with-current-buffer mailbuf
 		    (mml-buffer-substring-no-properties-except-hard-newlines
 		     (point-min) (point-max))))
-	  (shimbun-mixi-send-mail (message-fetch-field "mixi-to")
-				  (message-fetch-field "subject")
-				  (buffer-substring (message-goto-body)
-						    (point-max))))
+	  (mixi-send-mail (message-fetch-field "mixi-to")
+			  (message-fetch-field "subject")
+			  (buffer-substring (message-goto-body)
+					    (point-max))))
       (kill-buffer tembuf))
     (set-buffer mailbuf)
     (push 'mixi message-sent-message-via)))

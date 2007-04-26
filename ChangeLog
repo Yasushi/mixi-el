@@ -1,3 +1,7 @@
+2007-04-26  OHASHI Akira  <bg66@koka-in.org>
+
+	* riece-mixi.el (riece-mixi-send-object-with-url): Don't send a title.
+
 2007-04-19  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-mixi-to-regexp): Abolish.
@@ -1559,3 +1563,10 @@
 2006-10-20  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el: Importing mixi.el.
+
+
+Local Variables:
+coding: iso-2022-7bit
+fill-column: 79
+indent-tabs-mode: t
+End:

@@ -106,9 +106,7 @@ of mixi object."
 
 (defun riece-mixi-send-object-with-url (target object)
   (condition-case nil
-      (let ((string (mixi-make-title object t))
-	    (url (mixi-make-url object)))
-	(riece-mixi-send-notice target string)
+      (let ((url (mixi-make-url object)))
 	(riece-mixi-send-notice target url))
     (error nil)))
 

@@ -1,3 +1,14 @@
+2007-05-31  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-content-regexp): Follow the change of mixi.
+	(mixi-search-diary-list-regexp): Ditto.
+	(mixi-topic-content-regexp): Ditto.
+	(mixi-event-detail-regexp): Ditto.
+	(mixi-diary-comment-list-regexp): Ditto.
+	(mixi-topic-comment-list-regexp): Ditto.
+	(mixi-event-comment-list-regexp): Ditto.
+	(mixi-message-content-regexp): Ditto.
+
 2007-04-26  OHASHI Akira  <bg66@koka-in.org>
 
 	* riece-mixi.el (riece-mixi-send-object-with-url): Don't send a title.

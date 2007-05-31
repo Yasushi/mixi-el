@@ -1165,7 +1165,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-title-regexp
   "<td bgcolor=\"?#FFF4E0\"? width=\"?430\"?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-diary-content-regexp
-  "<td class=\"?h12\"?>\\(\\(.\\|\r?\n\\)*?\\)</td>")
+  "<td class=\"?h12\"? width=\"?410\"?>\\(\\(.\\|\r?\n\\)*?\\)</td>")
 
 (defun mixi-realize-diary (diary &optional page)
   "Realize a DIARY."
@@ -1342,7 +1342,7 @@ Increase this value when unexpected error frequently occurs."
 
 <tr>
 <td BGCOLOR=#FDF9F2><font COLOR=#996600>本&nbsp;&nbsp;文</font></td>
-<td COLSPAN=2 BGCOLOR=#FFFFFF>\\(.*\\)</td></tr>
+<td COLSPAN=2 BGCOLOR=#FFFFFF width=\"380\">\\(.*\\)</td></tr>
 
 
 <tr>
@@ -1726,7 +1726,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-topic-owner-regexp
   "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)\\(さん\\)?</a>")
 (defconst mixi-topic-content-regexp
-  "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\"><table><tr>\\(<td width=\"130\" height=\"140\" align=\"center\" valign=\"middle\"><a href=\"javascript:void(0)\" onClick=\"MM_openBrWindow('show_bbs_picture\\.pl\\?id=[0-9]+&comm_id=[0-9]+&number=[0-9]+','pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')\"><img src=\"http://ic[0-9]+\\.mixi\\.jp/[^.]+\\.jpg\" border=\"0\"></a></td>\n\\)*</tr></table>\\(.+\\)</td></tr></table>")
+  "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\" width=\"500\"><table><tr>\\(<td width=\"130\" height=\"140\" align=\"center\" valign=\"middle\"><a href=\"javascript:void(0)\" onClick=\"MM_openBrWindow('show_bbs_picture\\.pl\\?id=[0-9]+&comm_id=[0-9]+&number=[0-9]+','pict','width=680,height=660,toolbar=no,scrollbars=yes,left=5,top=5')\"><img src=\"http://ic[0-9]+\\.mixi\\.jp/[^.]+\\.jpg\" border=\"0\"></a></td>\n\\)*</tr></table>\\(.+\\)</td></tr></table>")
 
 (defun mixi-realize-topic (topic &optional page)
   "Realize a TOPIC."
@@ -1917,7 +1917,7 @@ Increase this value when unexpected error frequently occurs."
 </td>")
 (defconst mixi-event-detail-regexp
   "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>詳細</td>
-<td bgcolor=\"?#FFFFFF\"?><table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?5\"?><tr><td class=\"?h120\"?>\\(.+\\)</td></tr></table></td>")
+<td bgcolor=\"?#FFFFFF\"?><table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?5\"?><tr><td class=\"?h120\"? width=\"?410\"?>\\(.+\\)</td></tr></table></td>")
 (defconst mixi-event-limit-regexp
   "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>募集期限</td>
 ?<td bgcolor=\"?#FFFFFF\"?>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
@@ -2271,7 +2271,7 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-diary-comment-list-regexp
-"<td rowspan=\"2\" align=\"center\" width=\"95\" bgcolor=\"#f2ddb7\" nowrap>
+  "<td rowspan=\"2\" align=\"center\" width=\"95\" bgcolor=\"#f2ddb7\" nowrap>
 \\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)\\(<br>
 <input type=checkbox name=comment_id value=\".+\">
 \\|\\)
@@ -2294,7 +2294,7 @@ Increase this value when unexpected error frequently occurs."
 <td bgcolor=\"#ffffff\">
 <table BORDER=0 CELLSPACING=0 CELLPADDING=[35] WIDTH=410>
 <tr>
-<td CLASS=h12>
+<td CLASS=h12 width=\"410\">
 \\(.+\\)
 </td></tr></table>")
 
@@ -2325,7 +2325,7 @@ Increase this value when unexpected error frequently occurs."
 <td bgcolor=\"#ffffff\" align=\"center\">
 <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\" width=\"500\">
 <tr>
-<td class=\"h120\">
+<td class=\"h120\" width=\"500\">
 
 \\(.+\\)
 </td>
@@ -2358,7 +2358,7 @@ Increase this value when unexpected error frequently occurs."
 <tr>
 <td ALIGN=center BGCOLOR=#FFFFFF>
 <table BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH=500>
-<tr><td CLASS=h120>\\(.+\\)</td></tr>
+<tr><td CLASS=h120 width=\"500\">\\(.+\\)</td></tr>
 </table>
 </td>
 </tr>")
@@ -2505,7 +2505,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-message-title-regexp
 "<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.*\\)\n?</td>")
 (defconst mixi-message-content-regexp
-  "<tr><td CLASS=h120>\\(.*\\)</td></tr>")
+  "<tr><td CLASS=h120 width=\"500\">\\(.*\\)</td></tr>")
 
 (defun mixi-realize-message (message)
   "Realize a MESSAGE."

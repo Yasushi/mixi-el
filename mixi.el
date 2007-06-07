@@ -1898,7 +1898,8 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-event-time-regexp
   "<td rowspan=\"?11\"? bgcolor=\"?#FFD8B0\"? align=\"?center\"? valign=\"?top\"? width=\"?110\"?>
 ?\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
-?\\([0-9]+\\):\\([0-9]+\\)</td>")
+?\\([0-9]+\\):\\([0-9]+\\)
+</td>")
 (defconst mixi-event-title-regexp
   "<td bgcolor=\"?#FFF4E0\"?\\( width=\"?410\"?\\)?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-event-owner-regexp
@@ -1917,7 +1918,8 @@ Increase this value when unexpected error frequently occurs."
 </td>")
 (defconst mixi-event-detail-regexp
   "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>詳細</td>
-<td bgcolor=\"?#FFFFFF\"?><table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?5\"?><tr><td class=\"?h120\"? width=\"?410\"?>\\(.+\\)</td></tr></table></td>")
+<td bgcolor=\"?#FFFFFF\"? class=\"?h120\"? width=\"?410\"?>
+<div style=\"?padding:5px\"?>\\(.+\\)</div>")
 (defconst mixi-event-limit-regexp
   "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>募集期限</td>
 ?<td bgcolor=\"?#FFFFFF\"?>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
@@ -2358,7 +2360,12 @@ Increase this value when unexpected error frequently occurs."
 <tr>
 <td ALIGN=center BGCOLOR=#FFFFFF>
 <table BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH=500>
-<tr><td CLASS=h120 width=\"500\">\\(.+\\)</td></tr>
+<tr>
+<td CLASS=h120 width=\"500\">
+
+\\(.+\\)
+</td>
+</tr>
 </table>
 </td>
 </tr>")

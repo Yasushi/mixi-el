@@ -1380,7 +1380,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/add_diary.pl"))
 
 (defconst mixi-post-key-regexp
-  "<input type=\"?hidden\"? name=\"?post_key\"? value=\"\\([a-z0-9]+\\)\">")
+  "<input type=\"?hidden\"? name=\"?post_key\"? +value=\"\\([a-z0-9]+\\)\"")
 (defconst mixi-post-succeed-regexp
   "<b>\\(作成\\|書き込み\\)が完了しました。反映に時間がかかることがありますので、表示されていない場合は少々お待ちください。</b>")
 

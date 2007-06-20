@@ -1265,7 +1265,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defconst mixi-diary-list-regexp
   "<tr VALIGN=top>
-<td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#F2DDB7><font COLOR=#996600>\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</font>\\(<br><input type=\"checkbox\" name=\"diary_id\" value=\"[0-9]+\">\\|\\)</td>
+<td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#F2DDB7><font COLOR=#996600>\\([0-9]+\\)年<br />\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</font>\\(<br><input type=\"checkbox\" name=\"diary_id\" value=\"[0-9]+\">\\|\\)</td>
 <td bgcolor=\"#FFF4E0\">&nbsp;<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a></td>")
 
 ;;;###autoload
@@ -1283,21 +1283,16 @@ Increase this value when unexpected error frequently occurs."
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
     (let ((items (mixi-get-matched-items (mixi-diary-list-page friend)
 					 mixi-diary-list-regexp
-					 range))
-	  (year (nth 5 (decode-time (current-time))))
-	  (month (nth 4 (decode-time (current-time)))))
+					 range)))
       (mapcar (lambda (item)
-		(let ((month-of-item (string-to-number (nth 0 item))))
-		  (when (> month-of-item month)
-		    (decf year))
-		  (setq month month-of-item)
-		  (mixi-make-diary friend (nth 5 item) nil
-				   (encode-time
-				    0 (string-to-number (nth 3 item))
-				    (string-to-number (nth 2 item))
-				    (string-to-number (nth 1 item))
-				    month year)
-				   (nth 6 item))))
+		(mixi-make-diary friend (nth 6 item) nil
+				 (encode-time
+				  0 (string-to-number (nth 4 item))
+				  (string-to-number (nth 3 item))
+				  (string-to-number (nth 2 item))
+				  (string-to-number (nth 1 item))
+				  (string-to-number (nth 0 item)))
+				  (nth 7 item)))
 	      items))))
 
 (defmacro mixi-new-diary-list-page ()
@@ -2790,7 +2785,7 @@ Increase this value when unexpected error frequently occurs."
 
 
 (defconst mixi-news-finished-regexp
-  "<td ALIGN=center background=http://img\\.mixi\\.jp/img/bg_line\\.gif> 申し訳ございませんが、このニュースは掲載終了しました。</td>")
+  "申し訳ございませんが、このニュースは掲載が終了したか、URLが間違っていいるためご覧いただけません。</td>")
 (defconst mixi-news-title-regexp
   "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)\\(
 \\)?</td>")

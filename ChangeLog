@@ -1,3 +1,9 @@
+2007-06-20  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-list-regexp): Follow the change of mixi.
+	(mixi-get-diaries): Follow the change above.
+	(mixi-news-finished-regexp): Follow the change of mixi.
+
 2007-06-19  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-post-key-regexp): Follow the change of mixi.

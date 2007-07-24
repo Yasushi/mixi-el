@@ -1,3 +1,11 @@
+2007-07-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (with-mixi-retrieve): Follow the change of mixi.
+	(with-mixi-post-form): Ditto.
+	(mixi-login-form): New constant.
+	(with-mixi-retrieve): Use it.
+	(with-mixi-post-form): Ditto.
+
 2007-06-20  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-list-regexp): Follow the change of mixi.

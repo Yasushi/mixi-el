@@ -433,14 +433,15 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-logout ()
   (mixi-retrieve "/logout.pl"))
 
+(defconst mixi-login-form "<form action=\"/login.pl\" method=\"post\">")
+
 (defmacro with-mixi-retrieve (url &rest body)
   `(with-current-buffer (get-buffer-create mixi-temp-buffer-name)
      (when ,url
        (erase-buffer)
        (insert (mixi-retrieve ,url))
        (goto-char (point-min))
-       (when (search-forward
-	      "<form action=\"login.pl\" method=\"post\">" nil t)
+       (when (search-forward mixi-login-form nil t)
 	 (mixi-login)
 	 (erase-buffer)
 	 (insert (mixi-retrieve ,url))))
@@ -455,8 +456,7 @@ Increase this value when unexpected error frequently occurs."
        (erase-buffer)
        (insert (mixi-post-form ,url ,fields))
        (goto-char (point-min))
-       (when (search-forward
-	      "<form action=\"login.pl\" method=\"post\">" nil t)
+       (when (search-forward mixi-login-form nil t)
 	 (mixi-login)
 	 (erase-buffer)
 	 (insert (mixi-post-form ,url ,fields))))

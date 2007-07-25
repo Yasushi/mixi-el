@@ -2323,8 +2323,7 @@ Increase this value when unexpected error frequently occurs."
 <table border=\"0\" cellspacing=\"0\" cellpadding=\"5\" width=\"500\">
 <tr>
 <td class=\"h120\" width=\"500\">
-
-\\(.+\\)
+\\(\\(.\\|\r?\n\\)*?\\)
 </td>
 </tr>
 </table>

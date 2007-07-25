@@ -1,3 +1,7 @@
+2007-07-25  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-topic-comment-list-regexp): Fix regexp.
+
 2007-07-24  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (with-mixi-retrieve): Follow the change of mixi.

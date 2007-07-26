@@ -101,7 +101,7 @@
 (defcustom shimbun-mixi-group-alist nil
   "*An alist of mixi shimbun group definition.
 Each element looks like (NAME . URL) or (NAME . FUNCTION).
-NAME is a shimbun group name.
+NAME is a shimbun group name that you can name it as you like.
 URL is the URL for mixi access point of the group.  If URL is friend's, get
 his/her diaries as article.  If community's, get its BBSes.  If diary's or
 BBS's, get its comments.

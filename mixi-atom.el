@@ -44,6 +44,11 @@
   :type 'string
   :group 'mixi)
 
+(defcustom mixi-atom-self ""
+  "*URI for retrieving Atom Feed Documents representing this Atom feed."
+  :type 'string
+  :group 'mixi)
+
 (defcustom mixi-atom-title "Mixi Feed"
   "*Title for feed."
   :type 'string
@@ -96,7 +101,8 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
 	  " <id>" (mixi-make-tag-uri object) "</id>\n"
 	  " <updated>" (mixi-atom-make-date (mixi-object-time object))
 	  "</updated>\n"
-	  " <summary>" (mixi-remove-markup (mixi-make-content object))
+	  " <summary>" (mixi-encode-specials-string
+			(mixi-remove-markup (mixi-make-content object)))
 	  "</summary>\n"
 	  "</entry>\n"))
 
@@ -121,6 +127,7 @@ RANGE is the range for getting articles.  If RANGE is nil, get all articles."
   (concat "<?xml version=\"1.0\" encoding=\""
 	  (symbol-name mixi-atom-coding-system) "\"?>\n"
 	  "<feed xmlns=\"" mixi-atom-namespace "\">\n"
+	  "<link rel=\"self\" href=\"" mixi-atom-self "\"/>\n"
 	  "\n"
 	  "<title>" mixi-atom-title "</title>\n"
 	  "<link href=\"" mixi-url "\"/>\n"

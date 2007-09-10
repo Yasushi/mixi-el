@@ -513,6 +513,29 @@ Increase this value when unexpected error frequently occurs."
     (buffer-string)))
 
 ;; stolen (and modified) from w3m.el
+(defconst mixi-entity-alist '(("gt" . ">")
+			      ("lt" . "<")
+			      ("amp" . "&"))
+  "Alist of html character entities and values.")
+
+;; stolen (and modified) from w3m.el
+(defun mixi-encode-specials-string (str)
+  "Encode special characters in the string STR."
+  (let ((pos 0)
+	(buf))
+    (while (string-match "[<>&]" str pos)
+      (setq buf
+	    (cons ";"
+		  (cons (car (rassoc (match-string 0 str) mixi-entity-alist))
+			(cons "&"
+			      (cons (substring str pos (match-beginning 0))
+				    buf))))
+	    pos (match-end 0)))
+    (if buf
+	(apply 'concat (nreverse (cons (substring str pos) buf)))
+      str)))
+
+;; stolen (and modified) from w3m.el
 (defun mixi-url-encode-string (string)
   (apply (function concat)
 	 (mapcar

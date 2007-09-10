@@ -1,3 +1,12 @@
+2007-09-10  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-entity-alist): New constant.
+	(mixi-encode-specials-string): New function.
+	* mixi-atom.el (mixi-make-atom-entry): Use it.
+
+	* mixi-atom.el (mixi-atom-self): New constant.
+	(mixi-make-atom): Use it.
+
 2007-07-25  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-topic-comment-list-regexp): Fix regexp.

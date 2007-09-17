@@ -1,6 +1,6 @@
 ;; mixi.el --- API libraries for accessing to mixi -*- coding: euc-jp -*-
 
-;; Copyright (C) 2005,2006 OHASHI Akira
+;; Copyright (C) 2005,2006,2007 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: hypermedia
@@ -1188,7 +1188,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-title-regexp
   "<td bgcolor=\"?#FFF4E0\"? width=\"?430\"?>&nbsp;\\([^<]+\\)</td>")
 (defconst mixi-diary-content-regexp
-  "<td class=\"?h12\"? width=\"?410\"?>\\(\\(.\\|\r?\n\\)*?\\)</td>")
+  "<table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?3\"? width=\"?410\"?>\\(\\(.\\|\r?\n\\)*?\\)\\(\t\\|</tr>\r?\n\\)</table>")
 
 (defun mixi-realize-diary (diary &optional page)
   "Realize a DIARY."

@@ -1,3 +1,7 @@
+2007-09-17  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-content-regexp): Fix for retrieving photos.
+
 2007-09-10  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-entity-alist): New constant.

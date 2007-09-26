@@ -1,6 +1,6 @@
 ;; mixi.el --- API libraries for accessing to mixi -*- coding: euc-jp -*-
 
-;; Copyright (C) 2005,2006,2007 OHASHI Akira
+;; Copyright (C) 2005, 2006, 2007 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: hypermedia

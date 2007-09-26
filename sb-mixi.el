@@ -1,6 +1,6 @@
 ;;; sb-mixi.el --- shimbun backend for mixi
 
-;; Copyright (C) 2006 OHASHI Akira
+;; Copyright (C) 2006, 2007 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: news
@@ -192,7 +192,9 @@ of mixi object."
 					 &optional range)
   (let ((url-or-function (cdr (assoc (shimbun-current-group-internal shimbun)
 				     (shimbun-mixi-group-alist))))
-	(range (when (integerp range) (* range shimbun-mixi-page-articles))))
+	(pages (shimbun-header-index-pages range)))
+    (when (integerp pages)
+      (setq range (* pages shimbun-mixi-page-articles)))
     (shimbun-sort-headers
      (shimbun-mixi-get-headers shimbun
 			       (mixi-make-objects url-or-function range)

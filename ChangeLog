@@ -1,3 +1,7 @@
+2007-09-26  OHASHI Akira  <bg66@koka-in.org>
+
+	* sb-mixi.el (shimbun-get-headers): Use `shimbun-header-index-pages'.
+
 2007-09-25  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-topic-content-regexp): Fix regexp.

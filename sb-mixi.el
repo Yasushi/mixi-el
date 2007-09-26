@@ -192,9 +192,9 @@ of mixi object."
 					 &optional range)
   (let ((url-or-function (cdr (assoc (shimbun-current-group-internal shimbun)
 				     (shimbun-mixi-group-alist))))
-	(pages (shimbun-header-index-pages range)))
-    (when (integerp pages)
-      (setq range (* pages shimbun-mixi-page-articles)))
+	(range (shimbun-header-index-pages range)))
+    (when (integerp range)
+      (setq range (* range shimbun-mixi-page-articles)))
     (shimbun-sort-headers
      (shimbun-mixi-get-headers shimbun
 			       (mixi-make-objects url-or-function range)

@@ -1,3 +1,9 @@
+2007-09-27  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-url-retrieve): Add a URL to error messages.
+	(mixi-w3m-retrieve): Ditto.
+	(mixi-curl-retrieve): Ditto.
+
 2007-09-26  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-get-headers): Use `shimbun-header-index-pages'.

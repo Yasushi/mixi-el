@@ -168,12 +168,16 @@
 	  ((eq class 'mixi-friend)
 	   (if (mixi-object-realized-p object)
 	       (let ((sex (if (eq (mixi-friend-sex object) 'male) "男" "女"))
-		     (age (number-to-string (mixi-friend-age object)))
-		     (birthday
-		      (concat (mapconcat (lambda (number)
-					   (number-to-string number))
-					 (mixi-friend-birthday object) "月")
-			      "日"))
+		     (age (if (numberp (mixi-friend-age object))
+			      (number-to-string (mixi-friend-age object))
+			    "??"))
+		     (birthday (if (mixi-friend-birthday object)
+				   (concat
+				    (mapconcat (lambda (number)
+						 (number-to-string number))
+					       (mixi-friend-birthday object)
+					       "月") "日")
+				 "??月??日"))
 		     (blood-type (symbol-name
 				  (mixi-friend-blood-type object)))
 		     (hobby (mapconcat 'identity

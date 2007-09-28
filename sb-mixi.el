@@ -118,6 +118,11 @@ of mixi object."
 			      (const :tag "Logs" mixi-get-logs)
 			      (function :tag "Other function")))))
 
+(defcustom shimbun-mixi-get-profile-with-diary t
+  "*If non-nil, get his/her profile together with diaries."
+  :group 'shimbun
+  :type 'boolean)
+
 ;; FIXME: Don't use this user option.
 (defcustom shimbun-mixi-page-articles 10
   "*How many articles are there in one page."
@@ -154,6 +159,11 @@ of mixi object."
     (catch 'stop
       (while objects
 	(let ((object (car objects)))
+	  (when (and shimbun-mixi-get-profile-with-diary
+		     (mixi-diary-p object))
+	    (let ((owner (mixi-diary-owner object)))
+	      (unless (mixi-object-realized-p owner)
+		(mixi-realize-friend owner))))
 	  (when (mixi-parent-p object)
 	    (let* ((comments (mixi-get-comments object range))
 		   (comment-headers (shimbun-mixi-get-headers shimbun

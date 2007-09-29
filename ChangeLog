@@ -1,3 +1,7 @@
+2007-09-30  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-friend-profile-regexp): Fix regexp.
+
 2007-09-28  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-utils.el (mixi-make-content): Fix for closed users.

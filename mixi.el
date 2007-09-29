@@ -854,7 +854,7 @@ Increase this value when unexpected error frequently occurs."
   "½ê\\(&nbsp;\\| \\)Â°</font></td>\n<td[^>]*>\\(.+?\\)\\(</td>\\| <img\\)")
 (defconst mixi-friend-profile-regexp
   "¼«¸Ê¾Ò²ð</font></td>
-<td class=\"?h120\"?>\\(.+\\)</td></tr>")
+<td class=\"?h120\"? width=\"?345\"?>\\(\\(.\\|\r?\n\\)*?\\)</td></tr>")
 
 (defun mixi-realize-friend (friend)
   "Realize a FRIEND."

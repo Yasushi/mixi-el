@@ -178,8 +178,10 @@
 					       (mixi-friend-birthday object)
 					       "月") "日")
 				 "??月??日"))
-		     (blood-type (symbol-name
-				  (mixi-friend-blood-type object)))
+		     (blood-type (if (mixi-friend-blood-type object)
+				     (symbol-name
+				      (mixi-friend-blood-type object))
+				   "?"))
 		     (hobby (mapconcat 'identity
 				       (mixi-friend-hobby object) ", ")))
 		 (concat "<dl>"

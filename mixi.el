@@ -52,7 +52,7 @@
 ;; 
 ;; Utilities:
 ;;
-;;  * mixi-remove-markup
+;;  * mixi-remove-markup (half broken)
 
 ;; Examples:
 ;;
@@ -1937,7 +1937,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-event-detail-regexp
   "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>詳細</td>
 <td bgcolor=\"?#FFFFFF\"? class=\"?h120\"? width=\"?410\"?>
-<div style=\"?padding:5px\"?>\\(.+\\)</div>")
+<div style=\"?padding:5px\"?>\\(\\(.\\|\r?\n\\)*?\\)</div>")
 (defconst mixi-event-limit-regexp
   "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>募集期限</td>
 ?<td bgcolor=\"?#FFFFFF\"?>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")

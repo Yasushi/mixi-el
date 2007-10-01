@@ -1,5 +1,7 @@
 2007-10-01  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-post-succeed-regexp):  Follow the change of mixi.
+
 	* mixi.el (mixi-diary-comment-list-regexp): Follow the change of mixi.
 	(mixi-get-comments): Follow the change above.
 

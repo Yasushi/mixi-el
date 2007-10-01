@@ -1,5 +1,63 @@
 2007-10-01  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
+	(mixi-friend-name-regexp): Ditto.
+	(mixi-friend-sex-regexp): Ditto.
+	(mixi-friend-address-regexp): Ditto.
+	(mixi-friend-age-regexp): Ditto.
+	(mixi-friend-birthday-regexp): Ditto.
+	(mixi-friend-blood-type-regexp): Ditto.
+	(mixi-friend-birthplace-regexp): Ditto.
+	(mixi-friend-hobby-regexp): Ditto.
+	(mixi-friend-job-regexp): Ditto.
+	(mixi-friend-organization-regexp): Ditto.
+	(mixi-friend-profile-regexp): Ditto.
+	(mixi-realize-friend): Ditto.
+	(mixi-friend-list-nick-regexp): Ditto.
+	(mixi-diary-owner-nick-regexp): Ditto.
+	(mixi-diary-title-regexp): Ditto.
+	(mixi-diary-time-regexp): Ditto.
+	(mixi-diary-content-regexp): Ditto.
+	(mixi-realize-diary): Ditto.
+	(mixi-diary-list-regexp): Ditto.
+	(mixi-new-diary-list-regexp): Ditto.
+	(mixi-get-diaries): Ditto.
+	(mixi-community-name-regexp): Ditto.
+	(mixi-community-birthday-regexp): Ditto.
+	(mixi-community-owner-regexp): Ditto.
+	(mixi-community-category-regexp): Ditto.
+	(mixi-community-members-regexp): Ditto.
+	(mixi-community-open-level-regexp): Ditto.
+	(mixi-community-authority-regexp): Ditto.
+	(mixi-community-description-regexp): Ditto.
+	(mixi-community-list-name-regexp): Ditto.
+	(mixi-search-community-list-regexp): Ditto.
+	(mixi-topic-community-regexp): Ditto.
+	(mixi-topic-title-regexp): Ditto.
+	(mixi-topic-time-regexp): Ditto.
+	(mixi-topic-owner-regexp): Ditto.
+	(mixi-topic-content-regexp): Ditto.
+	(mixi-event-community-regexp): Ditto.
+	(mixi-event-title-regexp): Ditto.
+	(mixi-event-time-regexp): Ditto.
+	(mixi-event-date-regexp): Ditto.
+	(mixi-event-place-regexp): Ditto.
+	(mixi-event-owner-regexp): Ditto.
+	(mixi-event-owner-seceded-regexp): Ditto.
+	(mixi-event-detail-regexp): Ditto.
+	(mixi-event-limit-regexp): Ditto.
+	(mixi-event-members-regexp): Ditto.
+	(mixi-realize-event): Ditto.
+	(mixi-bbs-list-regexp): Ditto.
+	(mixi-new-bbs-list-regexp): Ditto.
+	(mixi-search-bbs-list-regexp): Ditto.
+	(mixi-diary-comment-list-regexp): Ditto.
+	(mixi-topic-comment-list-regexp): Ditto.
+	(mixi-event-comment-list-regexp): Ditto.
+	(mixi-get-comments): Ditto.
+	(mixi-new-comment-list-regexp): Ditto.
+	* mixi-utils.el (mixi-make-content): Follow the change above.
+
 	* mixi.el (mixi-event-detail-regexp): Fix regexp.
 
 2007-09-30  OHASHI Akira  <bg66@koka-in.org>

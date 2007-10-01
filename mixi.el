@@ -825,36 +825,29 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_profile.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<img \\(alt=\"\\*\" \\)?src=\"?http://img\\.mixi\\.jp/img/dot0\\.gif\"? width=\"?1\"? height=\"?5\"?\\( /\\)?><br\\( /\\)?>?
-\\(.*\\)さん([0-9]+)")
+  "<h3>\\(.*\\)さん([0-9]+)</h3>")
 (defconst mixi-friend-name-regexp
-  "名\\(&nbsp;\\| \\)前</font></td>
-
-?<td width=\"?345\"?>\\(.+?\\)\\(</td>\\| <img\\)")
+  "<dt>名前</dt>\n?<dd>\\(.+?\\)\\(<img\\|</dd>\\)")
 (defconst mixi-friend-sex-regexp
-  "性\\(&nbsp;\\| \\)別</font></td>
-
-?<td width=\"?345\"?>\\([男女]\\)性\\(</td>\\| <img\\)")
+  "<dt>性別</dt>\n?<dd>\\([男女]\\)性\\(<img\\|</dd>\\)")
 (defconst mixi-friend-address-regexp
-  "現住所</font></td>
-<td>\\(.+?\\)\\(</td>\\| <img\\)")
+  "<dt>現住所</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
 (defconst mixi-friend-age-regexp
-  "年\\(&nbsp;\\| \\)齢</font></td>\n<td>\\([0-9]+\\)歳\\(</td>\\| <img\\)")
+  "<dt>年齢</dt>\n?<dd>\\([0-9]+\\)歳\\( <img\\|</dd>\\)")
 (defconst mixi-friend-birthday-regexp
-  "誕生日</font></td>\n<td>\\([0-9]+\\)月\\([0-9]+\\)日\\(</td>\\| <img\\)")
+  "<dt>誕生日</dt>\n?<dd>\\([0-9]+\\)月\\([0-9]+\\)日\\(<img \\|</dd>\\)")
 (defconst mixi-friend-blood-type-regexp
-  "血液型</font></td>\n<td>\\([ABO]B?\\)型\\(</td>\\| <img\\)")
+  "<dt>血液型</dt>\n?<dd>\\([ABO]B?\\)型\\(<img \\|</dd>\\)")
 (defconst mixi-friend-birthplace-regexp
-  "出身地</font>\n?</td>\n<td>\\(.+?\\)\\(</td>\\| <img\\)")
+  "<dt>出身地</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
 (defconst mixi-friend-hobby-regexp
-  "趣\\(&nbsp;\\| \\)味</font></td>\n<td>\\(.+?\\)\\(</td>\\| <img\\)")
+  "<dt>趣味</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
 (defconst mixi-friend-job-regexp
-  "職\\(&nbsp;\\| \\)業</font></td>\n<td>\\(.+?\\)\\(</td>\\| <img\\)")
+  "<dt>職業</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
 (defconst mixi-friend-organization-regexp
-  "所\\(&nbsp;\\| \\)属</font></td>\n<td[^>]*>\\(.+?\\)\\(</td>\\| <img\\)")
+  "<dt>所属</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
 (defconst mixi-friend-profile-regexp
-  "自己紹介</font></td>
-<td class=\"?h120\"? width=\"?345\"?>\\(\\(.\\|\r?\n\\)*?\\)</td></tr>")
+  "<dt>自己紹介</dt>\n?<dd class=\"userInput\">\\(.+?\\)</dd>")
 
 (defun mixi-realize-friend (friend)
   "Realize a FRIEND."
@@ -863,17 +856,17 @@ Increase this value when unexpected error frequently occurs."
     (with-mixi-retrieve (mixi-friend-page friend)
       (let ((case-fold-search t))
 	(if (re-search-forward mixi-friend-nick-regexp nil t)
-	    (mixi-friend-set-nick friend (match-string 4))
+	    (mixi-friend-set-nick friend (match-string 1))
 	  (mixi-realization-error 'cannot-find-nick friend))
 	(when (re-search-forward mixi-friend-name-regexp nil t)
-	  (mixi-friend-set-name friend (match-string 2)))
+	  (mixi-friend-set-name friend (match-string 1)))
 	(when (re-search-forward mixi-friend-sex-regexp nil t)
-	  (mixi-friend-set-sex friend (if (string= (match-string 2) "男")
+	  (mixi-friend-set-sex friend (if (string= (match-string 1) "男")
 					  'male 'female)))
 	(when (re-search-forward mixi-friend-address-regexp nil t)
 	  (mixi-friend-set-address friend (match-string 1)))
 	(when (re-search-forward mixi-friend-age-regexp nil t)
-	  (mixi-friend-set-age friend (string-to-number (match-string 2))))
+	  (mixi-friend-set-age friend (string-to-number (match-string 1))))
 	(when (re-search-forward mixi-friend-birthday-regexp nil t)
 	  (mixi-friend-set-birthday
 	   friend (list (string-to-number (match-string 1))
@@ -883,11 +876,11 @@ Increase this value when unexpected error frequently occurs."
 	(when (re-search-forward mixi-friend-birthplace-regexp nil t)
 	  (mixi-friend-set-birthplace friend (match-string 1)))
 	(when (re-search-forward mixi-friend-hobby-regexp nil t)
-	  (mixi-friend-set-hobby friend (split-string (match-string 2) ", ")))
+	  (mixi-friend-set-hobby friend (split-string (match-string 1) ", ")))
 	(when (re-search-forward mixi-friend-job-regexp nil t)
-	  (mixi-friend-set-job friend (match-string 2)))
+	  (mixi-friend-set-job friend (match-string 1)))
 	(when (re-search-forward mixi-friend-organization-regexp nil t)
-	  (mixi-friend-set-organization friend (match-string 2)))
+	  (mixi-friend-set-organization friend (match-string 1)))
 	(when (re-search-forward mixi-friend-profile-regexp nil t)
 	  (mixi-friend-set-profile friend (match-string 1)))))
     (mixi-object-touch friend)))
@@ -1062,7 +1055,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-friend-list-id-regexp
   "<a href=\"?show_friend\\.pl\\?id=\\([0-9]+\\)\"?")
 (defconst mixi-friend-list-nick-regexp
-  "<td valign=\"?top\"?>\\(.+\\)さん([0-9]+)")
+  "<span>\\(.+\\)さん([0-9]+)</span>")
 
 ;;;###autoload
 (defun mixi-get-friends (&rest friend-or-range)
@@ -1182,13 +1175,18 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-closed-regexp
   "<td>友人\\(の友人\\)?まで公開のため読むことが出来ません。</td>")
 (defconst mixi-diary-owner-nick-regexp
-  "<td width=\"?490\"? background=\"?http://img\\.mixi\\.jp/img/bg_w\\.gif\"?><b><font color=\"?#605048\"?>\\(.+?\\)\\(さん\\)?の日記</font></b></td>")
-(defconst mixi-diary-time-regexp
-  "<td align=\"?center\"? rowspan=\"?[23]\"? nowrap\\(=\"?nowrap\"?\\)? width=\"?95\"? bgcolor=\"?#FFD8B0\"?>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br\\( /\\)?>\\([0-9]+\\):\\([0-9]+\\)</td>")
+  "<div class=\"diaryTitle\\(Friend\\)? clearfix\">
+<h2>\\(.+?\\)\\(さん\\)?の日記</h2>")
 (defconst mixi-diary-title-regexp
-  "<td bgcolor=\"?#FFF4E0\"? width=\"?430\"?>&nbsp;\\([^<]+\\)</td>")
+  "<div class=\"listDiaryTitle\">
+<dl class=\"clearfix\">
+<dt>\\([^<\n]+\\)\\(<span>\\)?")
+(defconst mixi-diary-time-regexp
+  "<dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日\\([0-9]+\\):\\([0-9]+\\)</dd>")
 (defconst mixi-diary-content-regexp
-  "<table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?3\"? width=\"?410\"?>\\(\\(.\\|\r?\n\\)*?\\)\\(\t\\|</tr>\r?\n\\)</table>")
+  "<div class=\"txtconfirmArea\">
+\\(\\(.\\|\r?\n\\)*?\\)
+<!--/viewDiaryBox--></div>")
 
 (defun mixi-realize-diary (diary &optional page)
   "Realize a DIARY."
@@ -1199,19 +1197,19 @@ Increase this value when unexpected error frequently occurs."
 	(unless (re-search-forward mixi-diary-closed-regexp nil t)
 	  (if (re-search-forward mixi-diary-owner-nick-regexp nil t)
 	      (mixi-friend-set-nick (mixi-diary-owner diary)
-				    (match-string 1))
+				    (match-string 2))
 	    (mixi-realization-error 'cannot-find-owner-nick diary))
-	  (if (re-search-forward mixi-diary-time-regexp nil t)
-	      (mixi-diary-set-time
-	       diary (encode-time 0 (string-to-number (match-string 7))
-				  (string-to-number (match-string 6))
-				  (string-to-number (match-string 4))
-				  (string-to-number (match-string 3))
-				  (string-to-number (match-string 2))))
-	    (mixi-realization-error 'cannot-find-time diary))
 	  (if (re-search-forward mixi-diary-title-regexp nil t)
 	      (mixi-diary-set-title diary (match-string 1))
 	    (mixi-realization-error 'cannot-find-title diary))
+	  (if (re-search-forward mixi-diary-time-regexp nil t)
+	      (mixi-diary-set-time
+	       diary (encode-time 0 (string-to-number (match-string 5))
+				  (string-to-number (match-string 4))
+				  (string-to-number (match-string 3))
+				  (string-to-number (match-string 2))
+				  (string-to-number (match-string 1))))
+	    (mixi-realization-error 'cannot-find-time diary))
 	  (if (re-search-forward mixi-diary-content-regexp nil t)
 	      (mixi-diary-set-content diary (match-string 1))
 	    (mixi-realization-error 'cannot-find-content diary)))))
@@ -1287,9 +1285,9 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-diary-list-regexp
-  "<tr VALIGN=top>
-<td ALIGN=center ROWSPAN=3 NOWRAP bgcolor=#F2DDB7><font COLOR=#996600>\\([0-9]+\\)年<br />\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</font>\\(<br><input type=\"checkbox\" name=\"diary_id\" value=\"[0-9]+\">\\|\\)</td>
-<td bgcolor=\"#FFF4E0\">&nbsp;<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a></td>")
+  "<dt>\\(<input name=\"diary_id\" type=\"checkbox\" value=\"[0-9]+\"  />\\|\\)<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a>\\(<span><a href=\"edit_diary\\.pl\\?id=[0-9]+\">編集する</a></span>\\|\\)</dt>
+<dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日\n?\\([0-9]+\\):\\([0-9]+\\)</dd>
+</dl>")
 
 ;;;###autoload
 (defun mixi-get-diaries (&rest friend-or-range)
@@ -1308,22 +1306,22 @@ Increase this value when unexpected error frequently occurs."
 					 mixi-diary-list-regexp
 					 range)))
       (mapcar (lambda (item)
-		(mixi-make-diary friend (nth 6 item) nil
+		(mixi-make-diary friend (nth 1 item) nil
 				 (encode-time
-				  0 (string-to-number (nth 4 item))
-				  (string-to-number (nth 3 item))
-				  (string-to-number (nth 2 item))
-				  (string-to-number (nth 1 item))
-				  (string-to-number (nth 0 item)))
-				  (nth 7 item)))
+				  0 (string-to-number (nth 8 item))
+				  (string-to-number (nth 7 item))
+				  (string-to-number (nth 6 item))
+				  (string-to-number (nth 5 item))
+				  (string-to-number (nth 4 item)))
+				  (nth 2 item)))
 	      items))))
 
 (defmacro mixi-new-diary-list-page ()
   `(concat "/new_friend_diary.pl?page=%d"))
 
 (defconst mixi-new-diary-list-regexp
-  "<td WIDTH=180><img src=http://img\\.mixi\\.jp/img/pen\\.gif ALIGN=left WIDTH=14 HEIGHT=16>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td>
-<td WIDTH=450><a class=\"new_link\" href=view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)>\\(.+\\)</a> (\\(.*\\)) ")
+  "<dt>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</dt>
+<dd><a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\">\\(.+\\)</a> (\\(.*\\))<div ")
 
 ;;;###autoload
 (defun mixi-get-new-diaries (&optional range)
@@ -1458,40 +1456,35 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-nodata-regexp
   "^データがありません")
 (defconst mixi-community-name-regexp
-  "<td width=\"?345\"?>\\(.*\\)</td></tr>")
+  "<div class=\"pageTitle communityTitle002\">
+<h2>\\(.*\\)</h2>")
 (defconst mixi-community-birthday-regexp
-  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>開設日</font></td>
-<td width=\"?345\"?>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日")
+  "<dt>開設日</dt>
+<dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br />")
 ;; FIXME: Care when the owner has seceded.
 (defconst mixi-community-owner-regexp
-  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>管理人</font></td>
-<td width=\"?345\"?>
-<table style=\"width: 100%;\"><tr><td>
+  "<dt>管理人</dt>
+<dd>
 <a href=\"\\(home\\.pl\\|show_friend\\.pl\\?id=\\([0-9]+\\)\\)\">\\(.*\\)</a>")
 (defconst mixi-community-category-regexp
-  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>カテゴリ</font></td>
-<td width=\"?345\"?>
-\\(.+\\)
-</td>")
+  "<dt>カテゴリ</dt>
+<dd>\\(.+\\)</dd>")
 (defconst mixi-community-members-regexp
-  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>メンバー数</font></td>
-<td width=\"?345\"?>
-\\([0-9]+\\)人
-</td>")
+  "<dt>メンバー数</dt>
+<dd>\\([0-9]+\\)人</dd>")
 (defconst mixi-community-open-level-regexp
-  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>参加条件と<br />公開レベル</font></td>
-<td width=\"?345\"?>
-\\(.+\\)
-</td>")
+  "<dt>参加条件と<br />公開レベル</dt>
+<dd>\\(.+\\)</dd>")
 (defconst mixi-community-authority-regexp
-  "<td bgcolor=\"?#F2DDB7\"? width=\"?80\"?><font color=\"?#996600\"?>トピック作成の権限</font></td>
-<td width=\"?345\"?>
+  "<dt>トピックの<br />作成権限</dt>
+<dd>
 \\(.+\\)
 
 
-</td>")
+</dd>")
 (defconst mixi-community-description-regexp
-  "<td class=\"?h120\"? width=\"?345\"?>\\(.+\\)</td>")
+  "<div id=\"communityIntro\">
+<p>\\(.+\\)</p>")
 
 (defun mixi-realize-community (community)
   "Realize a COMMUNITY."
@@ -1657,7 +1650,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-list-id-regexp
   "<a href=\"?view_community\\.pl\\?id=\\([0-9]+\\)\"?")
 (defconst mixi-community-list-name-regexp
-  "<td valign=\"?top\"?>\\(.+\\)([0-9]+)")
+  "<span>\\(.+\\)([0-9]+)</span>")
 
 ;;;###autoload
 (defun mixi-get-communities (&rest friend-or-range)
@@ -1692,9 +1685,7 @@ Increase this value when unexpected error frequently occurs."
 	   "&category_id=0"))
 
 (defconst mixi-search-community-list-regexp
-  "<td WIDTH=90 VALIGN=top ROWSPAN=4 ALIGN=center background=http://img\\.mixi\\.jp/img/bg_line\\.gif><a href=\"view_community\\.pl\\?id=\\([0-9]+\\)\"><img SRC=\"http://img-c[0-9]+\\.mixi\\.jp/photo/comm/[^.]+\\.jpg\" VSPACE=3 border=0></a></td>
-<td NOWRAP WIDTH=90 BGCOLOR=#FDF9F2><font COLOR=#996600>コミュニティ名</font></td>
-<td COLSPAN=2 WIDTH=370 BGCOLOR=#FFFFFF>\\([^<]+\\)</td></tr>")
+  "<dt class=\"communityTitle\"><a href=\"view_community\\.pl\\?id=\\([0-9]+\\)\">\\(.+\\) ([0-9]+)</a>")
 
 ;; FIXME: Support category.
 ;;;###autoload
@@ -1736,15 +1727,16 @@ Increase this value when unexpected error frequently occurs."
 	   "&comm_id=" (mixi-community-id (mixi-topic-community ,topic))))
 
 (defconst mixi-topic-community-regexp
-  "<td width=\"595\" background=\"http://img\\.mixi\\.jp/img/bg_w\\.gif\"><b>\\[\\(.+\\)\\] トピック</b></td>")
-(defconst mixi-topic-time-regexp
-  "<td rowspan=\"3\" width=\"110\" bgcolor=\"#ffd8b0\" align=\"center\" valign=\"top\" nowrap>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)</td>")
+  "<div class=\"pageTitle communityTitle002\">
+<h2>\\(.+\\) トピック</h2>")
 (defconst mixi-topic-title-regexp
-  "<td bgcolor=\"#fff4e0\">&nbsp;\\([^<]+\\)</td>")
+  "<span class=\"title\">\\([^<]+\\)</span>")
+(defconst mixi-topic-time-regexp
+  "<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span>")
 (defconst mixi-topic-owner-regexp
-  "<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#dfb479\"></font>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)\\(さん\\)?</a>")
+  "<dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)\\(さん\\)?</a>")
 (defconst mixi-topic-content-regexp
-  "<table width=\"500\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"h120\" width=\"500\"><table><tr>\\(\\(.\\|\r?\n\\)*?\\)</td></tr></table>")
+  "<dd>\\(\\(.\\|\r?\n\\)*?\\)</dd>")
 
 (defun mixi-realize-topic (topic &optional page)
   "Realize a TOPIC."
@@ -1755,6 +1747,9 @@ Increase this value when unexpected error frequently occurs."
 	  (mixi-community-set-name (mixi-topic-community topic)
 				   (match-string 1))
 	(mixi-realization-error 'cannot-find-community topic))
+      (if (re-search-forward mixi-topic-title-regexp nil t)
+	  (mixi-topic-set-title topic (match-string 1))
+	(mixi-realization-error 'cannot-find-title topic))
       (if (re-search-forward mixi-topic-time-regexp nil t)
 	  (mixi-topic-set-time
 	   topic (encode-time 0 (string-to-number (match-string 5))
@@ -1763,9 +1758,6 @@ Increase this value when unexpected error frequently occurs."
 			      (string-to-number (match-string 2))
 			      (string-to-number (match-string 1))))
 	(mixi-realization-error 'cannot-find-time topic))
-      (if (re-search-forward mixi-topic-title-regexp nil t)
-	  (mixi-topic-set-title topic (match-string 1))
-	(mixi-realization-error 'cannot-find-title topic))
       (if (re-search-forward mixi-topic-owner-regexp nil t)
 	  (mixi-topic-set-owner topic (mixi-make-friend (match-string 1)
 							(match-string 2)))
@@ -1912,44 +1904,31 @@ Increase this value when unexpected error frequently occurs."
 	   "&comm_id=" (mixi-community-id (mixi-event-community ,event))))
 
 (defconst mixi-event-community-regexp
-  "<td width=\"?595\"? background=\"?http://img\\.mixi\\.jp/img/bg_w\\.gif\"?><b>\\[\\(.+\\)\\] イベント</b></td>")
-(defconst mixi-event-time-regexp
-  "<td rowspan=\"?11\"? bgcolor=\"?#FFD8B0\"? align=\"?center\"? valign=\"?top\"? width=\"?110\"?>
-?\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
-?\\([0-9]+\\):\\([0-9]+\\)
-</td>")
+  "<div class=\"pageTitle communityTitle002\">
+<h2>\\(.+\\) イベント</h2>")
 (defconst mixi-event-title-regexp
-  "<td bgcolor=\"?#FFF4E0\"?\\( width=\"?410\"?\\)?>&nbsp;\\([^<]+\\)</td>")
-(defconst mixi-event-owner-regexp
-  "<td bgcolor=\"?#FDF9F2\"?>&nbsp;<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>")
-(defconst mixi-event-owner-seceded-regexp
-  "<td bgcolor=\"?#FDF9F2\"?>&nbsp;\\((mixi 退会済)\\)")
+  "<span class=\"title\">\\([^<]+\\)</span>")
+(defconst mixi-event-time-regexp
+  "<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span>")
 (defconst mixi-event-date-regexp
-  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>開催日時</td>
-<td bgcolor=\"?#FFFFFF\"?>
-&nbsp;\\(.+\\)
-</td>")
+  "<dt>開催日時</dt>
+<dd>\\(.+\\)</dd>")
 (defconst mixi-event-place-regexp
-  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>開催場所</td>
-<td bgcolor=\"?#FFFFFF\"?>
-&nbsp;\\(.+\\)
-</td>")
+  "<dt>開催場所</dt>
+<dd>\\(.+\\)</dd>")
+(defconst mixi-event-owner-regexp
+  "<dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></dt>")
+(defconst mixi-event-owner-seceded-regexp
+  "<dt>\\((mixi 退会済)\\)</dt>")
 (defconst mixi-event-detail-regexp
-  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>詳細</td>
-<td bgcolor=\"?#FFFFFF\"? class=\"?h120\"? width=\"?410\"?>
-<div style=\"?padding:5px\"?>\\(\\(.\\|\r?\n\\)*?\\)</div>")
+  "<dd>\\(\\(.\\|\r?\n\\)*?\\)</dd>
+</dl>")
 (defconst mixi-event-limit-regexp
-  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>募集期限</td>
-?<td bgcolor=\"?#FFFFFF\"?>&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日</td>")
+  "<dt>募集期限</dt>
+<dd>\\(.+\\)</dd>")
 (defconst mixi-event-members-regexp
-  "<td bgcolor=\"?#FFFFFF\"? align=\"?center\"? nowrap>参加者</td>
-<td bgcolor=\"?#FFFFFF\"?>
-
-?
-?<table border=\"?0\"? cellspacing=\"?0\"? cellpadding=\"?0\"? width=\"?100%\"?>
-<tr>
-
-?<td>&nbsp;\\(.+\\)</td>")
+  "<dt>参加者</dt>
+<dd>\\(.+\\)</dd>")
 
 (defun mixi-realize-event (event &optional page)
   "Realize a EVENT."
@@ -1961,6 +1940,9 @@ Increase this value when unexpected error frequently occurs."
 	    (mixi-community-set-name (mixi-event-community event)
 				     (match-string 1))
 	  (mixi-realization-error 'cannot-find-community event))
+	(if (re-search-forward mixi-event-title-regexp nil t)
+	    (mixi-event-set-title event (match-string 1))
+	  (mixi-realization-error 'cannot-find-title event))
 	(if (re-search-forward mixi-event-time-regexp nil t)
 	    (mixi-event-set-time
 	     event (encode-time 0 (string-to-number (match-string 5))
@@ -1969,9 +1951,12 @@ Increase this value when unexpected error frequently occurs."
 				(string-to-number (match-string 2))
 				(string-to-number (match-string 1))))
 	  (mixi-realization-error 'cannot-find-time event))
-	(if (re-search-forward mixi-event-title-regexp nil t)
-	    (mixi-event-set-title event (match-string 2))
-	  (mixi-realization-error 'cannot-find-title event))
+	(if (re-search-forward mixi-event-date-regexp nil t)
+	    (mixi-event-set-date event (match-string 1))
+	  (mixi-realization-error 'cannot-find-date event))
+	(if (re-search-forward mixi-event-place-regexp nil t)
+	    (mixi-event-set-place event (match-string 1))
+	  (mixi-realization-error 'cannot-find-place event))
 	(if (re-search-forward mixi-event-owner-regexp nil t)
 	    (mixi-event-set-owner event (mixi-make-friend (match-string 1)
 							  (match-string 2)))
@@ -1979,20 +1964,12 @@ Increase this value when unexpected error frequently occurs."
 	      (mixi-event-set-owner event
 				    (mixi-make-friend nil (match-string 1)))
 	    (mixi-realization-error 'cannot-find-owner event)))
-	(if (re-search-forward mixi-event-date-regexp nil t)
-	    (mixi-event-set-date event (match-string 1))
-	  (mixi-realization-error 'cannot-find-date event))
-	(if (re-search-forward mixi-event-place-regexp nil t)
-	    (mixi-event-set-place event (match-string 1))
-	  (mixi-realization-error 'cannot-find-place event))
 	(if (re-search-forward mixi-event-detail-regexp nil t)
 	    (mixi-event-set-detail event (match-string 1))
 	  (mixi-realization-error 'cannot-find-detail event))
-	(when (re-search-forward mixi-event-limit-regexp nil t)
-	  (mixi-event-set-limit
-	   event (encode-time 0 0 0 (string-to-number (match-string 3))
-			      (string-to-number (match-string 2))
-			      (string-to-number (match-string 1)))))
+	(if (re-search-forward mixi-event-limit-regexp nil t)
+	  (mixi-event-set-limit event (match-string 1))
+	  (mixi-realization-error 'cannot-find-limit event))
 	(if (re-search-forward mixi-event-members-regexp nil t)
 	    (mixi-event-set-members event (match-string 1))
 	  (mixi-realization-error 'cannot-find-members event))))
@@ -2169,7 +2146,7 @@ Increase this value when unexpected error frequently occurs."
 	   "&id=" (mixi-community-id ,community)))
 
 (defconst mixi-bbs-list-regexp
-  "<a href=view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)")
+  "<a href=\"?view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)")
 
 ;;;###autoload
 (defun mixi-get-bbses (community &optional range)
@@ -2191,7 +2168,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/new_bbs.pl?page=%d"))
 
 (defconst mixi-new-bbs-list-regexp
-  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\" class=\"new_link\">")
+  "<dd><a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\">")
 
 ;;;###autoload
 (defun mixi-get-new-bbses (&optional range)
@@ -2222,7 +2199,7 @@ Increase this value when unexpected error frequently occurs."
 	   "&community_id=0&category_id=0"))
 
 (defconst mixi-search-bbs-list-regexp
-  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\"><img src=http://img\\.mixi\\.jp/img/shbtn\\.gif ALT=詳細を見る BORDER=0 WIDTH=104 HEIGHT=19></a>")
+  "<a href=\"view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\" class=\"title\">")
 
 ;; FIXME: Support community and category.
 ;;;###autoload
@@ -2291,32 +2268,31 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-diary-comment-list-regexp
-  "<td rowspan=\"2\" align=\"center\" width=\"95\" bgcolor=\"#f2ddb7\" nowrap>
-\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>\\([0-9]+\\):\\([0-9]+\\)\\(<br>
-<input type=checkbox name=comment_id value=\".+\">
-\\|\\)
-</td>
-<td ALIGN=center BGCOLOR=#FDF9F2 WIDTH=430>
-<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"410\">
-<tr>
-\\(<td>\\)
-<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
+  "<span class=\"commentTitleName\">\\(<input type=\"checkbox\" name=\"comment_id\" value=\".+\" />
+\\|\\)<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
+</span>
 
-\\(<font color=\"#f2ddb7\">|</font> <a href=[^>]+>削除</a>
+<span class=\"commentTitleDate\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</span>
 
-\\|\\)</td>
-</tr>
-</table>
-</td>
-</tr>
-<!-- [^ ]+ : start -->
-<tr>
-<td bgcolor=\"#ffffff\">
-<table BORDER=0 CELLSPACING=0 CELLPADDING=[35] WIDTH=410>
-<tr>
-<td CLASS=h12 width=\"410\">
+
+?
+</dt>
+
+
+
+
+
+
+
+
+
+
+
+
+?
+<dd>
 \\(.+\\)
-</td></tr></table>")
+</dd>")
 
 (defun mixi-topic-comment-list-page (topic)
   (concat "/view_bbs.pl?page=all"
@@ -2325,33 +2301,13 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-topic-comment-list-regexp
-  "<tr valign=\"top\">
-<td rowspan=\"2\" width=\"110\" bgcolor=\"#f2ddb7\" align=\"center\" nowrap>
-\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
-\\([0-9]+\\):\\([0-9]+\\)<br>
-\\(<input type=\"checkbox\" name=\"comment_id\" value=\".+\">
-\\|\\)</td>
-<td bgcolor=\"#fdf9f2\">&nbsp;<font color=\"#f8a448\">
-<b>[^<]+</b>:</font>&nbsp;
-\\(
-\\|\\) *<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
-
-?\\(
-
-\\|<font color=\"#f2ddb7\">|&nbsp;</font><a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+\">削除</a>
-\\|\\)</td>
-</tr>
-<tr>
-<td bgcolor=\"#ffffff\" align=\"center\">
-<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\" width=\"500\">
-<tr>
-<td class=\"h120\" width=\"500\">
+  "<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
+<dd>
+<dl class=\"commentContent01\">
+<dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></dt>
+<dd>
 \\(\\(.\\|\r?\n\\)*?\\)
-</td>
-</tr>
-</table>
-</td>
-</tr>")
+</dd>")
 
 (defun mixi-event-comment-list-page (event)
   (concat "/view_event.pl?page=all"
@@ -2360,32 +2316,13 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-event-comment-list-regexp
-  "<tr>
-<td ROWSPAN=2 ALIGN=center BGCOLOR=#F2DDB7 WIDTH=110>
-\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日<br>
-\\([0-9]+\\):\\([0-9]+\\)<br>
-\\(</td>\\)
-\\(<td BGCOLOR=#FDF9F2>\\)
-<font COLOR=#F8A448><b>[^<]+</b> :</font>
-<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
-
-\\(<font COLOR=#F2DDB7>|</font>
-<a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+&type=event\">削除</a>
-
-\\|\\)</td>
-</tr>
-<tr>
-<td ALIGN=center BGCOLOR=#FFFFFF>
-<table BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH=500>
-<tr>
-<td CLASS=h120 width=\"500\">
-
-\\(.+\\)
-</td>
-</tr>
-</table>
-</td>
-</tr>")
+  "<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
+<dd>
+<dl class=\"commentContent01\">
+<dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></dt>
+<dd>
+\\(\\(.\\|\r?\n\\)*?\\)
+</dd>")
 
 ;;;###autoload
 (defun mixi-get-comments (parent &optional range)
@@ -2403,23 +2340,42 @@ Increase this value when unexpected error frequently occurs."
       (setq page nil))
     (let ((items (mixi-get-matched-items page regexp range t)))
       (mapcar (lambda (item)
-		(mixi-make-comment parent (mixi-make-friend
-					   (nth 7 item) (nth 8 item))
-				   (encode-time
-				    0
-				    (string-to-number (nth 4 item))
-				    (string-to-number (nth 3 item))
-				    (string-to-number (nth 2 item))
-				    (string-to-number (nth 1 item))
-				    (string-to-number (nth 0 item)))
-				   (nth 10 item)))
+		(let (owner-id owner-nick year month day hour minute content)
+		  (if (eq (mixi-object-class parent) 'mixi-diary)
+		      (progn
+			(setq owner-id (nth 1 item))
+			(setq owner-nick (nth 2 item))
+			(setq year (nth 3 item))
+			(setq month (nth 4 item))
+			(setq day (nth 5 item))
+			(setq hour (nth 6 item))
+			(setq minute (nth 7 item))
+			(setq content (nth 8 item)))
+		    (setq owner-id (nth 5 item))
+		    (setq owner-nick (nth 6 item))
+		    (setq year (nth 0 item))
+		    (setq month (nth 1 item))
+		    (setq day (nth 2 item))
+		    (setq hour (nth 3 item))
+		    (setq minute (nth 4 item))
+		    (setq content (nth 7 item)))
+		  (mixi-make-comment parent (mixi-make-friend owner-id
+							      owner-nick)
+				     (encode-time
+				      0
+				      (string-to-number minute)
+				      (string-to-number hour)
+				      (string-to-number day)
+				      (string-to-number month)
+				      (string-to-number year))
+				     content)))
 	      items))))
 
 (defmacro mixi-new-comment-list-page ()
   `(concat "/new_comment.pl?page=%d"))
 
 (defconst mixi-new-comment-list-regexp
-  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)\" class=\"new_link\">")
+  "<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)\">")
 
 ;;;###autoload
 (defun mixi-get-new-comments (&optional range)
@@ -2804,7 +2760,6 @@ Increase this value when unexpected error frequently occurs."
 (defmacro mixi-news-page (news)
   `(concat "http://news.mixi.jp/view_news.pl?id=" (mixi-news-id ,news)
 	   "&media_id=" (mixi-news-media-id ,news)))
-
 
 (defconst mixi-news-finished-regexp
   "申し訳ございませんが、このニュースは掲載が終了したか、URLが間違っていいるためご覧いただけません。</td>")

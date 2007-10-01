@@ -149,22 +149,18 @@
 (defun mixi-make-content (object)
   (with-mixi-class object
     (cond ((eq class 'mixi-event)
-	   (let ((limit (mixi-event-limit object)))
-	     (setq limit (if limit
-			     (format-time-string "%Y年%m月%d日" limit)
-			   "指定なし"))
-	     (concat "<dl>"
-		     "<dt>開催日時：</dt>"
-		     "<dd>" (mixi-event-date object) "</dd>\n"
-		     "<dt>開催場所：</dt>"
-		     "<dd>" (mixi-event-place object) "</dd>\n"
-		     "<dt>詳細：</dt>"
-		     "<dd>" (mixi-event-detail object) "</dd>\n"
-		     "<dt>募集期限：</dt>"
-		     "<dd>" limit "</dd>\n"
-		     "<dt>参加者：</dt>"
-		     "<dd>" (mixi-event-members object) "</dd>\n"
-		     "</dl>")))
+	   (concat "<dl>"
+		   "<dt>開催日時：</dt>"
+		   "<dd>" (mixi-event-date object) "</dd>\n"
+		   "<dt>開催場所：</dt>"
+		   "<dd>" (mixi-event-place object) "</dd>\n"
+		   "<dt>詳細：</dt>"
+		   "<dd>" (mixi-event-detail object) "</dd>\n"
+		   "<dt>募集期限：</dt>"
+		   "<dd>" (mixi-event-limit object) "</dd>\n"
+		   "<dt>参加者：</dt>"
+		   "<dd>" (mixi-event-members object) "</dd>\n"
+		   "</dl>"))
 	  ((eq class 'mixi-friend)
 	   (if (mixi-object-realized-p object)
 	       (let ((sex (if (eq (mixi-friend-sex object) 'male) "男" "女"))

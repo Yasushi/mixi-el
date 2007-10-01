@@ -1,5 +1,8 @@
 2007-10-01  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-diary-comment-list-regexp): Follow the change of mixi.
+	(mixi-get-comments): Follow the change above.
+
 	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
 	(mixi-friend-name-regexp): Ditto.
 	(mixi-friend-sex-regexp): Ditto.

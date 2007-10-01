@@ -2270,7 +2270,9 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-diary-comment-list-regexp
   "<span class=\"commentTitleName\">\\(<input type=\"checkbox\" name=\"comment_id\" value=\".+\" />
 \\|\\)<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>
-</span>
+\\(
+| <a href=\"delete_comment\\.pl\\?diary_id=[0-9]+&owner_id=[0-9]+&comment_id=.+&type=comment\">自分のコメントを削除する</a>
+\\|\\)</span>
 
 <span class=\"commentTitleDate\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</span>
 
@@ -2291,8 +2293,10 @@ Increase this value when unexpected error frequently occurs."
 
 ?
 <dd>
-\\(.+\\)
-</dd>")
+\\(\\(.\\|\r?\n\\)*?\\)
+</dd>
+</dl>
+</div>")
 
 (defun mixi-topic-comment-list-page (topic)
   (concat "/view_bbs.pl?page=all"
@@ -2345,12 +2349,12 @@ Increase this value when unexpected error frequently occurs."
 		      (progn
 			(setq owner-id (nth 1 item))
 			(setq owner-nick (nth 2 item))
-			(setq year (nth 3 item))
-			(setq month (nth 4 item))
-			(setq day (nth 5 item))
-			(setq hour (nth 6 item))
-			(setq minute (nth 7 item))
-			(setq content (nth 8 item)))
+			(setq year (nth 4 item))
+			(setq month (nth 5 item))
+			(setq day (nth 6 item))
+			(setq hour (nth 7 item))
+			(setq minute (nth 8 item))
+			(setq content (nth 9 item)))
 		    (setq owner-id (nth 5 item))
 		    (setq owner-nick (nth 6 item))
 		    (setq year (nth 0 item))

@@ -33,6 +33,8 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
+(defconst shimbun-mixi-revision "$Revision: 1.57 $")
+
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache))
   (luna-define-internal-accessors 'shimbun-mixi))

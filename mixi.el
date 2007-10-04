@@ -40,7 +40,7 @@
 ;;  * mixi-get-comments
 ;;  * mixi-get-new-comments
 ;;  * mixi-get-messages
-;;  * mixi-get-introductions
+;;  * mixi-get-introductions (broken)
 ;;  * mixi-get-news
 ;;
 ;; APIs for posting:
@@ -134,6 +134,8 @@
   (autoload 'w3m-decode-buffer "w3m")
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
+
+(defconst mixi-revision "$Revision: 1.169 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."

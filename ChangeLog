@@ -1,3 +1,9 @@
+2007-10-04  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-revision): New constant.
+	* sb-mixi.el (shimbun-mixi-revision): Ditto.
+	* configure.ac (AM_INIT_AUTOMAKE): Change the version of this package.
+
 2007-10-01  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-post-succeed-regexp):  Follow the change of mixi.
@@ -1016,7 +1022,7 @@
 	(mixi-save-cache): Remove the prefix of file name.
 	(mixi-read-cache): Use `mixi-read-object' instead of `puthash'.
 	(mixi-load-cache): Follow the change above.
-	(mixi-make-friend): Add all slots to the argument. 
+	(mixi-make-friend): Add all slots to the argument.
 	(mixi-make-diary): Ditto.
 	(mixi-make-community): Ditto.
 	(mixi-make-topic): Ditto.

@@ -63,11 +63,13 @@
       (wl-draft-write-sendlog 'ok 'mixi nil (list recipients) id))))
 
 (defun mixi-wl-setup-draft-buffer ()
-  (when (string-match mixi-to-regexp (mixi-wl-get-recipients-from-buffer))
-    (make-local-variable 'wl-draft-send-confirm-with-preview)
-    (setq wl-draft-send-confirm-with-preview nil)
-    (make-local-variable 'wl-draft-send-mail-function)
-    (setq wl-draft-send-mail-function 'wl-draft-send-mail-with-mixi)))
+  (let ((recipients (mixi-wl-get-recipients-from-buffer)))
+    (when (and recipients
+	       (string-match mixi-to-regexp recipients))
+      (make-local-variable 'wl-draft-send-confirm-with-preview)
+      (setq wl-draft-send-confirm-with-preview nil)
+      (make-local-variable 'wl-draft-send-mail-function)
+      (setq wl-draft-send-mail-function 'wl-draft-send-mail-with-mixi))))
 
 (defun mixi-wl-setup ()
   (add-hook 'wl-draft-send-hook 'mixi-wl-setup-draft-buffer))

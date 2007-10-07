@@ -1,3 +1,8 @@
+2007-10-07  Yoichi NAKAYAMA  <yoichi@geiin.org>
+
+	* mixi-wl.el (mixi-wl-setup-draft-buffer): Avoid error when there is
+	no recipient.
+
 2007-10-04  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-revision): New constant.

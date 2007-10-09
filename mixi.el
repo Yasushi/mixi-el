@@ -135,7 +135,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.169 $")
+(defconst mixi-revision "$Revision: 1.170 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1919,9 +1919,9 @@ Increase this value when unexpected error frequently occurs."
   "<dt>³«ºÅ¾ì½ê</dt>
 <dd>\\(.+\\)</dd>")
 (defconst mixi-event-owner-regexp
-  "<dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></dt>")
+  "<dt>\\((mixi Âà²ñºÑ)\\|<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>\\)</dt>")
 (defconst mixi-event-owner-seceded-regexp
-  "<dt>\\((mixi Âà²ñºÑ)\\)</dt>")
+  "(mixi Âà²ñºÑ)")
 (defconst mixi-event-detail-regexp
   "<dd>\\(\\(.\\|\r?\n\\)*?\\)</dd>
 </dl>")
@@ -1960,12 +1960,12 @@ Increase this value when unexpected error frequently occurs."
 	    (mixi-event-set-place event (match-string 1))
 	  (mixi-realization-error 'cannot-find-place event))
 	(if (re-search-forward mixi-event-owner-regexp nil t)
-	    (mixi-event-set-owner event (mixi-make-friend (match-string 1)
-							  (match-string 2)))
-	  (if (re-search-forward mixi-event-owner-seceded-regexp nil t)
-	      (mixi-event-set-owner event
-				    (mixi-make-friend nil (match-string 1)))
-	    (mixi-realization-error 'cannot-find-owner event)))
+	    (let ((id (match-string 1))
+		  (nick (match-string 2)))
+	      (if (string-match mixi-event-owner-seceded-regexp id)
+		  (mixi-event-set-owner event (mixi-make-friend nil id))
+		(mixi-event-set-owner event (mixi-make-friend id nick))))
+	  (mixi-realization-error 'cannot-find-owner event))
 	(if (re-search-forward mixi-event-detail-regexp nil t)
 	    (mixi-event-set-detail event (match-string 1))
 	  (mixi-realization-error 'cannot-find-detail event))

@@ -135,7 +135,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.170 $")
+(defconst mixi-revision "$Revision: 1.171 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1960,10 +1960,12 @@ Increase this value when unexpected error frequently occurs."
 	    (mixi-event-set-place event (match-string 1))
 	  (mixi-realization-error 'cannot-find-place event))
 	(if (re-search-forward mixi-event-owner-regexp nil t)
-	    (let ((id (match-string 1))
-		  (nick (match-string 2)))
-	      (if (string-match mixi-event-owner-seceded-regexp id)
-		  (mixi-event-set-owner event (mixi-make-friend nil id))
+	    (let ((seceded-or-not (match-string 1))
+		  (id (match-string 2))
+		  (nick (match-string 3)))
+	      (if (string= mixi-event-owner-seceded-regexp seceded-or-not)
+		  (mixi-event-set-owner event
+					(mixi-make-friend nil seceded-or-not))
 		(mixi-event-set-owner event (mixi-make-friend id nick))))
 	  (mixi-realization-error 'cannot-find-owner event))
 	(if (re-search-forward mixi-event-detail-regexp nil t)

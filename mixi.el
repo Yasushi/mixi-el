@@ -135,7 +135,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.171 $")
+(defconst mixi-revision "$Revision: 1.172 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2279,23 +2279,10 @@ Increase this value when unexpected error frequently occurs."
 \\|\\)</span>
 
 <span class=\"commentTitleDate\">\\([0-9]+\\)Ç¯\\([0-9]+\\)·î\\([0-9]+\\)Æü&nbsp;\\([0-9]+\\):\\([0-9]+\\)</span>
-
-
-?
 </dt>
 
 
-
-
-
-
-
-
-
-
-
-
-?
++
 <dd>
 \\(\\(.\\|\r?\n\\)*?\\)
 </dd>

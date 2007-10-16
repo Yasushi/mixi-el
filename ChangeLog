@@ -1,3 +1,11 @@
+2007-10-16  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-new-bbs-comment-list-page): New macro.
+	(mixi-new-bbs-comment-list-regexp): New constant.
+	(mixi-get-new-bbs-comments): New function.
+	* sb-mixi.el (shimbun-mixi-default-group-alist): Add it.
+	(shimbun-mixi-group-alist): Remove unnecessary constants.
+
 2007-10-15  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-comment-list-regexp): Follow the change of mixi.

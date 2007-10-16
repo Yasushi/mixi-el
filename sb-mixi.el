@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.57 $")
+(defconst shimbun-mixi-revision "$Revision: 1.58 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache))
@@ -43,6 +43,7 @@
   '(("new-diaries" . mixi-get-new-diaries)
     ("new-comments" . mixi-get-new-comments)
     ("new-bbses" . mixi-get-new-bbses)
+    ("new-bbs-comments" . mixi-get-new-bbs-comments)
     ("messages" . mixi-get-messages)
     ("messages.sent" .
      (lambda (range)
@@ -113,12 +114,7 @@ of mixi object."
   :type '(repeat (cons :fromat "%v"
 		       (string :tag "Group name")
 		       (radio (string :tag "URL")
-			      (const :tag "New diaries" mixi-get-new-diaries)
-			      (const :tag "New comments" mixi-get-new-comments)
-			      (const :tag "New BBSes" mixi-get-new-bbses)
-			      (const :tag "Messages" mixi-get-messages)
-			      (const :tag "Logs" mixi-get-logs)
-			      (function :tag "Other function")))))
+			      (function :tag "Function")))))
 
 (defcustom shimbun-mixi-get-profile-with-diary t
   "*If non-nil, get his/her profile together with diaries."

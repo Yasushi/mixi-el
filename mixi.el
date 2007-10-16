@@ -39,6 +39,7 @@
 ;;  * mixi-search-bbses
 ;;  * mixi-get-comments
 ;;  * mixi-get-new-comments
+;;  * mixi-get-new-bbs-comments
 ;;  * mixi-get-messages
 ;;  * mixi-get-introductions (broken)
 ;;  * mixi-get-news
@@ -135,7 +136,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.172 $")
+(defconst mixi-revision "$Revision: 1.173 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2389,6 +2390,40 @@ Increase this value when unexpected error frequently occurs."
 				(< comment-count count))
 			(mixi-diary-set-comment-count diary count)
 			diary)))
+		  items))))
+
+(defmacro mixi-new-bbs-comment-list-page ()
+  `(concat "/new_bbs_comment.pl?page=%d"))
+
+(defconst mixi-new-bbs-comment-list-regexp
+  "<a href=\"?view_\\(bbs\\|event\\)\\.pl\\?id=\\([0-9]+\\)&comment_count=\\([0-9]+\\)&comm_id=\\([0-9]+\\)\"?>")
+
+;;;###autoload
+(defun mixi-get-new-bbs-comments (&optional range)
+  "Get new BBS comments."
+  (let ((items (mixi-get-matched-items (mixi-new-bbs-comment-list-page)
+				       mixi-new-bbs-comment-list-regexp
+				       range)))
+    (delq nil
+	  (mapcar (lambda (item)
+		    (let ((name (nth 0 item)))
+		      (when (string= name "bbs")
+			(setq name "topic"))
+		      (let ((make-func (intern (concat "mixi-make-" name)))
+			    (comment-count-func
+			     (intern (concat "mixi-" name "-comment-count")))
+			    (set-comment-count-func
+			     (intern (concat "mixi-" name
+					     "-set-comment-count"))))
+			(let* ((bbs (funcall make-func
+				     (mixi-make-community (nth 3 item))
+				     (nth 1 item)))
+			       (comment-count (funcall comment-count-func bbs))
+			       (count (string-to-number (nth 2 item))))
+			  (when (or (null comment-count)
+				    (< comment-count count))
+			    (funcall set-comment-count-func bbs count)
+			    bbs)))))
 		  items))))
 
 (defun mixi-post-diary-comment-page (diary)

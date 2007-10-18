@@ -1,3 +1,13 @@
+2007-10-18  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-atom.el: Fix expressions of the copyright notices.
+	* mixi-gnus.el: Ditto.
+	* mixi-ticker.el: Ditto.
+	* mixi-utils.el: Ditto.
+	* mixi-wl.el: Ditto.
+	* mixi.el: Ditto.
+	* sb-mixi.el: Ditto.
+
 2007-10-16  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-new-bbs-comment-list-page): New macro.

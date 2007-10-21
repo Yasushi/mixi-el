@@ -1,0 +1,1377 @@
+\input texinfo @c -*- mode: texinfo; coding: iso-2022-jp -*-
+@c %**start of header
+@setfilename mixi-ja.info
+@settitle mixi.el --- API libraries for accessing to mixi
+@c %**end of header
+@c @documentlanguage ja
+@include version.texi
+@c @syncodeindex pg cp
+@finalout
+
+@dircategory GNU Emacs Lisp
+@direntry
+* mixi-ja: (mixi-ja).  API libraries for accessing to mixi
+@end direntry
+
+@copying
+Copyright @copyright{} 2007 @w{OHASHI Akira}.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+@end quotation
+@end copying
+
+@ifinfo
+このファイルは Emacs で mixi にアクセスするための Emacs Lisp ライブラリ
+mixi.el に関するマニュアルです。
+
+@insertcopying
+@end ifinfo
+
+@titlepage
+@title mixi.el ユーザマニュアル
+@subtitle for version @value{VERSION}, @value{UPDATED}
+
+@author by OHASHI Akira
+@page
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@summarycontents
+
+@ifnottex
+@node Top
+@top mixi.el ユーザマニュアル
+
+このマニュアルでは mixi.el バージョン @value{VERSION} について解説します。
+@end ifnottex
+
+@menu
+* 概要::
+* 必要な物::
+* インストール::
+* 同梱されているアプリケーション::
+* mixi.el API::
+* カスタマイズ::
+* 良くある質問と答え::
+* バグレポート::
+* 概念索引::
+* 関数索引::
+* 変数索引::
+@end menu
+
+@node 概要
+@chapter 概要
+
+mixi.el とは Emacs 上で mixi の各種情報を閲覧、または日記などの投稿を行
+なえるようにするための Emacs Lisp ライブラリです。
+
+閲覧機能の基本的な動作原理は以下のようになっています。
+
+@enumerate
+@item
+mixi へ HTTP アクセスする (必要ならログインを実行する)
+@item
+必要とするページを取得する
+@item
+取得されたページを解析する
+@item
+解析結果を @ref{mixi オブジェクト} に格納して返却する
+@end enumerate
+
+@noindent
+取得されたページを解析する際、正規表現を用いて日付や本文などの必要な要素
+のみを切り出します。
+この作業は mixi の出力する HTML ページの構造に強く依存しているため、mixi
+側がレイアウトやデザインの変更を実施した場合は正常に動作しなくなることが
+あります。
+
+@node 必要な物
+@chapter 必要な物
+@cindex backend
+@cindex バックエンド
+
+mixi.el は mixi へアクセスするために以下のライブラリ、または外部アプリケー
+ションを使用します。
+必ず以下のうちのどれか一つはインストールしておかなければいけません。
+
+@itemize @bullet
+@item @uref{http://emacs-w3m.namazu.org/, emacs-w3m}
+@item @file{url.el} (Emacs 22 以降に付属の物でないと正常に動かないかもし
+れません)
+@item @uref{http://curl.haxx.se/, cURL}
+@end itemize
+
+使用するライブラリまたは外部アプリケーションのことを@dfn{バックエンド}と
+呼びます。どのバックエンドを使用するかは環境を調査して自動的に決定されま
+すが、@ref{mixi-backend} で変更することもできます。
+
+@node インストール
+@chapter インストール
+
+最初に、配布された mixi.el の tarball を以下のように適当な場所で展開し、
+作成された @file{mixi} ディレクトリへ移動してください。
+
+@cartouche
+@example
+% tar zxf mixi-el-1.0.0.tar.gz
+% cd mixi-el-1.0.0
+@end example
+@end cartouche
+
+@noindent
+もしあなたが mixi.el を CVS から取得したのであれば、@code{configure}
+スクリプトを生成するために以下を実行する必要があります。
+
+@cartouche
+@example
+% autoreconf -f -i
+@end example
+@end cartouche
+
+@noindent
+後は以下を実行することによりインストールが完了します。
+
+@cartouche
+@example
+% ./configure
+% make
+% make install (root権限が必要になるかもしれません)
+@end example
+@end cartouche
+
+@noindent
+すべての Emacs Lisp ファイルと info ファイルが適切なディレクトリにイン
+ストールされているはずです。
+
+mixi.el には mixi.el で用意されている API を使用して実装したいくつかの
+アプリケーションが同梱されています。
+これらのアプリケーションの中にはあなたが必要としない物も含まれているか
+もしれません。
+また、使用している環境によっては自動で決定されるインストール先が不都合
+な場合があるかもしれません。
+これらの問題を解消するためにあなたは @code{configure} スクリプトに引数
+を与えることができます。
+使用可能な引数については以下を実行してヘルプで確認してください。
+
+@cartouche
+@example
+% ./configure --help
+@end example
+@end cartouche
+
+@node 同梱されているアプリケーション
+@chapter 同梱されているアプリケーション
+
+mixi.el には mixi.el で用意されている API を使用して実装したいくつかの
+アプリケーションが同梱されています。この章でそれらを簡単に紹介します。
+
+@table @code
+@item sb-mixi.el
+@uref{http://gnus.org/, Gnus}、@uref{http://www.gohome.org/wl/,
+Wanderlust}、@uref{http://www.mew.org/, Mew} のような Shimbun 対応のメー
+ラで mixi の記事を見ることができるようになります。
+
+@item mixi-gnus.el
+@itemx mixi-wl.el
+Gnus と Wanderlust からそれぞれ mixi に投稿できるようになります。
+
+@item riece-mixi.el
+@uref{http://www.nongnu.org/riece/, Riece} に mixi の新着記事チェック
+機能などを追加します。
+
+@item mixi-atom.el
+RSS リーダで読み込める Atom Syndication Format で mixi の記事を出力し
+ます。
+
+@item mixi-ticker.el
+mixi の新着記事をミニバッファにティッカー表示します。
+@end table
+
+@node mixi.el API
+@chapter mixi.el API
+
+この章では mixi.el で扱うデータ形式と API について解説します。
+
+@menu
+* mixi オブジェクト::
+* 一覧取得関数::
+* 投稿用関数::
+* その他の関数::
+@end menu
+
+@node mixi オブジェクト
+@section mixi オブジェクト
+@cindex mixi オブジェクト
+@cindex オブジェクト
+
+mixi.el ではマイミクシィや日記、コミュニティ、トピックなどを @dfn{mixi
+オブジェクト}という独自のデータ形式で管理しています。mixi.el API の各種
+取得関数ではこの mixi オブジェクト形式のリストが返却され、日記取得関数な
+ど引数を取る関数を使用する際にもまた mixi オブジェクト形式で引数を与えな
+ければいけません。
+
+mixi オブジェクトは正確にはマイミクシィや日記などでそれぞれデータ形式が
+異なります。それは各オブジェクトが持っている情報 (マイミクシィなら名前や
+ニックネーム、日記ならタイトルや本文など) が異なるためです。
+mixi オブジェクトはオブジェクト指向プログラムでいうところのインスタンス
+のように扱うように実装されており、そのオブジェクトが持つ情報を取得あるい
+は設定するためにアクセサメソッドのように使うことができる関数が用意されて
+います。
+
+mixi オブジェクトは各オブジェクト専用のオブジェクト生成関数を使用して生
+成することができます。
+ただし、オブジェクトを生成しただけではまだ mixi のサイトへのアクセスは発
+生しません。これは、一覧取得関数を実行したときなどに大量のサイトアクセス
+が発生して時間が掛かってしまうのを防ぐためです。
+この仕組みは GoF のデザインパターンのうちの Proxy パターン (必要になって
+から作る) から発想を得ました。
+
+@cartouche
+@example
+(setq my-friend (mixi-make-friend "XXXXX"))
+    @result{} friend オブジェクト (この時点ではまだサイトにはアクセスし
+    ていません)
+
+(mixi-friend-nick my-friend)
+    @result{} ニックネーム (このとき初めてサイトアクセスが発生します)
+
+(mixi-friend-name my-friend)
+    @result{} 名前 (上記のサイトアクセスで全情報を取得しているので、もう
+    サイトにはアクセスしません)
+@end example
+@end cartouche
+
+以降の小節で各 mixi オブジェクトについて解説します。
+
+@subsection friend オブジェクト
+@cindex friend オブジェクト
+
+マイミクシィを表すオブジェクトです。
+以下の関数を使用することにより friend オブジェクトを生成することができま
+す。
+
+@defun mixi-make-friend id
+friend オブジェクトを生成します。
+引数にはマイミクシィの ID を文字列で指定してください。
+@end defun
+
+@subsubsection アクセサメソッド
+
+friend オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以
+下に解説します。
+
+@defun mixi-friend-id friend
+ID を返却します。
+@end defun
+
+@defun mixi-friend-nick friend
+ニックネームを返却します。
+@end defun
+
+@defun mixi-friend-name friend
+名前を返却します。
+@end defun
+
+@defun mixi-friend-sex friend
+性別を返却します。
+@end defun
+
+@defun mixi-friend-address friend
+現住所を返却します。
+@end defun
+
+@defun mixi-friend-age friend
+年齢を返却します。
+@end defun
+
+@defun mixi-friend-birthday friend
+誕生日を返却します。
+@end defun
+
+@defun mixi-friend-blood-type friend
+血液型を返却します。
+@end defun
+
+@defun mixi-friend-birthplace friend
+出身地を返却します。
+@end defun
+
+@defun mixi-friend-hobby friend
+趣味を返却します。
+@end defun
+
+@defun mixi-friend-job friend
+職業を返却します。
+@end defun
+
+@defun mixi-friend-organization friend
+所属を返却します。
+@end defun
+
+@defun mixi-friend-profile friend
+自己紹介を返却します。
+@end defun
+
+@subsection log オブジェクト
+@cindex log オブジェクト
+
+足あとを表すオブジェクトです。
+このオブジェクトを直接生成することは無いと思います。
+
+@subsubsection アクセサメソッド
+
+log オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下に
+解説します。
+
+@defun mixi-log-friend log
+足あとのマイミクシィを返却します。
+@end defun
+
+@defun mixi-log-time log
+足あとの日時を返却します。
+@end defun
+
+@subsection diary オブジェクト
+@cindex diary オブジェクト
+
+日記を表すオブジェクトです。
+以下の関数を使用することにより diary オブジェクトを生成することができま
+す。
+
+@defun mixi-make-diary owner id
+diary オブジェクトを生成します。
+引数には作成者を表す friend オブジェクトと日記の ID を文字列で指定してく
+ださい。
+@end defun
+
+@subsubsection アクセサメソッド
+
+diary オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
+に解説します。
+
+@defun mixi-diary-owner diary
+作成者を返却します。
+@end defun
+
+@defun mixi-diary-id diary
+ID を返却します。
+@end defun
+
+@defun mixi-diary-comment-count diary
+コメント数を返却します。
+@end defun
+
+@defun mixi-diary-time diary
+時刻を返却します。
+@end defun
+
+@defun mixi-diary-title diary
+タイトルを返却します。
+@end defun
+
+@defun mixi-diary-content diary
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection community オブジェクト
+@cindex community オブジェクト
+
+コミュニティを表すオブジェクトです。
+以下の関数を使用することにより community オブジェクトを生成することがで
+きます。
+
+@defun mixi-make-community id
+community オブジェクトを生成します。
+引数にはコミュニティの ID を文字列で指定してください。
+@end defun
+
+@subsubsection アクセサメソッド
+
+community オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を
+以下に解説します。
+
+@defun mixi-community-id community
+ID を返却します。
+@end defun
+
+@defun mixi-community-name community
+名前を返却します。
+@end defun
+
+@defun mixi-community-birthday community
+開設日を返却します。
+@end defun
+
+@defun mixi-community-owner community
+管理人を返却します。
+@end defun
+
+@defun mixi-community-category community
+カテゴリを返却します。
+@end defun
+
+@defun mixi-community-members community
+人数を返却します。
+@end defun
+
+@defun mixi-community-open-level community
+参加条件と公開レベルを返却します。
+@end defun
+
+@defun mixi-community-authority community
+トピック作成の権限を返却します。
+@end defun
+
+@defun mixi-community-description community
+説明を返却します。
+説明には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection topic オブジェクト
+@cindex topic オブジェクト
+
+トピックを表すオブジェクトです。
+以下の関数を使用することにより topic オブジェクトを生成することができま
+す。
+
+@defun mixi-make-topic community id
+topic オブジェクトを生成します。
+引数にはトピックが属するコミュニティを表す community オブジェクトとトピッ
+クの ID を文字列で指定してください。
+@end defun
+
+@subsubsection アクセサメソッド
+
+topic オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
+に解説します。
+
+@defun mixi-topic-community topic
+属するコミュニティを返却します。
+@end defun
+
+@defun mixi-topic-id topic
+ID を返却します。
+@end defun
+
+@defun mixi-topic-comment-count topic
+コメント数を返却します。
+@end defun
+
+@defun mixi-topic-time topic
+時刻を返却します。
+@end defun
+
+@defun mixi-topic-title topic
+タイトルを返却します。
+@end defun
+
+@defun mixi-topic-owner topic
+作成者を返却します。
+@end defun
+
+@defun mixi-topic-content topic
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection event オブジェクト
+@cindex event オブジェクト
+
+イベントを表すオブジェクトです。
+以下の関数を使用することにより event オブジェクトを生成することができま
+す。
+
+@defun mixi-make-event community id
+event オブジェクトを生成します。
+引数には属するコミュニティを表す community オブジェクトと ID を文字列形
+式で指定してください。
+@end defun
+
+@subsubsection アクセサメソッド
+
+event オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
+に解説します。
+
+@defun mixi-event-community event
+属するコミュニティを返却します。
+@end defun
+
+@defun mixi-event-id event
+ID を返却します。
+@end defun
+
+@defun mixi-event-comment-count event
+コメント数を返却します。
+@end defun
+
+@defun mixi-event-time event
+時刻を返却します。
+@end defun
+
+@defun mixi-event-title event
+タイトルを返却します。
+@end defun
+
+@defun mixi-event-owner event
+作成者を返却します。
+@end defun
+
+@defun mixi-event-date event
+開催日時を返却します。
+@end defun
+
+@defun mixi-event-place event
+開催場所を返却します。
+@end defun
+
+@defun mixi-event-detail event
+詳細を返却します。
+@end defun
+
+@defun mixi-event-limit event
+募集期限を返却します。
+@end defun
+
+@defun mixi-event-members event
+参加者を返却します。
+@end defun
+
+@subsection comment オブジェクト
+@cindex comment オブジェクト
+
+コメントを表すオブジェクトです。
+このオブジェクトを直接生成することは無いと思います。
+
+@subsubsection アクセサメソッド
+
+comment オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以
+下に解説します。
+
+@defun mixi-comment-parent comment
+属する親オブジェクト (日記/トピック/イベント) を返却します。
+@end defun
+
+@defun mixi-comment-owner comment
+作成者を返却します。
+@end defun
+
+@defun mixi-comment-time comment
+時刻を返却します。
+@end defun
+
+@defun mixi-comment-content comment
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection message オブジェクト
+@cindex message オブジェクト
+
+メッセージを表すオブジェクトです。
+このオブジェクトを直接生成することは無いと思います。
+
+@subsubsection アクセサメソッド
+
+message オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以
+下に解説します。
+
+@defun mixi-message-id message
+ID を返却します。
+@end defun
+
+@defun mixi-message-box message
+種類を返却します。
+@table @asis
+@item inbox
+受信箱
+@item outbox
+送信済み
+@item savebox
+下書き保存箱
+@item thrash
+ごみ箱
+@end table
+@end defun
+
+@defun mixi-message-owner message
+作成者を返却します。
+@end defun
+
+@defun mixi-message-title message
+タイトルを返却します。
+@end defun
+
+@defun mixi-message-time message
+時刻を返却します。
+@end defun
+
+@defun mixi-message-content message
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection introduction オブジェクト
+@cindex introduction オブジェクト
+
+紹介文を表すオブジェクトです。
+このオブジェクトを直接生成することは無いと思います。
+
+@subsubsection アクセサメソッド
+
+introduction オブジェクトの各種情報を取得するためのアクセサメソッドの一
+覧を以下に解説します。
+
+@defun mixi-introduction-parent introduction
+紹介されている人を返却します。
+@end defun
+
+@defun mixi-introduction-owner introduction
+作成者を返却します。
+@end defun
+
+@defun mixi-introduction-content introduction
+紹介文を返却します。
+紹介文には HTML タグが含まれている可能性があります。それらを取り除くため
+に @ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection news オブジェクト
+@cindex news オブジェクト
+
+ニュースを表すオブジェクトです。
+このオブジェクトを直接生成することは無いと思います。
+
+@subsubsection アクセサメソッド
+
+news オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
+に解説します。
+
+@defun mixi-news-media-id news
+メディア ID を返却します。
+@end defun
+
+@defun mixi-news-id news
+ID を返却します。
+@end defun
+
+@defun mixi-news-media news
+メディアを返却します。
+@end defun
+
+@defun mixi-news-time news
+日時を返却します。
+@end defun
+
+@defun mixi-news-title news
+タイトルを返却します。
+@end defun
+
+@defun mixi-news-content news
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@node 一覧取得関数
+@section 一覧取得関数
+
+一覧取得関数では mixi のさまざまな情報を mixi オブジェクトのリスト形式で
+取得することができます。
+
+@defun mixi-get-friends &rest friend-or-range
+マイミクシィ一覧を取得します。
+@var{friend-or-range} は friend オブジェクトまたは数値を指定することがで
+きます。
+friend オブジェクトを指定した場合はそのオブジェクトで指定した人のマイミ
+クシィ一覧を取得します。friend オブジェクトを指定しなかった場合は
+@emph{自分}のマイミクシィ一覧を取得します。
+数値を指定した場合は最大でこの数のマイミクシィのみを取得します。
+friend オブジェクトと数値は同時に指定することもできます。
+
+@cartouche
+@example
+(mixi-get-friends)
+    @result{} 自分のマイミクシィすべて
+
+(mixi-get-friends 5)
+    @result{} 自分のマイミクシィ最大で 5 人分のみ
+
+(mixi-get-friends friend)
+    @result{} friend さんのマイミクシィすべて
+
+(mixi-get-friends friend 10)
+    @result{} friend さんのマイミクシィ最大で 10 人分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-favorites &optional range
+お気に入り一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のお気に入りのみを取得します。
+
+@cartouche
+@example
+(mixi-get-favorites)
+    @result{} お気に入りすべて
+
+(mixi-get-favorites 5)
+    @result{} お気に入り最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-logs &optional range
+足あと一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の足あとのみを取得します。
+
+@cartouche
+@example
+(mixi-get-logs)
+    @result{} 足あとすべて
+
+(mixi-get-logs 5)
+    @result{} 足あと最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-diaries &rest friend-or-range
+日記一覧を取得します。
+@var{friend-or-range} は friend オブジェクトまたは数値を指定することがで
+きます。
+friend オブジェクトを指定した場合はそのオブジェクトで指定した人の日記一
+覧を取得します。friend オブジェクトを指定しなかった場合は@emph{自分}の日
+記一覧を取得します。
+数値を指定した場合は最大でこの数の日記のみを取得します。
+friend オブジェクトと数値は同時に指定することもできます。
+
+@cartouche
+@example
+(mixi-get-diaries)
+    @result{} 自分の日記すべて
+
+(mixi-get-diaries 5)
+    @result{} 自分の日記最大で 5 件分のみ
+
+(mixi-get-diaries friend)
+    @result{} friend さんの日記すべて
+
+(mixi-get-diaries friend 10)
+    @result{} friend さんの日記最大で 10 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-new-diaries &optional range
+マイミクシィ最新日記一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のマイミクシィ最新日記のみを取得
+します。
+
+@cartouche
+@example
+(mixi-get-new-diaries)
+    @result{} マイミクシィ最新日記すべて
+
+(mixi-get-new-diaries 5)
+    @result{} マイミクシィ最新日記最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-search-diaries keyword &optional range
+新着日記検索結果一覧を取得します。
+@var{keyword} は検索したいキーワードを指定してください。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の検索結果のみを取得します。
+
+@cartouche
+@example
+(mixi-search-diaries "mixi.el")
+    @result{} @samp{mixi.el} で検索した新着日記すべて
+
+(mixi-search-diaries "mixi.el" 5)
+    @result{} @samp{mixi.el} で検索した新着日記最大で 5 件分
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-communities &rest friend-or-range
+コミュニティ一覧を取得します。
+@var{friend-or-range} は friend オブジェクトまたは数値を指定することがで
+きます。
+friend オブジェクトを指定した場合はそのオブジェクトで指定した人のコミュ
+ニティ一覧を取得します。friend オブジェクトを指定しなかった場合は
+@emph{自分}のコミュニティ一覧を取得します。
+数値を指定した場合は最大でこの数のコミュニティのみを取得します。
+friend オブジェクトと数値は同時に指定することもできます。
+
+@cartouche
+@example
+(mixi-get-communities)
+    @result{} 自分のコミュニティすべて
+
+(mixi-get-communities 5)
+    @result{} 自分のコミュニティ最大で 5 件分のみ
+
+(mixi-get-communities friend)
+    @result{} friend さんのコミュニティすべて
+
+(mixi-get-communities friend 10)
+    @result{} friend さんのコミュニティ最大で 10 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-search-communities keyword &optional range
+コミュニティ検索結果一覧を取得します。
+@var{keyword} は検索したいキーワードを指定してください。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の検索結果のみを取得します。
+
+@cartouche
+@example
+(mixi-search-communities "mixi.el")
+    @result{} @samp{mixi.el} で検索したコミュニティすべて
+
+(mixi-search-communities "mixi.el" 5)
+    @result{} @samp{mixi.el} で検索したコミュニティ最大で 5 件分
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-bbses community &optional range
+掲示板 (トピック/イベント) 一覧を取得します。
+@var{community} は community オブジェクトを指定してください。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の掲示板のみを取得します。
+
+@cartouche
+@example
+(mixi-get-bbses community)
+    @result{} community の掲示板すべて
+
+(mixi-get-bbses community 5)
+    @result{} community の掲示板最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-new-bbses &optional range
+コミュニティ最新書き込み一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の書き込みのみを取得します。
+
+@cartouche
+@example
+(mixi-get-new-bbses)
+    @result{} コミュニティ最新書き込みすべて
+
+(mixi-get-new-bbses 5)
+    @result{} コミュニティ最新書き込み最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-search-bbses keyword &optional range
+掲示板検索結果一覧を取得します。
+@var{keyword} は検索したいキーワードを指定してください。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の検索結果のみを取得します。
+
+@cartouche
+@example
+(mixi-search-bbses "mixi.el")
+    @result{} @samp{mixi.el} で検索した掲示板すべて
+
+(mixi-search-bbses "mixi.el" 5)
+    @result{} @samp{mixi.el} で検索した掲示板最大で 5 件分
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-comments parent &optional range
+コメント一覧を取得します。
+@var{parent} は以下のいずれかを指定してください。
+@itemize @bullet
+@item diary オブジェクト
+@item topic オブジェクト
+@item event オブジェクト
+@end itemize
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のコメントのみを取得します。
+
+@cartouche
+@example
+(mixi-get-comments diary)
+    @result{} diary のコメント日記すべて
+
+(mixi-get-comments topic)
+    @result{} topic のコメント最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-new-comments &optional range
+日記コメント記入履歴一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の日記のみを取得します。
+
+@cartouche
+@example
+(mixi-get-new-comments)
+    @result{} 日記コメント記入履歴すべて
+
+(mixi-get-new-comments 5)
+    @result{} 日記コメント記入履歴最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-new-bbs-comments &optional range
+コミュニティコメント記入履歴一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の書き込みのみを取得します。
+
+@cartouche
+@example
+(mixi-get-new-bbs-comments)
+    @result{} コミュニティコメント記入履歴すべて
+
+(mixi-get-new-bbs-comments 5)
+    @result{} コミュニティコメント記入履歴最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-messages &rest box-or-range
+メッセージ一覧を取得します。
+@var{box-or-range} はメッセージの種類を表す以下のいずれかまたは数値を指
+定することができます。
+@table @asis
+@item inbox
+受信箱
+@item outbox
+送信済み
+@item savebox
+下書き保存箱
+@item thrash
+ごみ箱
+@end table
+メッセージの種類を指定した場合は指定したメッセージ一覧を取得します。メッ
+セージの種類を指定しなかった場合は@emph{受信箱}のメッセージ一覧を取得し
+ます。
+数値を指定した場合は最大でこの数のメッセージのみを取得します。
+メッセージの種類と数値は同時に指定することもできます。
+
+@cartouche
+@example
+(mixi-get-messages)
+    @result{} 受信箱のメッセージすべて
+
+(mixi-get-messages 'outbox)
+    @result{} 送信済みのメッセージすべて
+
+(mixi-get-messages 'savebox 5)
+    @result{} 下書き保存箱のメッセージ最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-introductions &rest friend-or-range
+紹介文一覧を取得します。
+@var{friend-or-range} は friend オブジェクトまたは数値を指定することがで
+きます。
+friend オブジェクトを指定した場合はそのオブジェクトで指定したマイミクシィ
+の紹介文一覧を取得します。friend オブジェクトを指定しなかった場合は
+@emph{自分}の紹介文一覧を取得します。
+数値を指定した場合は最大でこの数の紹介文のみを取得します。
+friend オブジェクトと数値は同時に指定することもできます。
+
+@cartouche
+@example
+(mixi-get-introductions)
+    @result{} 自分の紹介文すべて
+
+(mixi-get-introductions 5)
+    @result{} 自分の紹介文最大で 5 人分のみ
+
+(mixi-get-introductions friend)
+    @result{} friend さんの紹介文すべて
+
+(mixi-get-introductions friend 10)
+    @result{} friend さんの紹介文最大で 10 人分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-news category sort &optional range
+ニュース一覧を取得します。
+@var{category} はカテゴリを表す以下のいずれかを指定してください。
+@table @asis
+@item domestic
+国内
+@item politics
+政治
+@item economy
+経済
+@item area
+地域
+@item abroad
+海外
+@item sports
+スポーツ
+@item entertainment
+エンターテインメント
+@item IT
+IT・テクノロジー
+@end table
+@var{sort} は種類を表す以下のいずれかを指定してください。
+@table @asis
+@item newest
+最新のニュース
+@item pickup
+注目のニュース
+@end table
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のニュースのみを取得します。
+
+@cartouche
+@example
+(mixi-get-news 'domestic 'newest)
+    @result{} 国内の最新ニュースすべて
+
+(mixi-get-introductions 'politics 'pickup 5)
+    @result{} 政治の注目ニュース最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@node 投稿用関数
+@section 投稿用関数
+
+投稿用関数を使用することにより日記の作成やコメントの投稿などが行なえます。
+
+@defun mixi-post-diary title content
+日記を投稿します。
+引数にはタイトルと本文を指定してください。
+
+@cartouche
+@example
+(mixi-post-diary "タイトル" "本文")
+    @result{} 不定
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-post-topic community title content
+トピックを投稿します。
+引数には投稿するコミュニティを表す community オブジェクトとタイトル、本
+文を指定してください。
+
+@cartouche
+@example
+(mixi-post-topic community "タイトル" "本文")
+    @result{} 不定
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-post-comment parent content
+コメントを投稿します。
+引数には投稿する親オブジェクト (日記/トピック/イベント) と本文を指定して
+ください。
+
+@cartouche
+@example
+(mixi-post-comment diary "本文")
+    @result{} 不定
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-post-message friend title content
+メッセージを送信します。
+引数には送信相手を表す friend オブジェクトとタイトル、本文を指定してくだ
+さい。
+
+@cartouche
+@example
+(mixi-post-message friend "タイトル" "本文")
+    @result{} 不定
+@end example
+@end cartouche
+@end defun
+
+@node その他の関数
+@section その他の関数
+
+@defun mixi-login &optional email password
+mixi にログインします。
+@var{email} と @var{password} が指定されていた場合はそれらの値をログイン
+時の E-mail とパスワードとして使用します。
+指定されていなかった場合は @ref{mixi-default-email} と
+@ref{mixi-default-password} の値を使用します。
+これらの値も指定されていなかった場合は、対話的に入力が求められます。
+
+@cartouche
+@example
+(mixi-login)
+    @result{} 自分を表す friend オブジェクト
+@end example
+@end cartouche
+
+各種情報取得関数を実行した際、もし mixi にログインしていなかった場合は自
+動的に @code{mixi-login} が実行されるので、明示的にログイン関数を実行す
+る必要はありません。
+@end defun
+
+@defun mixi-logout
+mixi からログアウトします。
+
+@cartouche
+@example
+(mixi-logout)
+    @result{} 不定
+@end example
+@end cartouche
+@end defun
+
+@anchor{mixi-remove-markup}
+@defun mixi-remove-markup string
+
+diary オブジェクトの本文などは HTML タグが含まれたままの状態で取得されま
+す。この関数を使用することにより、それらの文字列から HTML タグを取り除く
+ことができます。@footnote{ただし、現在この関数は正常にすべてのタグを取り
+除くことができません。}
+
+@cartouche
+@example
+(mixi-remove-markup (mixi-diary-content diary))
+    @result{} タグ取り除き済み文字列
+@end example
+@end cartouche
+@end defun
+
+@node カスタマイズ
+@chapter カスタマイズ
+@cindex ユーザオプション
+
+mixi.el にはユーザが動作をカスタマイズするためのいくつかの変数が用意され
+ています。単一のオプションを指定してカスタマイズするためには @kbd{M-x
+customize-option} を、グループ (mixi.el の場合のグループは @code{mixi})
+に属するすべてのオプションを変更するためには @kbd{M-x customize-group}
+を使用することができます。
+
+@section ユーザオプション一覧
+
+@defopt mixi-url
+mixi のサイトの URL を指定します。
+@end defopt
+
+@defopt mixi-directory
+キャッシュファイルやクッキーなどを格納するためのディレクトリを指定します。
+@end defopt
+
+@defopt mixi-coding-system
+mixi の web ページで使用されているコーディングシステムを指定します。
+@end defopt
+
+@defopt mixi-curl-program
+バックエンドとして @code{curl} を使う場合の起動するプログラム名を指定し
+ます。
+@end defopt
+
+@defopt mixi-curl-cookie-file
+バックエンドとして @code{curl} を使う場合のクッキーファイルを指定します。
+@end defopt
+
+@anchor{mixi-backend}
+@defopt mixi-backend
+使用するバックエンドを指定します。
+
+@table @asis
+@item w3m
+Emacs Lisp プログラム @code{emacs-w3m} を使用します。
+@item url
+Emacs に同梱されている @file{url.el} を使用します。
+@item curl
+外部プログラム @code{curl} を使用します。
+@end table
+
+バックエンドを明示的に指定しなかった場合は上記表の上から順番に自動的に決
+定されます。
+@end defopt
+
+@anchor{mixi-login-use-ssl}
+@defopt mixi-login-use-ssl
+mixi にログインする際に SSL を使用するかどうかを指定します。
+SSL を使用する場合は、バックエンドが @code{url} のときは外部プログラムと
+して @code{gnutls-cli} あるいは @code{openssl} コマンドが必要になり、バッ
+クエンドが @code{w3m} のときは @option{-with-ssl} でコンパイルされた
+@code{w3m} コマンドが必要になります。
+@end defopt
+
+@anchor{mixi-default-email}
+@defopt mixi-default-email
+mixi にログインする必要が出た場合に使用するメールアドレスを指定します。
+この値を指定していない場合は、対話的に入力が求められます。
+@end defopt
+
+@anchor{mixi-default-password}
+@defopt mixi-default-password
+mixi にログインする必要が出た場合に使用するパスワードを指定します。
+この値を指定していない場合は、対話的に入力が求められます。
+@end defopt
+
+@defopt mixi-accept-adult-contents
+アダルトカテゴリのコミュニティを閲覧しても問題ないかどうかを指定します。
+@end defopt
+
+@defopt mixi-continuously-access-interval
+mixi のサイトは自動ツールなどで短時間に連続してアクセスした場合、その接
+続を拒否する旨のメッセージを表示します。
+接続を拒否された場合に待機する@emph{秒数}を指定します。
+@end defopt
+
+@defopt mixi-cache-expires
+mixi オブジェクトのキャッシュの有効期限を指定します。
+
+@table @asis
+@item 数値
+有効期限を指定した数値秒に設定します。
+@item t
+常に期限切れとして扱います。
+@item nil
+常に期限が切れていない物として扱います。
+@end table
+@end defopt
+
+@defopt mixi-cache-use-file
+mixi オブジェクトのキャッシュをファイルとして保存するかどうかを指定しま
+す。@footnote{ただし、現在この機能は実装されていません。}
+@end defopt
+
+@node 良くある質問と答え
+@chapter 良くある質問と答え
+@cindex FAQ
+@cindex Tips
+
+この章ではよく聞かれる質問に対する答えと便利な設定例を紹介します。
+
+@section Cannot retrieve というエラーが出ます
+
+なんらかの原因により mixi のサイトに接続できなかった場合、以下のようなエ
+ラーが発生することがあるかもしれません。
+
+@example
+mixi-url-retrieve: [mixi] Cannot retrieve: http://@dots{}
+@end example
+
+@noindent
+そのような場合は以下を確認してみてください。
+
+@itemize
+@item 通信回線に異常がないかどうか
+@item mixi のサイトがメンテ中あるいはダウンしていないかどうか
+@item 使用しているバックエンドでエラーで示されたページにアクセスできるか
+どうか
+@end itemize
+
+@section セキュリティが心配なので SSL でログインしたいのですが
+
+@ref{mixi-login-use-ssl} を @code{t} に設定することで SSL でログインする
+ように設定できます。
+
+@node バグレポート
+@chapter バグレポート
+
+mixi.el を使用していると予期せぬエラーが表示されたり、あるいはあなたの期
+待した動作をしないことがあるかもしれません。mixi.el を最新版にしてもなお
+問題が解消されない場合、それは mixi.el の不具合の可能性があります。
+
+@section エラーが表示される場合
+
+エラーが表示される場合はバックトレースを取得してデバッグにご協力ください。
+バックトレースの取得方法は以下の URL が参考になります。
+
+@uref{http://www.jpl.org/elips/BUGS-ja.html,
+プログラムの作者にバグを知らせる方法 (初心者向け)}
+
+バックトレースが取得できたらそれをなんらかの方法で作者に届ける必要があり
+ますが、残念なことに mixi のメッセージはファイルの添付ができません。
+メール、どこかのアップローダ、Web サイト、FTP サイト、手段はなんでも構い
+ませんので、なんらかの方法で作者までそれを届けてください。
+さらに、同じ不具合で困っている人が他にもいるかもしれませんので、エラーの
+内容を 
+@uref{http://mixi.jp/view_community.pl?id=1596390, mixi.el コミュニティ}
+内の@emph{不具合報告}トピックへも投稿してください。
+
+なお、バックトレース内には表示しようとしていた mixi ページの内容が含まれ
+ています。できるだけプライバシー上問題ないと判断される再現手順でのバック
+トレース取得をお願いします。下手に内容を改ざんされますとデバッグに支障を来
+たす可能性がありますのでご注意ください。
+
+@section 期待した動作をしない場合
+
+仕様か不具合かは分からないけれど期待した動作をしない場合、最低限以下の内
+容をできるだけ詳細で具体的に 
+@uref{http://mixi.jp/view_community.pl?id=1596390, mixi.el コミュニティ}
+内の@emph{不具合報告}トピックへ投稿してください。
+
+@itemize @bullet
+@item どういう動作を期待して
+@item どういう操作を行なったが
+@item どういう結果が得られた
+@end itemize
+
+@section 不具合対応におけるお願い
+
+不具合の報告を受けたらできるだけ早急に確認したいとは思いますが、平日昼間
+の仕事をしている間や、休日遊びに行っている間などは対応が遅れることがあり
+ます。さらに、24 時間自分の自由に触れる PC の前にいるわけでもありません。
+ですので「不具合報告トピックに投稿したのにまったく反応が無い」などと言っ
+た理由で足あとをつけまくって粘着したり、メッセージを送ってきたりしないで
+ください。
+
+さらに、私は mixi.el と Gnus を常時起動したままにして mixi に自動でアク
+セスしています。
+最終ログインが 5 分以内などとなっていても PC の前にいるとは限りませんの
+で「mixi 見てるのにまったく反応が無い」などと言った理由で足あとをつけま
+くって粘着したり、メッセージを送ってきたりしないでください。
+
+@node 概念索引
+@unnumbered 概念索引
+@printindex cp
+
+@node 関数索引
+@unnumbered 関数索引
+@printindex fn
+
+@node 変数索引
+@unnumbered 変数索引
+@printindex vr
+
+@contents
+
+@bye
+
+@c Local Variables:
+@c fill-column: 72
+@c End:

@@ -1,3 +1,14 @@
+2007-10-21  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-ja.texi: New file.
+	* infohack.el: Ditto.
+	* ptexinfmt.el: Ditto.
+	* Makefile.am (EXTRA_DIST): Add texinfo files.
+	(info_TEXINFOS): New variable.
+	(install): Depend install-info.
+	(install-package): Make info file.
+	(%.info): New rule.
+
 2007-10-18  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-atom.el: Fix expressions of the copyright notices.

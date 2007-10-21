@@ -12,3 +12,8 @@ config.cache
 COPYING
 INSTALL
 COMPILE
+texinfo.tex
+*.info*
+mdate-sh
+stamp-vti
+version.texi

@@ -1,0 +1,102 @@
+What's this?
+------------
+
+  mixi.el is API libraries for accessing to mixi for Emacs.
+
+Features
+--------
+
+  * You can get the following data on mixi:
+
+    - Friends
+    - Favorites
+    - Logs
+    - Diaries
+    - Communities
+    - BBSes
+    - Comments
+    - Messages
+    - Introductions
+    - News
+
+  * You can post the following data to mixi:
+
+    - Diary
+    - Topic
+    - Comment
+    - Message
+
+Working Environments
+--------------------
+
+  The latest version of mixi.el is verified to work properly under
+  following emacsen.
+
+  Emacs 22.1
+  Emacs 22.1.50
+
+Requirements
+------------
+
+  You need one of following packages:
+
+    * emacs-w3m - http://emacs-w3m.namazu.org
+    * url.el    - included in your Emacs
+    * cURL      - http://curl.haxx.se/
+
+Installation
+------------
+
+  % ./configure
+  % make
+  % su
+  # make install
+
+How to use
+----------
+
+Info manual is available after installation.  To read, start Emacs
+and type M-x info and select "mixi-ja" (Japanese only).
+
+Copying
+-------
+
+  mixi.el is copyrighted free software by OHASHI Akira <bg66@koka-in.org>.
+  You can redistribute it and/or modify it under either the terms of
+  the GPL (see the file `COPYING').
+
+Information
+-----------
+
+  For more information, see the mixi.el community on mixi.
+
+    <URL:http://mixi.jp/view_community.pl?id=1596390>
+
+Development
+-----------
+
+  Development of mixi.el uses CVS, Concurrent Versions System. Latest
+  development version is available via CVS.
+
+  * cvs login (first time only)
+
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root login
+    (CVS password: [CR] # NULL string)
+
+  * checkout modules
+
+    % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root checkout mixi
+ 
+  Browsing the CVS tree gives you a great view into the current status of
+  this project's code. You may also view the complete history of any file
+  in the repository.
+  Please refer to <URL:http://cvs.m17n.org/cgi-bin/viewcvs/mixi/>.
+
+  If you would like to join CVS based development, please refer to
+  <URL:http://cvs.m17n.org/>.
+
+Bug reports
+-----------
+
+  If you have bug reports and/or suggestions for improvement, please
+  send them via <URL:http://mixi.jp/view_community.pl?id=1596390>.

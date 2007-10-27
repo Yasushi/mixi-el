@@ -40,9 +40,9 @@ Requirements
 
   You need one of following packages:
 
-    * emacs-w3m - http://emacs-w3m.namazu.org
-    * url.el    - included in your Emacs
-    * cURL      - http://curl.haxx.se/
+    * emacs-w3m  - http://emacs-w3m.namazu.org/
+    * url.el     - included in your Emacs
+    * cURL       - http://curl.haxx.se/
 
 Installation
 ------------
@@ -55,8 +55,8 @@ Installation
 How to use
 ----------
 
-Info manual is available after installation.  To read, start Emacs
-and type M-x info and select "mixi-ja" (Japanese only).
+Info manual is available after installation.  To read, start Emacs and
+type `M-x info' and select "mixi-ja" (Japanese only).
 
 Copying
 -------
@@ -75,7 +75,7 @@ Information
 Development
 -----------
 
-  Development of mixi.el uses CVS, Concurrent Versions System. Latest
+  Development of mixi.el uses CVS, Concurrent Versions System.  Latest
   development version is available via CVS.
 
   * cvs login (first time only)
@@ -87,9 +87,9 @@ Development
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root checkout mixi
  
-  Browsing the CVS tree gives you a great view into the current status of
-  this project's code. You may also view the complete history of any file
-  in the repository.
+  Browsing the CVS tree gives you a great view into the current status
+  of this project's code.  You may also view the complete history of
+  any file in the repository.
   Please refer to <URL:http://cvs.m17n.org/cgi-bin/viewcvs/mixi/>.
 
   If you would like to join CVS based development, please refer to

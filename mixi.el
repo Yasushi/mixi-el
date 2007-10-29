@@ -136,7 +136,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.174 $")
+(defconst mixi-revision "$Revision: 1.175 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1459,7 +1459,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-community-nodata-regexp
   "^データがありません")
 (defconst mixi-community-name-regexp
-  "<div class=\"pageTitle communityTitle002\">
+  "<div class=\"pageTitle communityTitle002 communityTop\">
 <h2>\\(.*\\)</h2>")
 (defconst mixi-community-birthday-regexp
   "<dt>開設日</dt>

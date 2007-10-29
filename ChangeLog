@@ -1,3 +1,8 @@
+2007-10-29  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-el: Version 1.0.0 released.
+	* configure.ac: Bump up version.
+
 2007-10-26  OHASHI Akira  <bg66@koka-in.org>
 
 	* AUTHORS: Add new entries of the special thanks.

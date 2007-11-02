@@ -61,21 +61,21 @@ type `M-x info' and select "mixi-ja" (Japanese only).
 Copying
 -------
 
-  mixi.el is copyrighted free software by OHASHI Akira <bg66@koka-in.org>.
+  mixi-el is copyrighted free software by OHASHI Akira <bg66@koka-in.org>.
   You can redistribute it and/or modify it under either the terms of
   the GPL (see the file `COPYING').
 
 Information
 -----------
 
-  For more information, see the mixi.el community on mixi.
+  For more information, see the mixi-el community on mixi.
 
     <URL:http://mixi.jp/view_community.pl?id=1596390>
 
 Development
 -----------
 
-  Development of mixi.el uses CVS, Concurrent Versions System.  Latest
+  Development of mixi-el uses CVS, Concurrent Versions System.  Latest
   development version is available via CVS.
 
   * cvs login (first time only)

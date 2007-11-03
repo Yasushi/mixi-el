@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.59 $")
+(defconst shimbun-mixi-revision "$Revision: 1.60 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache))
@@ -121,6 +121,11 @@ of mixi object."
   :group 'shimbun
   :type 'boolean)
 
+(defcustom shimbun-mixi-add-comment-count-to-author t
+  "*If non-nil, add comment count to author."
+  :group 'shimbun
+  :type 'boolean)
+
 ;; FIXME: Don't use this user option.
 (defcustom shimbun-mixi-page-articles 10
   "*How many articles are there in one page."
@@ -181,7 +186,7 @@ of mixi object."
 				       "^new-"
 				       (shimbun-current-group-internal
 					shimbun)))
-	      (mixi-make-author object)
+	      (mixi-make-author object shimbun-mixi-add-comment-count-to-author)
 	      (mixi-make-date object)
 	      id
 	      (if (eq class 'mixi-comment)

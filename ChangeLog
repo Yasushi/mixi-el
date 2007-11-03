@@ -1,3 +1,15 @@
+2007-11-03  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-make-comment): Add the COUNT slot.
+	(mixi-comment-count): New function.
+	(mixi-topic-comment-list-regexp): Fix regexp.
+	(mixi-event-comment-list-regexp): Ditto.
+	(mixi-get-comments): Follow the change above.
+	* mixi-utils.el (mixi-make-author): Add the ADD-COMMENT-COUNT argument.
+	* sb-mixi.el (shimbun-mixi-add-comment-count-to-author): New user
+	option.
+	(shimbun-mixi-get-headers): Use it.
+
 2007-10-29  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-community-name-regexp): Follow the change of mixi.

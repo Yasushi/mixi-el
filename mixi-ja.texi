@@ -577,6 +577,10 @@ comment オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以
 @ref{mixi-remove-markup} を使用することができます。
 @end defun
 
+@defun mixi-comment-count comment
+親オブジェクトがトピックまたはイベントのときのみコメント番号を返却します。
+@end defun
+
 @subsection message オブジェクト
 @cindex message オブジェクト
 

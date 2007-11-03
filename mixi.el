@@ -136,7 +136,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.175 $")
+(defconst mixi-revision "$Revision: 1.176 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2235,9 +2235,9 @@ Increase this value when unexpected error frequently occurs."
     (funcall func parent page)))
 
 ;; Comment object.
-(defun mixi-make-comment (parent owner time content)
+(defun mixi-make-comment (parent owner time content &optional count)
   "Return a comment object."
-  (cons 'mixi-comment (vector parent owner time content)))
+  (cons 'mixi-comment (vector parent owner time content count)))
 
 (defmacro mixi-comment-p (comment)
   `(eq (mixi-object-class ,comment) 'mixi-comment))
@@ -2265,6 +2265,12 @@ Increase this value when unexpected error frequently occurs."
   (unless (mixi-comment-p comment)
     (signal 'wrong-type-argument (list 'mixi-comment-p comment)))
   (aref (cdr comment) 3))
+
+(defun mixi-comment-count (comment)
+  "Return the count of COMMENT."
+  (unless (mixi-comment-p comment)
+    (signal 'wrong-type-argument (list 'mixi-comment-p comment)))
+  (aref (cdr comment) 4))
 
 (defun mixi-diary-comment-list-page (diary)
   (concat "/view_diary.pl?full=1"
@@ -2297,7 +2303,8 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-topic-comment-list-regexp
-  "<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
+  "<dt class=\"commentDate clearfix\"><span class=\"senderId\">\\(<input id=\"commentCheck01\" name=\"comment_id\" type=\"checkbox\" value=\"[0-9]+\" /><label for=\"commentCheck01\">\\|\\)\\([0-9]+\\)\\(<span class=\"deleteTextArea\"><a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+\">自分のコメントを削除する</a></span>\\|</label>\\|\\)</span>
+<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
 <dd>
 <dl class=\"commentContent01\">
 <dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></dt>
@@ -2312,7 +2319,8 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-event-comment-list-regexp
-  "<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
+  "<dt class=\"commentDate clearfix\"><span class=\"senderId\">\\(<input id=\"commentCheck01\" name=\"comment_id\" type=\"checkbox\" value=\"[0-9]+\" /><label for=\"commentCheck01\">\\|\\)\\([0-9]+\\)\\(<span class=\"deleteTextArea\"><a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+\">自分のコメントを削除する</a></span>\\|</label>\\|\\)</span>
+<span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
 <dd>
 <dl class=\"commentContent01\">
 <dt><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a></dt>
@@ -2336,7 +2344,8 @@ Increase this value when unexpected error frequently occurs."
       (setq page nil))
     (let ((items (mixi-get-matched-items page regexp range t)))
       (mapcar (lambda (item)
-		(let (owner-id owner-nick year month day hour minute content)
+		(let (owner-id owner-nick year month day hour minute content
+			       count)
 		  (if (eq (mixi-object-class parent) 'mixi-diary)
 		      (progn
 			(setq owner-id (nth 1 item))
@@ -2347,14 +2356,15 @@ Increase this value when unexpected error frequently occurs."
 			(setq hour (nth 7 item))
 			(setq minute (nth 8 item))
 			(setq content (nth 9 item)))
-		    (setq owner-id (nth 5 item))
-		    (setq owner-nick (nth 6 item))
-		    (setq year (nth 0 item))
-		    (setq month (nth 1 item))
-		    (setq day (nth 2 item))
-		    (setq hour (nth 3 item))
-		    (setq minute (nth 4 item))
-		    (setq content (nth 7 item)))
+		    (setq owner-id (nth 8 item))
+		    (setq owner-nick (nth 9 item))
+		    (setq year (nth 3 item))
+		    (setq month (nth 4 item))
+		    (setq day (nth 5 item))
+		    (setq hour (nth 6 item))
+		    (setq minute (nth 7 item))
+		    (setq content (nth 10 item))
+		    (setq count (nth 1 item)))
 		  (mixi-make-comment parent (mixi-make-friend owner-id
 							      owner-nick)
 				     (encode-time
@@ -2364,7 +2374,7 @@ Increase this value when unexpected error frequently occurs."
 				      (string-to-number day)
 				      (string-to-number month)
 				      (string-to-number year))
-				     content)))
+				     content count)))
 	      items))))
 
 (defmacro mixi-new-comment-list-page ()

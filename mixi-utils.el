@@ -78,14 +78,20 @@
 				   ")"))))
 	     (concat prefix subject suffix))))))
 
-(defun mixi-make-author (object)
+(defun mixi-make-author (object &optional add-comment-count)
   (with-mixi-class object
-    (if (eq class 'mixi-news)
-	(mixi-news-media object)
-      (let ((owner (if (eq class 'mixi-log)
-		       (mixi-log-friend object)
-		     (mixi-object-owner object))))
-	(mixi-friend-nick owner)))))
+    (cond ((eq class 'mixi-news)
+	   (mixi-news-media object))
+	  ((and add-comment-count
+		(eq class 'mixi-comment)
+		(mixi-bbs-p (mixi-comment-parent object)))
+	   (concat (mixi-comment-count object) " "
+		   (mixi-friend-nick (mixi-comment-owner object))))
+	  (t
+	   (let ((owner (if (eq class 'mixi-log)
+			    (mixi-log-friend object)
+			  (mixi-object-owner object))))
+	     (mixi-friend-nick owner))))))
 
 (defun mixi-make-date (object)
   (let* ((time (mixi-object-time object))

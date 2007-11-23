@@ -1,3 +1,7 @@
+2007-11-24  OHASHI Akira  <bg66@koka-in.org>
+
+	* Makefile.am (install-package): Install a info file correctly.
+
 2007-11-19  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-diary-comment-list-regexp): Follow the change of mixi.

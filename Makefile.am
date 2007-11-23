@@ -22,7 +22,7 @@ package:
 
 install-package: package
 	$(XEMACS) $(FLAGS) -l COMPILE -f mixi-install-package $(PACKAGEDIR)
-	$(MAKE) infodir=$(PACKAGEDIR)/info install
+	$(MAKE) infodir=$(PACKAGEDIR)/info install-info
 
 compile-individually:
 	@for i in `$(EMACS) $(FLAGS) -l COMPILE -f mixi-examine`; do \

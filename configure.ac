@@ -1,7 +1,7 @@
-AC_INIT
+AC_INIT([mixi-el], [1.0.0], [bg66@koka-in.org])
 AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR([mixi.el])
-AM_INIT_AUTOMAKE(mixi-el, 1.0.0)
+AM_INIT_AUTOMAKE
 
 AC_CHECK_EMACS
 AC_PATH_LISPDIR

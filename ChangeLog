@@ -1,3 +1,7 @@
+2007-12-21  OHASHI Akira  <bg66@koka-in.org>
+
+	* configure.ac: Use modern AC_INIT.
+
 2007-11-24  OHASHI Akira  <bg66@koka-in.org>
 
 	* Makefile.am (install-package): Install a info file correctly.

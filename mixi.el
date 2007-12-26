@@ -29,11 +29,13 @@
 ;;  * mixi-get-friends
 ;;  * mixi-get-favorites
 ;;  * mixi-get-logs
+;;  * mixi-get-recommended-friends (indies)
 ;;  * mixi-get-diaries
 ;;  * mixi-get-new-diaries
 ;;  * mixi-search-diaries
 ;;  * mixi-get-communities
 ;;  * mixi-search-communities
+;;  * mixi-get-recommended-communities (indies)
 ;;  * mixi-get-bbses
 ;;  * mixi-get-new-bbses
 ;;  * mixi-search-bbses
@@ -136,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.177 $")
+(defconst mixi-revision "$Revision: 1.178 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1147,6 +1149,23 @@ Increase this value when unexpected error frequently occurs."
 					  (string-to-number (nth 0 item)))))
 	    items)))
 
+;; Recommended friend.
+(defmacro mixi-recommended-friend-list-page ()
+  `(concat "http://indies.mixi.jp/recommend.pl"))
+
+(defconst mixi-recommended-friend-list-regexp
+  "<div class=\"iconListImage\"><a href=\"http://mixi\\.jp/show_friend\\.pl\\?id=\\([0-9]+\\)\" [^>]+>.+</a></div><span>\\(.+?\\)¤µ¤ó([0-9]+)</span>")
+
+;;;###autoload
+(defun mixi-get-recommended-friends (&optional range)
+  "Get recommended friends."
+  (let ((items (mixi-get-matched-items (mixi-recommended-friend-list-page)
+				       mixi-recommended-friend-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (mixi-make-friend (nth 0 item) (nth 1 item)))
+	    items)))
+
 ;; Diary object.
 (defvar mixi-diary-cache (make-hash-table :test 'equal))
 (defun mixi-make-diary (owner id &optional comment-count time title content)
@@ -1696,6 +1715,23 @@ Increase this value when unexpected error frequently occurs."
   (let ((items (mixi-get-matched-items (mixi-search-community-list-page
 					keyword)
 				       mixi-search-community-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (mixi-make-community (nth 0 item) (nth 1 item)))
+	    items)))
+
+;; Recommended community.
+(defalias 'mixi-recommended-community-list-page
+  'mixi-recommended-friend-list-page)
+
+(defconst mixi-recommended-community-list-regexp
+  "<div class=\"iconListImage\"><a href=\"http://mixi\\.jp/view_community\\.pl\\?id=\\([0-9]+\\)\" [^>]+>.+</a></div><span>\\(.+\\)([0-9]+)</span>")
+
+;;;###autoload
+(defun mixi-get-recommended-communities (&optional range)
+  "Get recommended communities."
+  (let ((items (mixi-get-matched-items (mixi-recommended-community-list-page)
+				       mixi-recommended-community-list-regexp
 				       range)))
     (mapcar (lambda (item)
 	      (mixi-make-community (nth 0 item) (nth 1 item)))

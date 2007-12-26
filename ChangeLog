@@ -1,3 +1,12 @@
+2007-12-26  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-recommended-friend-list-page): New macro.
+	(mixi-recommended-friend-list-regexp): New constant.
+	(mixi-get-recommended-friends): New function.
+	(mixi-recommended-community-list-page): New alias.
+	(mixi-recommended-community-list-regexp): New constant.
+	(mixi-get-recommended-communities): New function.
+
 2007-12-21  OHASHI Akira  <bg66@koka-in.org>
 
 	* configure.ac: Use modern AC_INIT.

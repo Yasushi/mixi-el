@@ -755,6 +755,23 @@ friend オブジェクトと数値は同時に指定することもできます。
 @end cartouche
 @end defun
 
+@defun mixi-get-recommended-friends &optional range
+おすすめマイミクシィ一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のおすすめマイミクシィのみを取得
+します。
+
+@cartouche
+@example
+(mixi-get-recommended-friends)
+    @result{} おすすめマイミクシィすべて
+
+(mixi-get-recommended-friends 5)
+    @result{} おすすめマイミクシィ最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
 @defun mixi-get-diaries &rest friend-or-range
 日記一覧を取得します。
 @var{friend-or-range} は friend オブジェクトまたは数値を指定することがで
@@ -856,6 +873,23 @@ friend オブジェクトと数値は同時に指定することもできます。
 
 (mixi-search-communities "mixi.el" 5)
     @result{} @samp{mixi.el} で検索したコミュニティ最大で 5 件分
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-recommended-communities &optional range
+おすすめコミュニティ一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のおすすめコミュニティのみを取得
+します。
+
+@cartouche
+@example
+(mixi-get-recommended-communities)
+    @result{} おすすめコミュニティすべて
+
+(mixi-get-recommended-communities 5)
+    @result{} おすすめコミュニティ最大で 5 件分のみ
 @end example
 @end cartouche
 @end defun

@@ -1,5 +1,10 @@
 2007-12-26  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-el: Version 1.1.0 released.
+	* configure.ac: Bump up version.
+
+2007-12-26  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-recommended-friend-list-page): New macro.
 	(mixi-recommended-friend-list-regexp): New constant.
 	(mixi-get-recommended-friends): New function.

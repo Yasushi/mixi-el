@@ -1,5 +1,10 @@
 2007-12-29  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-el: Version 1.2.0 released.
+	* configure.ac: Bump up version.
+
+2007-12-29  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-news-category-list): Add game-anime and column.
 	* sb-mixi.el (shimbun-mixi-default-group-alist): Support them.
 

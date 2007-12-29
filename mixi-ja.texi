@@ -117,12 +117,12 @@ mixi.el $B$O(B mixi $B$X%"%/%;%9$9$k$?$a$K0J2<$N%i%$%V%i%j!"$^$?$O30It%"%W%j%
 @chapter $B%$%s%9%H!<%k(B
 
 $B:G=i$K!"G[I[$5$l$?(B mixi-el $B$N(B tarball $B$r0J2<$N$h$&$KE,Ev$J>l=j$GE83+$7!"(B
-$B:n@.$5$l$?(B @file{mixi} $B%G%#%l%/%H%j$X0\F0$7$F$/$@$5$$!#(B
+$B:n@.$5$l$?(B @file{mixi-el-@value{VERSION}} $B%G%#%l%/%H%j$X0\F0$7$F$/$@$5$$!#(B
 
 @cartouche
 @example
-% tar zxf mixi-el-1.0.0.tar.gz
-% cd mixi-el-1.0.0
+% tar zxf mixi-el-@value{VERSION}.tar.gz
+% cd mixi-el-@value{VERSION}
 @end example
 @end cartouche
 

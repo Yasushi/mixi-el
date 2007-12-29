@@ -1079,6 +1079,10 @@ friend オブジェクトと数値は同時に指定することもできます。
 エンターテインメント
 @item IT
 IT・テクノロジー
+@item game-anime
+ゲーム・アニメ
+@item column
+コラム
 @end table
 @var{sort} は種類を表す以下のいずれかを指定してください。
 @table @asis

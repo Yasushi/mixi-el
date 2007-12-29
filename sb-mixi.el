@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.60 $")
+(defconst shimbun-mixi-revision "$Revision: 1.61 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache))
@@ -75,6 +75,12 @@
     ("news.newest.it" .
      (lambda (range)
        (mixi-get-news 'IT 'newest range)))
+    ("news.newest.game-anime" .
+     (lambda (range)
+       (mixi-get-news 'game-anime 'newest range)))
+    ("news.newest.column" .
+     (lambda (range)
+       (mixi-get-news 'column 'newest range)))
     ("news.pickup.domestic" .
      (lambda (range)
        (mixi-get-news 'domestic 'pickup range)))
@@ -98,7 +104,13 @@
        (mixi-get-news 'entertainment 'pickup range)))
     ("news.pickup.it" .
      (lambda (range)
-       (mixi-get-news 'IT 'pickup range))))
+       (mixi-get-news 'IT 'pickup range)))
+    ("news.pickup.game-anime" .
+     (lambda (range)
+       (mixi-get-news 'game-anime 'pickup range)))
+    ("news.pickup.column" .
+     (lambda (range)
+       (mixi-get-news 'column 'pickup range))))
   "An alist of mixi shimbun group default definition.")
 
 (defcustom shimbun-mixi-group-alist nil

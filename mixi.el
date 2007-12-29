@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.178 $")
+(defconst mixi-revision "$Revision: 1.179 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2949,7 +2949,8 @@ Increase this value when unexpected error frequently occurs."
   (aset (cdr news) 6 content))
 
 (defconst mixi-news-category-list '(domestic politics economy area abroad
-					     sports entertainment IT))
+					     sports entertainment IT game-anime
+					     column))
 
 (defmacro mixi-news-category-p (category)
   `(memq ,category mixi-news-category-list))

@@ -1,6 +1,6 @@
 ;; mixi.el --- API libraries for accessing to mixi -*- coding: euc-jp -*-
 
-;; Copyright (C) 2005, 2006, 2007 OHASHI Akira
+;; Copyright (C) 2005, 2006, 2007, 2008 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: hypermedia
@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.179 $")
+(defconst mixi-revision "$Revision: 1.180 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -475,7 +475,8 @@ Increase this value when unexpected error frequently occurs."
   (let ((page 1)
 	ids)
     (catch 'end
-      (while (or (null range) (< (length ids) range))
+      (while (and (or (null range) (< (length ids) range))
+		  (or (= page 1) (and (stringp url) (string-match "%d" url))))
 	(with-mixi-retrieve (when url (format url page))
 	  (let ((func (if reverse (progn
 				    (goto-char (point-max))

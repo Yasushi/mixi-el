@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.180 $")
+(defconst mixi-revision "$Revision: 1.181 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2192,7 +2192,7 @@ Increase this value when unexpected error frequently occurs."
 
 ;;;###autoload
 (defun mixi-get-bbses (community &optional range)
-  "Get bbese of COMMUNITY."
+  "Get bbses of COMMUNITY."
   (unless (mixi-community-p community)
     (signal 'wrong-type-argument (list 'mixi-community-p community)))
   (let ((items (mixi-get-matched-items (mixi-bbs-list-page community)

@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.181 $")
+(defconst mixi-revision "$Revision: 1.182 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2354,7 +2354,7 @@ Increase this value when unexpected error frequently occurs."
 
 ;; FIXME: Split regexp to time, owner(id and nick) and contents.
 (defconst mixi-event-comment-list-regexp
-  "<dt class=\"commentDate clearfix\"><span class=\"senderId\">\\(<input id=\"commentCheck01\" name=\"comment_id\" type=\"checkbox\" value=\"[0-9]+\" /><label for=\"commentCheck01\">\\|\\)\\([0-9]+\\)\\(<span class=\"deleteTextArea\"><a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+\">自分のコメントを削除する</a></span>\\|</label>\\|\\)</span>
+  "<dt class=\"commentDate clearfix\"><span class=\"senderId\">\\(<input id=\"commentCheck01\" name=\"comment_id\" type=\"checkbox\" value=\"[0-9]+\" /><label for=\"commentCheck01\">\\|\\)\\([0-9]+\\)\\(<span class=\"deleteTextArea\"><a href=\"delete_bbs_comment\\.pl\\?id=[0-9]+&comm_id=[0-9]+&comment_id=[0-9]+&type=event\">自分のコメントを削除する</a></span>\\|</label>\\|\\)</span>
 <span class=\"date\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span></dt>
 <dd>
 <dl class=\"commentContent01\">

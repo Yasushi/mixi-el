@@ -1,3 +1,7 @@
+2008-01-30  KAMO Tomoyuki  <kto2038@yahoo.co.jp>
+
+	* mixi.el (mixi-event-comment-list-regexp): Follow the change of mixi.
+
 2008-01-18  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-el: Version 1.2.1 released.

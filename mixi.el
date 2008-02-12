@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.182 $")
+(defconst mixi-revision "$Revision: 1.183 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2837,21 +2837,19 @@ Increase this value when unexpected error frequently occurs."
 	   "&media_id=" (mixi-news-media-id ,news)))
 
 (defconst mixi-news-finished-regexp
-  "申し訳ございませんが、このニュースは掲載が終了したか、URLが間違っていいるためご覧いただけません。</td>")
+  "<p class=\"supplement01\">※申し訳ありませんが、このニュースは掲載期間が終了したか、URLが間違っているためご覧いただけません。詳しくは<a href=\"http://mixi.jp/help.pl#16h\">こちら</a>をご覧ください。</p>")
 (defconst mixi-news-title-regexp
-  "<td HEIGHT=\"46\" STYLE=\"font-weight: bold;font-size: 14px;\" CLASS=\"h130\">\\(.+\\)\\(
-\\)?</td>")
+  "<div class=\"articleH[ae][ae]ding\">
+<h2>\\(.+\\)</h2>")
 (defconst mixi-news-media-time-regexp
-  "<td COLSPAN=\"2\" ALIGN=\"right\">(\\(.+\\)&nbsp;-&nbsp;\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\))</td></tr>")
+  "<p class=\"date\">（\\(.+\\) - \\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)）</p>")
 (defconst mixi-news-content-regexp
-  "<td CLASS=\"h150\">
-
+  "<div class=\"article\">
 \\(.+\\)
-<br>
-\\(.*
-\\)?
 
-\\(</td>\\|<br>\\)")
+
+\\(</div>
+</div>\\|<div class=\"additional\">\\)")
 
 (defun mixi-realize-news (news)
   "Realize a NEWS."
@@ -2984,14 +2982,9 @@ Increase this value when unexpected error frequently occurs."
 	   "&type=bn"))
 
 (defconst mixi-news-list-regexp
-  "<tr bgcolor=\"\\(#FCF5EB\\|#FFFFFF\\)\">
-<td WIDTH=\"1%\" valign=top CLASS=\"h120\">・</td>
-<td WIDTH=\"97%\" CLASS=\"h120\"><A HREF=\"view_news\\.pl\\?id=\\([0-9]+\\)&media_id=\\([0-9]+\\)\"class=\"new_link\">\\(.+\\)</A>
-\\(<IMG SRC=\"http://img\\.mixi\\.jp/img/news_camera3\\.gif\" WIDTH=\"11\" HEIGHT=\"12\">\\|\\)
-
-</td>
-<td WIDTH=\"1%\" nowrap CLASS=\"f08\"><A HREF=\"list_news_media\\.pl\\?id=[0-9]+\">\\(.+\\)</A></td>
-<td WIDTH=\"1%\" nowrap CLASS=\"f08\">\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td></tr>")
+  "<td class=\"newsTitle\"><p>・ <a href=\"view_news\\.pl\\?id=\\([0-9]+\\)&media_id=\\([0-9]+\\)\">\\(.+\\)</a><img src=\"http://img\\.mixi\\.jp/img/news_camera3\\.gif\" width=\"11\" height=\"12\" alt=\"\" /></p></td>
+<td class=\"media\"><a href=\"list_news_media\\.pl\\?id=[0-9]+\">\\(.+\\)</a></td>
+<td class=\"date\">\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</td>")
 
 ;;;###autoload
 (defun mixi-get-news (category sort &optional range)
@@ -3006,17 +2999,17 @@ Increase this value when unexpected error frequently occurs."
 	(year (nth 5 (decode-time (current-time))))
 	(month (nth 4 (decode-time (current-time)))))
     (mapcar (lambda (item)
-	      (let ((month-of-item (string-to-number (nth 6 item))))
+	      (let ((month-of-item (string-to-number (nth 4 item))))
 		(when (> month-of-item month)
 		  (decf year))
 		(setq month month-of-item)
-		(mixi-make-news (nth 2 item) (nth 1 item) (nth 5 item)
+		(mixi-make-news (nth 1 item) (nth 0 item) (nth 3 item)
 				(encode-time
-				 0 (string-to-number (nth 9 item))
-				 (string-to-number (nth 8 item))
-				 (string-to-number (nth 7 item))
+				 0 (string-to-number (nth 7 item))
+				 (string-to-number (nth 6 item))
+				 (string-to-number (nth 5 item))
 				 month year)
-				(nth 3 item))))
+				(nth 2 item))))
 	    items)))
 
 (provide 'mixi)

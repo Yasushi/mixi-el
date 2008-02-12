@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.62 $")
+(defconst shimbun-mixi-revision "$Revision: 1.63 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache release-cache))
@@ -250,7 +250,7 @@ of mixi object."
 	 (cache (shimbun-mixi-release-cache-internal shimbun))
 	 (article (gethash message-id cache)))
     (unless (stringp article)
-      (let* ((releases (mixi-get-releases)))
+      (let ((releases (mixi-get-releases)))
 	(while releases
 	  (let ((id (mixi-make-message-id (car releases)))
 		(content (mixi-release-content (car releases))))

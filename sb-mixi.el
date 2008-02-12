@@ -1,6 +1,6 @@
 ;;; sb-mixi.el --- shimbun backend for mixi
 
-;; Copyright (C) 2006, 2007 OHASHI Akira
+;; Copyright (C) 2006, 2007, 2008 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: news
@@ -33,10 +33,10 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.61 $")
+(defconst shimbun-mixi-revision "$Revision: 1.62 $")
 
 (eval-and-compile
-  (luna-define-class shimbun-mixi (shimbun) (comment-cache))
+  (luna-define-class shimbun-mixi (shimbun) (comment-cache release-cache))
   (luna-define-internal-accessors 'shimbun-mixi))
 
 (defconst shimbun-mixi-default-group-alist
@@ -110,7 +110,8 @@
        (mixi-get-news 'game-anime 'pickup range)))
     ("news.pickup.column" .
      (lambda (range)
-       (mixi-get-news 'column 'pickup range))))
+       (mixi-get-news 'column 'pickup range)))
+    ("releases" . mixi-get-releases))
   "An alist of mixi shimbun group default definition.")
 
 (defcustom shimbun-mixi-group-alist nil
@@ -157,10 +158,13 @@ of mixi object."
 						&rest init-args)
   (shimbun-mixi-set-comment-cache-internal shimbun
 					   (make-hash-table :test 'equal))
+  (shimbun-mixi-set-release-cache-internal shimbun
+					   (make-hash-table :test 'equal))
   shimbun)
 
 (luna-define-method shimbun-close :after ((shimbun shimbun-mixi))
   (shimbun-mixi-set-comment-cache-internal shimbun nil)
+  (shimbun-mixi-set-release-cache-internal shimbun nil)
   (mixi-logout))
 
 (luna-define-method shimbun-groups ((shimbun shimbun-mixi))
@@ -241,6 +245,21 @@ of mixi object."
 	  (setq comments (cdr comments)))))
     article))
 
+(defun shimbun-mixi-release-article (shimbun header)
+  (let* ((message-id (shimbun-header-id header))
+	 (cache (shimbun-mixi-release-cache-internal shimbun))
+	 (article (gethash message-id cache)))
+    (unless (stringp article)
+      (let* ((releases (mixi-get-releases)))
+	(while releases
+	  (let ((id (mixi-make-message-id (car releases)))
+		(content (mixi-release-content (car releases))))
+	    (puthash id content cache)
+	    (when (string= id message-id)
+	      (setq article content)))
+	  (setq releases (cdr releases)))))
+    article))
+
 (luna-define-method shimbun-article ((shimbun shimbun-mixi)
 				     header &optional outbuf)
   (when (shimbun-current-group-internal shimbun)
@@ -249,10 +268,14 @@ of mixi object."
        (or (with-temp-buffer
 	     (let* ((url (shimbun-article-url shimbun header))
 		    (object (mixi-make-object-from-url url))
-		    (article (if (string-match "#comment$" url)
-				 (shimbun-mixi-comment-article
-				  url shimbun header)
-			       (mixi-make-content object))))
+		    (article (cond ((string-match "#comment$" url)
+				    (shimbun-mixi-comment-article
+				     url shimbun header))
+				   ((string-match "release_info.pl$" url)
+				    (shimbun-mixi-release-article
+				     shimbun header))
+				   (t
+				    (mixi-make-content object)))))
 	       (mixi-make-reply-to object)
 	       (when (stringp article)
 		 (insert article)))

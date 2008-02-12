@@ -1,5 +1,26 @@
 2008-02-12  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-make-release): New function.
+	(mixi-release-p): New macro.
+	(mixi-release-title): New function.
+	(mixi-release-time): Ditto.
+	(mixi-release-content): Ditto.
+	(mixi-release-list-page): New macro.
+	(mixi-release-list-regexp): New constant.
+	(mixi-get-releases): New function.
+	* mixi-utils.el (mixi-make-author): Support release object.
+	(mixi-make-id-1): Ditto.
+	(mixi-make-url): Ditto.
+	(mixi-make-reply-to): Ditto.
+	* sb-mixi.el (shimbun-mixi): Add release-cache.
+	(shimbun-mixi-default-group-alist): Add releases group.
+	(initialize-instance): Initialize release cache.
+	(shimbun-close): Clear release cache.
+	(shimbun-mixi-release-article): New function.
+	(shimbun-article): Use it.
+
+2008-02-12  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-news-finished-regexp): Follow the change of mixi.
 	(mixi-news-title-regexp): Ditto.
 	(mixi-news-media-time-regexp): Ditto.

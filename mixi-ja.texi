@@ -14,7 +14,7 @@
 @end direntry
 
 @copying
-Copyright @copyright{} 2007 @w{OHASHI Akira}.
+Copyright @copyright{} 2007, 2008 @w{OHASHI Akira}.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -370,7 +370,7 @@ ID を返却します。
 @end defun
 
 @defun mixi-diary-time diary
-時刻を返却します。
+日時を返却します。
 @end defun
 
 @defun mixi-diary-title diary
@@ -469,7 +469,7 @@ ID を返却します。
 @end defun
 
 @defun mixi-topic-time topic
-時刻を返却します。
+日時を返却します。
 @end defun
 
 @defun mixi-topic-title topic
@@ -517,7 +517,7 @@ ID を返却します。
 @end defun
 
 @defun mixi-event-time event
-時刻を返却します。
+日時を返却します。
 @end defun
 
 @defun mixi-event-title event
@@ -568,7 +568,7 @@ comment オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以
 @end defun
 
 @defun mixi-comment-time comment
-時刻を返却します。
+日時を返却します。
 @end defun
 
 @defun mixi-comment-content comment
@@ -619,7 +619,7 @@ ID を返却します。
 @end defun
 
 @defun mixi-message-time message
-時刻を返却します。
+日時を返却します。
 @end defun
 
 @defun mixi-message-content message
@@ -685,6 +685,31 @@ ID を返却します。
 @end defun
 
 @defun mixi-news-content news
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
+@subsection release オブジェクト
+@cindex release オブジェクト
+
+新機能リリース・障害のご報告を表すオブジェクトです。
+このオブジェクトを直接生成することは無いと思います。
+
+@subsubsection アクセサメソッド
+
+release オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
+に解説します。
+
+@defun mixi-release-title release
+タイトルを返却します。
+@end defun
+
+@defun mixi-release-time release
+日時を返却します。
+@end defun
+
+@defun mixi-release-content release
 本文を返却します。
 本文には HTML タグが含まれている可能性があります。それらを取り除くために
 @ref{mixi-remove-markup} を使用することができます。
@@ -1101,6 +1126,23 @@ IT・テクノロジー
 
 (mixi-get-introductions 'politics 'pickup 5)
     @result{} 政治の注目ニュース最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-releases &optional range
+新機能リリース・障害のご報告一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の新機能リリース・障害のご報告の
+みを取得します。
+
+@cartouche
+@example
+(mixi-get-releases)
+    @result{} 新機能リリース・障害のご報告すべて
+
+(mixi-get-releases 5)
+    @result{} 新機能リリース・障害のご報告最大で 5 件分のみ
 @end example
 @end cartouche
 @end defun

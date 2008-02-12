@@ -1,6 +1,6 @@
 ;; mixi-utils.el --- Utilities for mixi object -*- coding: euc-jp -*-
 
-;; Copyright (C) 2007 OHASHI Akira
+;; Copyright (C) 2007, 2008 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: hypermedia
@@ -87,6 +87,8 @@
 		(mixi-bbs-p (mixi-comment-parent object)))
 	   (concat (mixi-comment-count object) " "
 		   (mixi-friend-nick (mixi-comment-owner object))))
+	  ((eq class 'mixi-release)
+	   "mixi±¿±Ä»öÌ³¶É")
 	  (t
 	   (let ((owner (if (eq class 'mixi-log)
 			    (mixi-log-friend object)
@@ -114,6 +116,8 @@
 				     (mixi-comment-parent object))) "."))
 	   ((eq class 'mixi-log)
 	    (concat (mixi-friend-id (mixi-log-friend object)) "@"))
+	   ((eq class 'mixi-release)
+	    (concat (md5 (mixi-release-title object)) "@"))
 	   (t
 	    (concat (mixi-object-id object) "@"
 		    (if (eq class 'mixi-news)
@@ -144,6 +148,10 @@
 	   (mixi-expand-url (mixi-message-page object)))
 	  ((eq class 'mixi-news)
 	   (mixi-news-page object))
+	  ((eq class 'mixi-release)
+	   (let ((url (mixi-release-list-page)))
+	     (mixi-expand-url (substring url 0
+					 (string-match "?" url)))))
 	  ((eq class 'mixi-log)
 	   (mixi-expand-url (mixi-friend-page (mixi-log-friend object))))
 	  ((eq class 'mixi-friend)
@@ -240,7 +248,9 @@
 			  (mixi-friend-id (mixi-message-owner object))))
 		 ((or (eq class 'mixi-friend) (eq class 'mixi-log))
 		  (concat mixi-reply-to "message;"
-			  (mixi-friend-id object))))))))
+			  (mixi-friend-id object)))
+		 (t
+		  (concat mixi-reply-to "diary")))))))
 
 (defconst mixi-to-regexp
   "^mixi;\\([a-z]+\\);?\\([a-z0-9]+\\)?;?\\([0-9]+\\)?;?\\([0-9]+\\)?")

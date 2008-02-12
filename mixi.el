@@ -45,6 +45,7 @@
 ;;  * mixi-get-messages
 ;;  * mixi-get-introductions (broken)
 ;;  * mixi-get-news
+;;  * mixi-get-releases
 ;;
 ;; APIs for posting:
 ;;
@@ -138,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.183 $")
+(defconst mixi-revision "$Revision: 1.184 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -3010,6 +3011,69 @@ Increase this value when unexpected error frequently occurs."
 				 (string-to-number (nth 5 item))
 				 month year)
 				(nth 2 item))))
+	    items)))
+
+;; Release object.
+(defun mixi-make-release (title time content)
+  "Return a release object."
+  (cons 'mixi-release (vector title time content)))
+
+(defmacro mixi-release-p (release)
+  `(eq (mixi-object-class ,release) 'mixi-release))
+
+(defun mixi-release-title (release)
+  "Return the title of RELEASE."
+  (unless (mixi-release-p release)
+    (signal 'wrong-type-argument (list 'mixi-release-p release)))
+  (aref (cdr release) 0))
+
+(defun mixi-release-time (release)
+  "Return the time of RELEASE."
+  (unless (mixi-release-p release)
+    (signal 'wrong-type-argument (list 'mixi-release-p release)))
+  (aref (cdr release) 1))
+
+(defun mixi-release-content (release)
+  "Return the content of RELEASE."
+  (unless (mixi-release-p release)
+    (signal 'wrong-type-argument (list 'mixi-release-p release)))
+  (aref (cdr release) 2))
+
+(defmacro mixi-release-list-page ()
+  `(concat "/release_info.pl?page=%d"))
+
+(defconst mixi-release-list-regexp
+  "<td>&nbsp;<span STYLE=\"font-size:8pt;color:#DFB479\">¢£</span>&nbsp;<b><font COLOR=#605048>\\(.+\\)</font></b></td>
+<td ALIGN=right><font COLOR=#605048>\\([1-9][0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)</font></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+
+<br>
+
+<table BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=450>
+<tr> 
+<td CLASS=h130>
+\\(.+\\)
+</td>
+</tr>
+</table>")
+
+;;;###autoload
+(defun mixi-get-releases (&optional range)
+  "Get releases."
+  (let ((items (mixi-get-matched-items (mixi-release-list-page)
+				       mixi-release-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (mixi-make-release (nth 0 item)
+				 (encode-time 0 0 0
+					      (string-to-number (nth 3 item))
+					      (string-to-number (nth 2 item))
+					      (string-to-number (nth 1 item)))
+				 (nth 4 item)))
 	    items)))
 
 (provide 'mixi)

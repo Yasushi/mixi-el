@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.184 $")
+(defconst mixi-revision "$Revision: 1.185 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2847,8 +2847,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-news-content-regexp
   "<div class=\"article\">
 \\(.+\\)
-
-
++
 \\(</div>
 </div>\\|<div class=\"additional\">\\)")
 

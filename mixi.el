@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.185 $")
+(defconst mixi-revision "$Revision: 1.186 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -439,7 +439,7 @@ Increase this value when unexpected error frequently occurs."
 (defun mixi-logout ()
   (mixi-retrieve "/logout.pl"))
 
-(defconst mixi-login-form "<form action=\"/login.pl\" method=\"post\">")
+(defconst mixi-login-form "<form action=\"/login.pl\" method=\"post\" name=\"login_form\">")
 
 (defmacro with-mixi-retrieve (url &rest body)
   `(with-current-buffer (get-buffer-create mixi-temp-buffer-name)

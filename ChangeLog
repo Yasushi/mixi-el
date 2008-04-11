@@ -1,3 +1,7 @@
+2008-04-12  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-login-form): Follow the change of mixi.
+
 2008-03-31  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-news-content-regexp): Follow the change of mixi.

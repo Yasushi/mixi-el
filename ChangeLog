@@ -1,3 +1,8 @@
+2008-04-15  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-el: Version 1.4.1 released.
+	* configure.ac: Bump up version.
+
 2008-04-12  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-login-form): Follow the change of mixi.

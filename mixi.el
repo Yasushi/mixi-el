@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.187 $")
+(defconst mixi-revision "$Revision: 1.188 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1410,7 +1410,7 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-post-key-regexp
   "<input type=\"?hidden\"? name=\"?post_key\"? +value=\"\\([a-z0-9]+\\)\"")
 (defconst mixi-post-succeed-regexp
-  "<p\\(\\| class=\"messageAlert\"\\)>\\(作成\\|書き込み\\)が完了しました。反映に時間がかかることがありますので、表示されていない場合は少々お待ちください。</p>")
+  "<p\\(\\| class=\"messageAlert\"\\)>\\(作成\\|書き込み\\)が完了しました。反映に時間がかかることがあります。</p>")
 
 ;; FIXME: Support photos.
 ;;;###autoload

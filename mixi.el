@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.188 $")
+(defconst mixi-revision "$Revision: 1.189 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1346,6 +1346,8 @@ Increase this value when unexpected error frequently occurs."
 (defconst mixi-new-diary-list-regexp
   "<dt>\\([0-9]+\\)Ç¯\\([0-9]+\\)·î\\([0-9]+\\)Æü&nbsp;\\([0-9]+\\):\\([0-9]+\\)</dt>
 <dd><a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\">\\(.+\\)</a> (\\(.*\\))<div ")
+(defconst mixi-new-diary-list-title-regexp
+  "\\(.+\\) (\\([0-9]+\\))")
 
 ;;;###autoload
 (defun mixi-get-new-diaries (&optional range)
@@ -1353,18 +1355,32 @@ Increase this value when unexpected error frequently occurs."
   (let ((items (mixi-get-matched-items (mixi-new-diary-list-page)
 				       mixi-new-diary-list-regexp
 				       range)))
-    (mapcar (lambda (item)
-	      (mixi-make-diary (mixi-make-friend (nth 6 item) (nth 8 item))
-			       (nth 5 item)
-			       nil
-			       (encode-time
-				0 (string-to-number (nth 4 item))
-				(string-to-number (nth 3 item))
-				(string-to-number (nth 2 item))
-				(string-to-number (nth 1 item))
-				(string-to-number (nth 0 item)))
-			       (nth 7 item)))
-	    items)))
+    (delq nil
+	  (mapcar (lambda (item)
+		    (let ((title (nth 7 item))
+			  count)
+		      (when (string-match mixi-new-diary-list-title-regexp
+					  title)
+			(setq count (string-to-number (match-string 2 title)))
+			(setq title (match-string 1 title)))
+		      (let* ((diary (mixi-make-diary
+				     (mixi-make-friend (nth 6 item)
+						       (nth 8 item))
+				     (nth 5 item)))
+			     (comment-count (mixi-diary-comment-count diary)))
+			(mixi-diary-set-time diary
+					     (encode-time
+					      0 (string-to-number (nth 4 item))
+					      (string-to-number (nth 3 item))
+					      (string-to-number (nth 2 item))
+					      (string-to-number (nth 1 item))
+					      (string-to-number (nth 0 item))))
+			(mixi-diary-set-title diary title)
+			(when (or (null comment-count)
+				  (< comment-count count))
+			  (mixi-diary-set-comment-count diary count)
+			  diary))))
+		  items))))
 
 (defmacro mixi-search-diary-list-page (keyword)
   `(concat "/search_diary.pl?page=%d&submit=search&keyword="

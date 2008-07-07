@@ -1,6 +1,8 @@
 2008-07-07  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-post-succeed-regexp): Follow the change of mixi.
+	(mixi-new-diary-list-title-regexp): New constant.
+	(mixi-get-new-diaries): Follow the change above.
 
 2008-06-07  OHASHI Akira  <bg66@koka-in.org>
 

@@ -1,3 +1,8 @@
+2008-07-31  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-gnus.el (mixi-gnus-setup): Avoid matching with bogus addresses
+	for `message-send-via-mixi'.
+
 2008-07-08  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-el: Version 1.4.2 released.

@@ -1,6 +1,6 @@
 ;;; mixi-gnus.el --- Gnus integration for mixi
 
-;; Copyright (C) 2007 OHASHI Akira
+;; Copyright (C) 2007, 2008 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: news
@@ -77,7 +77,10 @@
   (let ((method '(mixi message-mixi-p message-send-via-mixi)))
     (unless (member method message-send-method-alist)
       (setq message-send-method-alist
-	    (cons method message-send-method-alist)))))
+	    (cons method message-send-method-alist))))
+  ;; Avoid matching with bogus addresses for `message-send-via-mixi'.
+  (setq message-bogus-addresses
+	(remove "[ \t]" message-bogus-addresses)))
 
 (provide 'mixi-gnus)
 

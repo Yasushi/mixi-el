@@ -47,6 +47,7 @@
 ;;  * mixi-get-news
 ;;  * mixi-get-releases
 ;;  * mixi-get-echoes (limited)
+;;  * mixi-get-new-echoes (limited)
 ;;
 ;; APIs for posting:
 ;;
@@ -141,7 +142,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.190 $")
+(defconst mixi-revision "$Revision: 1.191 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."

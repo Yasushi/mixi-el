@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.63 $")
+(defconst shimbun-mixi-revision "$Revision: 1.64 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache release-cache))
@@ -41,6 +41,7 @@
 
 (defconst shimbun-mixi-default-group-alist
   '(("new-diaries" . mixi-get-new-diaries)
+    ("new-echoes" . mixi-get-new-echoes)
     ("new-comments" . mixi-get-new-comments)
     ("new-bbses" . mixi-get-new-bbses)
     ("new-bbs-comments" . mixi-get-new-bbs-comments)

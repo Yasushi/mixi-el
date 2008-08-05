@@ -1,5 +1,7 @@
 2008-08-05  OHASHI Akira  <bg66@koka-in.org>
 
+	* sb-mixi.el (shimbun-mixi-default-group-alist): Add echo group.
+
 	* mixi-utils.el (mixi-make-title): Support echo object.
 	(mixi-make-time): New function.
 	(mixi-make-date): Use it.

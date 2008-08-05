@@ -715,6 +715,37 @@ release オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
 @ref{mixi-remove-markup} を使用することができます。
 @end defun
 
+@subsection echo オブジェクト
+@cindex echo オブジェクト
+
+エコーを表すオブジェクトです。
+以下の関数を使用することにより echo オブジェクトを生成することができます。
+
+@defun mixi-make-echo owner post-time
+echo オブジェクトを生成します。
+引数には作成者を表す friend オブジェクトとエコーの日時を表す文字列を指定
+してください。
+@end defun
+
+@subsubsection アクセサメソッド
+
+echo オブジェクトの各種情報を取得するためのアクセサメソッドの一覧を以下
+に解説します。
+
+@defun mixi-echo-owner echo
+作成者を返却します。
+@end defun
+
+@defun mixi-echo-post-time echo
+日時を表す文字列を返却します。
+@end defun
+
+@defun mixi-echo-content echo
+本文を返却します。
+本文には HTML タグが含まれている可能性があります。それらを取り除くために
+@ref{mixi-remove-markup} を使用することができます。
+@end defun
+
 @node 一覧取得関数
 @section 一覧取得関数
 
@@ -1147,6 +1178,49 @@ IT・テクノロジー
 @end cartouche
 @end defun
 
+@defun mixi-get-echoes &rest friend-or-range
+エコー一覧を取得します。
+@var{friend-or-range} は friend オブジェクトまたは数値を指定することがで
+きます。
+friend オブジェクトを指定した場合はそのオブジェクトで指定した人のエコー
+一覧を取得します。friend オブジェクトを指定しなかった場合は@emph{自分}の
+エコー一覧を取得します。
+数値を指定した場合は最大でこの数のエコーのみを取得します。
+friend オブジェクトと数値は同時に指定することもできます。
+
+@cartouche
+@example
+(mixi-get-echoes)
+    @result{} 自分のエコーすべて
+
+(mixi-get-echoes 5)
+    @result{} 自分のエコー最大で 5 件分のみ
+
+(mixi-get-echoes friend)
+    @result{} friend さんのエコーすべて
+
+(mixi-get-echoes friend 10)
+    @result{} friend さんのエコー最大で 10 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-new-echoes &optional range
+みんなのエコー一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数のみんなのエコーのみを取得します。
+
+@cartouche
+@example
+(mixi-get-new-echoes)
+    @result{} みんなのエコーすべて
+
+(mixi-get-new-echoes 5)
+    @result{} みんなのエコー最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
 @node 投稿用関数
 @section 投稿用関数
 
@@ -1198,6 +1272,23 @@ IT・テクノロジー
 @cartouche
 @example
 (mixi-post-message friend "タイトル" "本文")
+    @result{} 不定
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-post-echo content &optional parent
+エコーを投稿します。
+引数には本文を指定してください。
+@var{parent} には返信先を表す echo オブジェクトを指定することができます。
+@var{parent} を指定した場合はこのエコーへの返信として投稿します。
+
+@cartouche
+@example
+(mixi-post-echo "本文")
+    @result{} 不定
+
+(mixi-post-echo "本文" echo)
     @result{} 不定
 @end example
 @end cartouche

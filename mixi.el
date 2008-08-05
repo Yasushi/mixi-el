@@ -46,6 +46,7 @@
 ;;  * mixi-get-introductions (broken)
 ;;  * mixi-get-news
 ;;  * mixi-get-releases
+;;  * mixi-get-echoes (limited)
 ;;
 ;; APIs for posting:
 ;;
@@ -53,6 +54,7 @@
 ;;  * mixi-post-topic
 ;;  * mixi-post-comment
 ;;  * mixi-post-message
+;;  * mixi-post-echo (limited)
 ;; 
 ;; Utilities:
 ;;
@@ -139,7 +141,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.189 $")
+(defconst mixi-revision "$Revision: 1.190 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -858,7 +860,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-realize-friend (friend)
   "Realize a FRIEND."
-  ;; FIXME: Check a expiration of cache?
+  ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p friend)
     (with-mixi-retrieve (mixi-friend-page friend)
       (let ((case-fold-search t))
@@ -1214,7 +1216,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-realize-diary (diary &optional page)
   "Realize a DIARY."
-  ;; FIXME: Check a expiration of cache?
+  ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p diary)
     (with-mixi-retrieve (or page (mixi-diary-page diary))
       (let ((case-fold-search t))
@@ -1516,7 +1518,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-realize-community (community)
   "Realize a COMMUNITY."
-  ;; FIXME: Check a expiration of cache?
+  ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p community)
     (with-mixi-retrieve (mixi-community-page community)
       (let ((case-fold-search t))
@@ -1785,7 +1787,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-realize-topic (topic &optional page)
   "Realize a TOPIC."
-  ;; FIXME: Check a expiration of cache?
+  ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p topic)
     (with-mixi-retrieve (or page (mixi-topic-page topic))
       (if (re-search-forward mixi-topic-community-regexp nil t)
@@ -1977,7 +1979,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-realize-event (event &optional page)
   "Realize a EVENT."
-  ;; FIXME: Check a expiration of cache?
+  ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p event)
     (with-mixi-retrieve (or page (mixi-event-page event))
       (let ((case-fold-search t))
@@ -2857,7 +2859,7 @@ Increase this value when unexpected error frequently occurs."
 
 (defun mixi-realize-news (news)
   "Realize a NEWS."
-  ;; FIXME: Check a expiration of cache?
+  ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p news)
     (with-mixi-retrieve (mixi-news-page news)
       (if (re-search-forward mixi-news-finished-regexp nil t)
@@ -3078,6 +3080,151 @@ Increase this value when unexpected error frequently occurs."
 					      (string-to-number (nth 1 item)))
 				 (nth 4 item)))
 	    items)))
+
+;; Echo object.
+(defvar mixi-echo-cache (make-hash-table :test 'equal))
+;; FIXME: Support parent.
+(defun mixi-make-echo (owner post-time &optional content)
+  "Return an echo object."
+  (let ((owner (or owner (mixi-make-me))))
+    (mixi-make-cache (list (mixi-friend-id owner) post-time)
+		     (cons 'mixi-echo (vector nil owner post-time content))
+		     mixi-echo-cache)))
+
+(defconst mixi-echo-url-regexp
+  "view_echo\\.pl\\?id=\\([0-9]+\\)&post_time=\\([0-9]+\\)")
+
+(defun mixi-make-echo-from-url (url)
+  "Return an echo object from URL."
+  (when (string-match mixi-echo-url-regexp url)
+    (let ((owner-id (match-string 1 url))
+	  (post-time (match-string 2 url)))
+      (mixi-make-echo (mixi-make-friend owner-id) post-time))))
+
+(defmacro mixi-echo-p (echo)
+  `(eq (mixi-object-class ,echo) 'mixi-echo))
+
+(defmacro mixi-echo-page (echo)
+  `(concat "/view_echo.pl?id=" (mixi-friend-id (mixi-echo-owner ,echo))
+	   "&post_time=" (mixi-echo-post-time ,echo)))
+
+(defconst mixi-echo-owner-nick-regexp
+  "<div id=\"echo_nickname_[0-9]+\"  style=\"display: none;\">\\(.*\\)</div>")
+(defconst mixi-echo-content-regexp
+  "<div id=\"echo_body_[0-9]+\"      style=\"display: none;\">\\(.+\\)</div>")
+
+(defun mixi-realize-echo (echo)
+  "Realize an ECHO."
+  ;; FIXME: Check an expiration of cache?
+  (unless (mixi-object-realized-p echo)
+    (with-mixi-retrieve (mixi-echo-page echo)
+      (let ((case-fold-search t))
+	(if (re-search-forward mixi-echo-owner-nick-regexp nil t)
+	    (mixi-friend-set-nick (mixi-echo-owner echo)
+				  (match-string 1))
+	  (mixi-realization-error 'cannot-find-owner-nick echo))
+	(if (re-search-forward mixi-echo-content-regexp nil t)
+	    (mixi-echo-set-content echo (match-string 1))
+	  (mixi-realization-error 'cannot-find-owner-nick echo))))
+    (mixi-object-touch echo)))
+
+(defun mixi-echo-owner (echo)
+  "Return the owner of ECHO."
+  (unless (mixi-echo-p echo)
+    (signal 'wrong-type-argument (list 'mixi-echo-p echo)))
+  (aref (cdr echo) 1))
+
+(defun mixi-echo-post-time (echo)
+  "Return the post-time of ECHO."
+  (unless (mixi-echo-p echo)
+    (signal 'wrong-type-argument (list 'mixi-echo-p echo)))
+  (aref (cdr echo) 2))
+
+(defun mixi-echo-content (echo)
+  "Return the content of ECHO."
+  (unless (mixi-echo-p echo)
+    (signal 'wrong-type-argument (list 'mixi-echo-p echo)))
+  (mixi-realize-echo echo)
+  (aref (cdr echo) 3))
+
+(defun mixi-echo-set-content (echo content)
+  "Set the content of ECHO."
+  (unless (mixi-echo-p echo)
+    (signal 'wrong-type-argument (list 'mixi-echo-p echo)))
+  (aset (cdr echo) 3 content))
+
+(defmacro mixi-echo-list-page (&optional friend)
+  `(concat "/list_echo.pl?page=%d"
+	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
+
+(defconst mixi-echo-list-regexp
+  "<a href=\"view_echo\\.pl\\?id=\\([0-9]+\\)&post_time=\\([0-9]+\\)\">")
+
+;;;###autoload
+(defun mixi-get-echoes (&rest friend-or-range)
+  "Get echoes of FRIEND."
+  (when (> (length friend-or-range) 2)
+    (signal 'wrong-number-of-arguments
+	    (list 'mixi-get-echoes (length friend-or-range))))
+  (let ((friend (nth 0 friend-or-range))
+	(range (nth 1 friend-or-range)))
+    (when (or (not (mixi-friend-p friend)) (mixi-friend-p range))
+      (setq friend (nth 1 friend-or-range))
+      (setq range (nth 0 friend-or-range)))
+    (unless (or (null friend) (mixi-friend-p friend))
+      (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
+    (let ((items (mixi-get-matched-items (mixi-echo-list-page friend)
+					 mixi-echo-list-regexp
+					 range)))
+      (mapcar (lambda (item)
+		(mixi-make-echo friend (nth 1 item)))
+	      items))))
+
+(defmacro mixi-new-echo-list-page ()
+  `(concat "/recent_echo.pl?page=%d"))
+
+(defconst mixi-new-echo-list-regexp
+  "<a href=\"view_echo\\.pl\\?id=\\([0-9]+\\)&post_time=\\([0-9]+\\)\">")
+
+;;;###autoload
+(defun mixi-get-new-echoes (&optional range)
+  "Get new echoes."
+  (let ((items (mixi-get-matched-items (mixi-new-echo-list-page)
+				       mixi-new-echo-list-regexp
+				       range)))
+    (mapcar (lambda (item)
+	      (mixi-make-echo (mixi-make-friend (nth 0 item)) (nth 1 item)))
+	    items)))
+
+(defmacro mixi-post-echo-page ()
+  `(concat "/add_echo.pl"))
+
+(defconst mixi-echo-post-succeed-regexp mixi-my-id-regexp)
+
+;;;###autoload
+(defun mixi-post-echo (content &optional parent)
+  "Post an echo."
+  (unless (stringp content)
+    (signal 'wrong-type-argument (list 'stringp content)))
+  (unless (or (null parent) (mixi-echo-p parent))
+    (signal 'wrong-type-argument (list 'mixi-echo-p parent)))
+  (let (fields post-key)
+    (with-mixi-retrieve (mixi-post-echo-page)
+      (if (re-search-forward mixi-post-key-regexp nil t)
+	  (setq post-key (match-string 1))
+	(mixi-post-error 'cannot-find-key)))
+    (setq fields `(("post_key" . ,post-key)
+		   ("redirect" . "home")
+		   ("body" . ,content)))
+    (when (mixi-echo-p parent)
+      (setq fields (cons `("parent_member_id" . ,(mixi-friend-id
+						  (mixi-echo-owner parent)))
+			 fields))
+      (setq fields (cons `("parent_post_time" . ,(mixi-echo-post-time parent))
+			 fields)))
+    (with-mixi-post-form (mixi-post-echo-page) fields
+      (unless (re-search-forward mixi-echo-post-succeed-regexp nil t)
+	(mixi-post-error 'cannot-find-succeed)))))
 
 (provide 'mixi)
 

@@ -1,3 +1,28 @@
+2008-08-05  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-echo-cache): New variable.
+	(mixi-make-echo): New function.
+	(mixi-echo-url-regexp): New constant.
+	(mixi-make-echo-from-url): New function.
+	(mixi-echo-p): New macro.
+	(mixi-echo-page): Ditto.
+	(mixi-echo-owner-nick-regexp): New constant.
+	(mixi-echo-content-regexp): Ditto.
+	(mixi-realize-echo): New function.
+	(mixi-echo-owner): New accessor method.
+	(mixi-echo-post-time): Ditto.
+	(mixi-echo-content): Ditto.
+	(mixi-echo-set-content): Ditto.
+	(mixi-echo-list-page): New macro.
+	(mixi-echo-list-regexp): New constant.
+	(mixi-get-echoes): New function.
+	(mixi-new-echo-list-page): New macro.
+	(mixi-new-echo-list-regexp): New constant.
+	(mixi-get-new-echoes): New function.
+	(mixi-post-echo-page): New macro.
+	(mixi-echo-post-succeed-regexp): New constant.
+	(mixi-post-echo): New function.
+
 2008-07-31  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-gnus.el (mixi-gnus-setup): Avoid matching with bogus addresses

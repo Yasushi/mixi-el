@@ -1,5 +1,14 @@
 2008-08-05  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-utils.el (mixi-make-title): Support echo object.
+	(mixi-make-time): New function.
+	(mixi-make-date): Use it.
+	(mixi-make-id-1): Support echo object.
+	(mixi-make-tag-uri): Ditto.
+	(mixi-make-url): Ditto.
+	(mixi-make-reply-to): Ditto.
+	(mixi-send-mail): Ditto.
+
 	* mixi.el (mixi-echo-cache): New variable.
 	(mixi-make-echo): New function.
 	(mixi-echo-url-regexp): New constant.

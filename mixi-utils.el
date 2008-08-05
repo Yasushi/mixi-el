@@ -62,6 +62,9 @@
 			   (mixi-comment-parent object) add-parent)))
 	  ((eq class 'mixi-log)
 	   (mixi-friend-nick (mixi-log-friend object)))
+	  ((eq class 'mixi-echo)
+	   (concat (mixi-friend-nick (mixi-echo-owner object)) " ("
+		   (mixi-echo-post-time object) ")"))
 	  (t
 	   (let ((prefix (when (eq class 'mixi-event) "[イベント]"))
 		 (subject (mixi-object-title object))
@@ -95,8 +98,21 @@
 			  (mixi-object-owner object))))
 	     (mixi-friend-nick owner))))))
 
+(defun mixi-make-time (object)
+  (with-mixi-class object
+    (if (eq class 'mixi-echo)
+	(let ((post-time (mixi-echo-post-time object)))
+	  (encode-time
+	   (string-to-number (substring post-time 12 14))
+	   (string-to-number (substring post-time 10 12))
+	   (string-to-number (substring post-time 8 10))
+	   (string-to-number (substring post-time 6 8))
+	   (string-to-number (substring post-time 4 6))
+	   (string-to-number (substring post-time 0 4))))
+      (mixi-object-time object))))
+
 (defun mixi-make-date (object)
-  (let* ((time (mixi-object-time object))
+  (let* ((time (mixi-make-time object))
 	 (cts (current-time-string time))
 	 (day-of-week (substring cts 0 3))
 	 (month (substring cts 4 7)))
@@ -108,7 +124,7 @@
 (defun mixi-make-id-1 (object)
   (with-mixi-class object
     (concat
-     (format-time-string "%Y%m%d%H%M" (mixi-object-time object)) "."
+     (format-time-string "%Y%m%d%H%M" (mixi-make-time object)) "."
      (cond ((eq class 'mixi-comment)
 	    (concat (mixi-friend-id (mixi-comment-owner object)) "@"
 		    (mixi-object-id (mixi-comment-parent object)) "."
@@ -118,6 +134,8 @@
 	    (concat (mixi-friend-id (mixi-log-friend object)) "@"))
 	   ((eq class 'mixi-release)
 	    (concat (md5 (mixi-release-title object)) "@"))
+	   ((eq class 'mixi-echo)
+	    (concat (mixi-friend-id (mixi-echo-owner object)) "@"))
 	   (t
 	    (concat (mixi-object-id object) "@"
 		    (if (eq class 'mixi-news)
@@ -130,7 +148,7 @@
 
 (defun mixi-make-tag-uri (object)
   (format "tag:mixi.jp,%s:%s"
-	  (format-time-string "%Y-%m-%d" (mixi-object-time object))
+	  (format-time-string "%Y-%m-%d" (mixi-make-time object))
 	  (mixi-make-id-1 object)))
 
 (defun mixi-make-url (object)
@@ -155,7 +173,9 @@
 	  ((eq class 'mixi-log)
 	   (mixi-expand-url (mixi-friend-page (mixi-log-friend object))))
 	  ((eq class 'mixi-friend)
-	   (mixi-expand-url (mixi-friend-page object))))))
+	   (mixi-expand-url (mixi-friend-page object)))
+	  ((eq class 'mixi-echo)
+	   (mixi-expand-url (mixi-echo-page object))))))
 
 (defun mixi-make-encoded-url (object)
   (mixi-url-encode-string (mixi-make-url object)))
@@ -249,6 +269,10 @@
 		 ((or (eq class 'mixi-friend) (eq class 'mixi-log))
 		  (concat mixi-reply-to "message;"
 			  (mixi-friend-id object)))
+		 ((eq class 'mixi-echo)
+		  (concat mixi-reply-to "echo;"
+			  (mixi-friend-id (mixi-echo-owner object)) ";"
+			  (mixi-echo-post-time object)))
 		 (t
 		  (concat mixi-reply-to "diary")))))))
 
@@ -277,7 +301,13 @@
 	     (mixi-post-diary title content))
 	    ((string= method "message")
 	     (mixi-post-message (mixi-make-friend (match-string 2 to))
-				title content))))))
+				title content))
+	    ((string= method "echo")
+	     (let ((owner-id (match-string 2 to))
+		   (post-time (match-string 3 to)))
+	       (mixi-post-echo content
+			       (mixi-make-echo (mixi-make-friend owner-id)
+					       post-time))))))))
 
 (provide 'mixi-utils)
 

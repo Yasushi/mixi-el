@@ -142,7 +142,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.191 $")
+(defconst mixi-revision "$Revision: 1.192 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1058,12 +1058,16 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
   (aset (cdr friend) 13 profile))
 
-(defmacro mixi-friend-list-page (&optional friend)
-  `(concat "/list_friend.pl?page=%d"
-	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
+(defun mixi-my-friend-list-page (&optional dummy)
+  (concat "/list_friend_simple.pl?page=%d"))
+
+(defun mixi-friend-list-page (friend)
+  (concat "/list_friend.pl?page=%d&id=" (mixi-friend-id friend)))
 
 (defconst mixi-friend-list-id-regexp
   "<a href=\"?show_friend\\.pl\\?id=\\([0-9]+\\)\"?")
+(defconst mixi-my-friend-list-nick-regexp
+  "<p>\\(.+\\)([0-9]+)</p>")
 (defconst mixi-friend-list-nick-regexp
   "<span>\\(.+\\)¤µ¤ó([0-9]+)</span>")
 
@@ -1080,19 +1084,25 @@ Increase this value when unexpected error frequently occurs."
       (setq range (nth 0 friend-or-range)))
     (unless (or (null friend) (mixi-friend-p friend))
       (signal 'wrong-type-argument (list 'mixi-friend-p friend)))
-    (let ((ids (mixi-get-matched-items (mixi-friend-list-page friend)
-				       mixi-friend-list-id-regexp
-				       range))
-	  (nicks (mixi-get-matched-items (mixi-friend-list-page friend)
-					 mixi-friend-list-nick-regexp
-					 range)))
-      (let ((index 0)
-	    ret)
-	(while (< index (length ids))
-	  (setq ret (cons (mixi-make-friend (nth 0 (nth index ids))
-					    (nth 0 (nth index nicks))) ret))
-	  (incf index))
-	(reverse ret)))))
+    (let (list-page list-nick-regexp)
+      (if (or (null friend) (equal friend mixi-me))
+	  (setq list-page 'mixi-my-friend-list-page
+		list-nick-regexp mixi-my-friend-list-nick-regexp)
+	  (setq list-page 'mixi-friend-list-page
+		list-nick-regexp mixi-friend-list-nick-regexp))
+      (let ((ids (mixi-get-matched-items (funcall list-page friend)
+					 mixi-friend-list-id-regexp
+					 range))
+	    (nicks (mixi-get-matched-items (funcall list-page friend)
+					   list-nick-regexp
+					   range)))
+	(let ((index 0)
+	      ret)
+	  (while (< index (length ids))
+	    (setq ret (cons (mixi-make-friend (nth 0 (nth index ids))
+					      (nth 0 (nth index nicks))) ret))
+	    (incf index))
+	  (reverse ret))))))
 
 ;; Favorite.
 (defmacro mixi-favorite-list-page ()

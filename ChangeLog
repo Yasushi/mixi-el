@@ -1,3 +1,11 @@
+2008-08-07  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-get-friends): Follow the change of mixi.
+	(mixi-my-friend-list-page): New function.
+	(mixi-friend-list-page): Change from macro to function.
+	(mixi-my-friend-list-nick-regexp): New constant.
+	(mixi-friend-list-nick-regexp): Fix regexp.
+
 2008-08-05  OHASHI Akira  <bg66@koka-in.org>
 
 	* sb-mixi.el (shimbun-mixi-default-group-alist): Add echo group.

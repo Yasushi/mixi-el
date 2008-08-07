@@ -142,7 +142,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.192 $")
+(defconst mixi-revision "$Revision: 1.193 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1088,8 +1088,8 @@ Increase this value when unexpected error frequently occurs."
       (if (or (null friend) (equal friend mixi-me))
 	  (setq list-page 'mixi-my-friend-list-page
 		list-nick-regexp mixi-my-friend-list-nick-regexp)
-	  (setq list-page 'mixi-friend-list-page
-		list-nick-regexp mixi-friend-list-nick-regexp))
+	(setq list-page 'mixi-friend-list-page
+	      list-nick-regexp mixi-friend-list-nick-regexp))
       (let ((ids (mixi-get-matched-items (funcall list-page friend)
 					 mixi-friend-list-id-regexp
 					 range))

@@ -1,5 +1,10 @@
 2008-08-07  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-el: Version 1.5.0 released.
+	* configure.ac: Bump up version.
+
+2008-08-07  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-get-friends): Follow the change of mixi.
 	(mixi-my-friend-list-page): New function.
 	(mixi-friend-list-page): Change from macro to function.

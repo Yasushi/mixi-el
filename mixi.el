@@ -142,7 +142,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.193 $")
+(defconst mixi-revision "$Revision: 1.194 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2339,10 +2339,10 @@ Increase this value when unexpected error frequently occurs."
 \\(
 | <a href=\"delete_comment\\.pl\\?diary_id=[0-9]+&owner_id=[0-9]+&comment_id=.+&type=comment\">自分のコメントを削除する</a>
 \\|\\)</span>
-
+*
 <span class=\"commentTitleDate\">\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</span>
 </dt>
-+
+*
 <dd>
 \\(\\(.\\|\r?\n\\)*?\\)
 </dd>

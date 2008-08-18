@@ -142,7 +142,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.194 $")
+(defconst mixi-revision "$Revision: 1.195 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -276,9 +276,7 @@ Increase this value when unexpected error frequently occurs."
 新は制限させていただいております。ご迷惑をおかけいたしますが、しばらくお<br>
 待ちいただいてから操作をおこなってください。")
 (defconst mixi-warning-continuously-accessing
-  "間隔を空けない連続的なページの遷移・更新を頻繁におこなわれていることが見<br>
-受けられましたので、一時的に操作を停止させていただきます。申し訳ございま<br>
-せんが、しばらくの間お待ちください。")
+  "間隔を空けない連続的なページの遷移・更新を頻繁におこなわれていることが見受けられましたので、一時的に操作を停止させていただきます。申し訳ございませんが、しばらくの間お待ちください。")
 
 (defmacro mixi-retrieve (url &optional post-data)
   `(funcall (intern (concat "mixi-" (symbol-name mixi-backend) "-retrieve"))

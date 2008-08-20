@@ -1,5 +1,5 @@
 ;;; riece-mixi.el --- Riece integration for mixi
-;; Copyright (C) 2007 OHASHI Akira
+;; Copyright (C) 2007, 2008 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: IRC, riece
@@ -139,9 +139,23 @@ If they exist, send them as notice to the corresponding channel."
 	  riece-mixi-check-alist)
     (setq riece-mixi-last-check (current-time))))
 
+(defun riece-mixi-message-filter-function (message)
+  (when (and (get 'riece-mixi 'riece-addon-enabled)
+	     (riece-message-own-p message)
+	     (eq 'action (riece-message-type message)))
+    (mixi-post-echo (riece-message-text message))))
+
 (defun riece-mixi-insinuate ()
   (add-hook 'riece-after-display-message-functions
-	    'riece-mixi-display-message-function))
+	    'riece-mixi-display-message-function)
+  (add-hook 'riece-message-filter-functions
+	    'riece-mixi-message-filter-function))
+
+(defun riece-mixi-uninstall ()
+  (remove-hook 'riece-after-display-message-functions
+	       'riece-mixi-display-message-function)
+  (remove-hook 'riece-message-filter-functions
+	       'riece-mixi-message-filter-function))
 
 (defun riece-mixi-enable ()
   (when riece-mixi-check-alist

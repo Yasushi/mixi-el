@@ -1,3 +1,9 @@
+2008-08-20  OHASHI Akira  <bg66@koka-in.org>
+
+	* riece-mixi.el (riece-mixi-message-filter-function): New function.
+	(riece-mixi-insinuate): Use it.
+	(riece-mixi-uninstall): New function.
+
 2008-08-18  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-warning-continuously-accessing): Follow the change of

@@ -139,23 +139,24 @@ If they exist, send them as notice to the corresponding channel."
 	  riece-mixi-check-alist)
     (setq riece-mixi-last-check (current-time))))
 
-(defun riece-mixi-message-filter-function (message)
+(defun riece-mixi-message-filter (message)
   (when (and (get 'riece-mixi 'riece-addon-enabled)
 	     (riece-message-own-p message)
 	     (eq 'action (riece-message-type message)))
-    (mixi-post-echo (riece-message-text message))))
+    (mixi-post-echo (riece-message-text message)))
+  message)
 
 (defun riece-mixi-insinuate ()
   (add-hook 'riece-after-display-message-functions
 	    'riece-mixi-display-message-function)
   (add-hook 'riece-message-filter-functions
-	    'riece-mixi-message-filter-function))
+	    'riece-mixi-message-filter))
 
 (defun riece-mixi-uninstall ()
   (remove-hook 'riece-after-display-message-functions
 	       'riece-mixi-display-message-function)
   (remove-hook 'riece-message-filter-functions
-	       'riece-mixi-message-filter-function))
+	       'riece-mixi-message-filter))
 
 (defun riece-mixi-enable ()
   (when riece-mixi-check-alist

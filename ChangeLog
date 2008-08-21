@@ -1,3 +1,10 @@
+2008-08-21  OHASHI Akira  <bg66@koka-in.org>
+
+	* riece-mixi.el (riece-mixi-message-filter): Rename from
+	`riece-mixi-message-filter-function' and return `message'.
+	(riece-mixi-insinuate): Follow the change above.
+	(riece-mixi-uninstall): Ditto.
+
 2008-08-20  OHASHI Akira  <bg66@koka-in.org>
 
 	* riece-mixi.el (riece-mixi-message-filter-function): New function.

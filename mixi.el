@@ -134,15 +134,11 @@
 ;; at run-time.
 (eval-when-compile
   (defvar w3m-use-cookies)
-  (defvar url-request-method)
-  (defvar url-request-data)
-  (defvar url-request-extra-headers)
-  (defvar url-show-status)
   (autoload 'w3m-decode-buffer "w3m")
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.195 $")
+(defconst mixi-revision "$Revision: 1.196 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."

@@ -1,3 +1,10 @@
+2008-08-22  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (url-request-method): Abolish useless variables.
+	(url-request-data): Ditto.
+	(url-request-extra-headers): Ditto.
+	(url-show-status): Ditto.
+
 2008-08-21  OHASHI Akira  <bg66@koka-in.org>
 
 	* riece-mixi.el (riece-mixi-message-filter): Rename from

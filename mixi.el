@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.197 $")
+(defconst mixi-revision "$Revision: 1.198 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2832,13 +2832,13 @@ Increase this value when unexpected error frequently occurs."
 		   mixi-news-cache))
 
 (defconst mixi-news-url-regexp
-  "/view_news\\.pl\\?id=\\([0-9]+\\)&media_id=\\([0-9]+\\)")
+  "/view_news\\.pl\\?\\(id=\\([0-9]+\\)&media_id=\\([0-9]+\\)\\|media_id=\\([0-9]+\\)&id=\\([0-9]+\\)\\)")
 
 (defun mixi-make-news-from-url (url)
   "Return a news object from URL."
   (when (string-match mixi-news-url-regexp url)
-    (let ((id (match-string 1 url))
-	  (media-id (match-string 2 url)))
+    (let ((id (or (match-string 2 url) (match-string 5 url)))
+	  (media-id (or (match-string 3 url) (match-string 4 url))))
       (mixi-make-news media-id id))))
 
 (defmacro mixi-news-p (news)

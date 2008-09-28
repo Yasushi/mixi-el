@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.196 $")
+(defconst mixi-revision "$Revision: 1.197 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1204,7 +1204,7 @@ Increase this value when unexpected error frequently occurs."
 	   "&owner_id=" (mixi-friend-id (mixi-diary-owner ,diary))))
 
 (defconst mixi-diary-closed-regexp
-  "<td>友人\\(の友人\\)?まで公開のため読むことが出来ません。</td>")
+  "この日記にアクセスできません。以下の可能性が考えられます。<br />")
 (defconst mixi-diary-owner-nick-regexp
   "<div class=\"diaryTitle\\(Friend\\)? clearfix\">
 <h2>\\(.+?\\)\\(さん\\)?の日記</h2>")

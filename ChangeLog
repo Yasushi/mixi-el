@@ -1,3 +1,7 @@
+2008-09-05  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-diary-closed-regexp): Fix regexp.
+
 2008-08-22  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (url-request-method): Abolish useless variables.

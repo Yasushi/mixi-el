@@ -607,6 +607,8 @@ ID を返却します。
 下書き保存箱
 @item thrash
 ごみ箱
+@item noticebox
+mixiからのお知らせ
 @end table
 @end defun
 

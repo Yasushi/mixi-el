@@ -92,6 +92,9 @@
 		   (mixi-friend-nick (mixi-comment-owner object))))
 	  ((eq class 'mixi-release)
 	   "mixi±¿±Ä»öÌ³¶É")
+	  ((eq class 'mixi-message)
+	   (let ((owner (mixi-message-owner object)))
+	     (if (null owner) "mixi" (mixi-friend-nick owner))))
 	  (t
 	   (let ((owner (if (eq class 'mixi-log)
 			    (mixi-log-friend object)
@@ -136,6 +139,8 @@
 	    (concat (md5 (mixi-release-title object)) "@"))
 	   ((eq class 'mixi-echo)
 	    (concat (mixi-friend-id (mixi-echo-owner object)) "@"))
+	   ((and (eq class 'mixi-message) (null (mixi-message-owner object)))
+	    (concat (mixi-object-id object) "@"))
 	   (t
 	    (concat (mixi-object-id object) "@"
 		    (if (eq class 'mixi-news)
@@ -263,7 +268,8 @@
 			  (mixi-community-id object)))
 		 ((or (eq class 'mixi-news) (eq object (mixi-make-me)))
 		  (concat mixi-reply-to "diary"))
-		 ((eq class 'mixi-message)
+		 ((and (eq class 'mixi-message)
+		       (not (null (mixi-message-owner object))))
 		  (concat mixi-reply-to "message;"
 			  (mixi-friend-id (mixi-message-owner object))))
 		 ((or (eq class 'mixi-friend) (eq class 'mixi-log))

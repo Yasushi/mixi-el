@@ -1,3 +1,17 @@
+2008-11-12  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-message-box-list): Add `noticebox'.
+	(mixi-message-list-regexp): Follow the change of mixi.
+	(mixi-message-title-regexp): Ditto.
+	(mixi-message-time-regexp): Ditto.
+	(mixi-message-owner-regexp): Ditto.
+	(mixi-message-content-regexp): Ditto.
+	(mixi-realize-message): Follow the change above.
+	* mixi-utils.el (mixi-make-author): Ditto.
+	(mixi-make-id-1): Ditto.
+	(mixi-make-reply-to): Ditto.
+	* sb-mixi.el (shimbun-mixi-default-group-alist): Add `messages.notice'.
+
 2008-10-04  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-el: Version 2.0.0 released.

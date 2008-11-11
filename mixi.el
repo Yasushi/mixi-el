@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.198 $")
+(defconst mixi-revision "$Revision: 1.199 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2529,7 +2529,8 @@ Increase this value when unexpected error frequently occurs."
 	(mixi-post-error 'cannot-find-succeed parent)))))
 
 ;; Message object.
-(defconst mixi-message-box-list '(inbox outbox savebox thrash)) ; thrash?
+(defconst mixi-message-box-list
+  '(inbox outbox savebox thrash noticebox)) ; thrash?
 
 (defmacro mixi-message-box-p (box)
   `(memq ,box mixi-message-box-list))
@@ -2565,35 +2566,40 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/view_message.pl?id=" (mixi-message-id ,message)
 	   "&box=" (mixi-message-box ,message)))
 
-(defconst mixi-message-owner-regexp
-  "<font COLOR=#996600>\\(差出人\\|宛&nbsp;先\\)</font>&nbsp;:&nbsp;<a HREF=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)\\(</a>\\|</td>\\)")
-(defconst mixi-message-time-regexp
-"<font COLOR=#996600>日\\(　\\|&nbsp;\\)付</font>&nbsp;:&nbsp;\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分&nbsp;&nbsp;")
 (defconst mixi-message-title-regexp
-"<font COLOR=#996600>件\\(　\\|&nbsp;\\)名</font>&nbsp;:&nbsp;\\(.*\\)\n?</td>")
+"<div class=\"messageDetailHead\">
+<h3>\\(.*\\)</h3>")
+(defconst mixi-message-time-regexp
+"<dt>日付</dt>
+<dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分</dd>")
+(defconst mixi-message-owner-regexp
+  "<dt>差出人</dt>
+<dd>\\(
+<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>\\|mixi</dd>\\)")
 (defconst mixi-message-content-regexp
-  "<tr><td CLASS=h120 width=\"500\">\\(.*\\)</td></tr>")
+  "<div id=\"message_body\" class=\"messageDetailBody\">\\(\\(.\\|\r?\n\\)*?\\)</div>")
 
 (defun mixi-realize-message (message)
   "Realize a MESSAGE."
   (unless (mixi-object-realized-p message)
     (with-mixi-retrieve (mixi-message-page message)
-      (if (re-search-forward mixi-message-owner-regexp nil t)
-	  (mixi-message-set-owner message
-				  (mixi-make-friend (match-string 2)
-						    (match-string 3)))
-	(mixi-realization-error 'cannot-find-owner message))
+      (if (re-search-forward mixi-message-title-regexp nil t)
+	  (mixi-message-set-title message (match-string 1))
+	(mixi-realization-error 'cannot-find-title message))
       (if (re-search-forward mixi-message-time-regexp nil t)
 	  (mixi-message-set-time
-	   message (encode-time 0 (string-to-number (match-string 6))
-				(string-to-number (match-string 5))
+	   message (encode-time 0 (string-to-number (match-string 5))
 				(string-to-number (match-string 4))
 				(string-to-number (match-string 3))
-				(string-to-number (match-string 2))))
+				(string-to-number (match-string 2))
+				(string-to-number (match-string 1))))
 	(mixi-realization-error 'cannot-find-time message))
-      (if (re-search-forward mixi-message-title-regexp nil t)
-	  (mixi-message-set-title message (match-string 2))
-	(mixi-realization-error 'cannot-find-title message))
+      (if (re-search-forward mixi-message-owner-regexp nil t)
+	  (unless (string= (match-string 1) "mixi</dd>")
+	    (mixi-message-set-owner message
+				    (mixi-make-friend (match-string 2)
+						      (match-string 3))))
+	(mixi-realization-error 'cannot-find-owner message))
       (if (re-search-forward mixi-message-content-regexp nil t)
 	  (mixi-message-set-content message (match-string 1))
 	(mixi-realization-error 'cannot-find-content message)))
@@ -2668,7 +2674,7 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,box (concat "&box=" ,box))))
 
 (defconst mixi-message-list-regexp
-  "<td><a HREF=\"view_message\\.pl\\?id=\\(.+\\)&box=\\(.+\\)\">")
+  "<a href=\"view_message\\.pl\\?id=\\(.+\\)&box=\\(.+\\)\">")
 
 ;;;###autoload
 (defun mixi-get-messages (&rest box-or-range)

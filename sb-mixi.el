@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.64 $")
+(defconst shimbun-mixi-revision "$Revision: 1.65 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache release-cache))
@@ -49,6 +49,9 @@
     ("messages.sent" .
      (lambda (range)
        (mixi-get-messages 'outbox range)))
+    ("messages.notice" .
+     (lambda (range)
+       (mixi-get-messages 'noticebox range)))
     ("logs" . mixi-get-logs)
     ("my-diaries" . "/home.pl")
     ("mixi-el" . "/view_community.pl?id=1596390")

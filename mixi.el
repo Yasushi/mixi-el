@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.199 $")
+(defconst mixi-revision "$Revision: 1.200 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2863,8 +2863,7 @@ Increase this value when unexpected error frequently occurs."
   "<p class=\"date\">（\\(.+\\) - \\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)）</p>")
 (defconst mixi-news-content-regexp
   "<div class=\"article\">
-\\(.+\\)
-+
+\\(\\(.\\|\r?\n\\)*?\\)
 \\(</div>
 </div>\\|<div class=\"additional\">\\)")
 

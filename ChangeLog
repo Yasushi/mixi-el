@@ -1,5 +1,9 @@
 2008-11-12  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi.el (mixi-news-content-regexp): Follow the change of mixi.
+
+2008-11-12  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-message-box-list): Add `noticebox'.
 	(mixi-message-list-regexp): Follow the change of mixi.
 	(mixi-message-title-regexp): Ditto.

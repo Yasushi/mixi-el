@@ -1,5 +1,10 @@
 2008-11-12  OHASHI Akira  <bg66@koka-in.org>
 
+	* mixi-el: Version 2.1.0 released.
+	* configure.ac: Bump up version.
+
+2008-11-12  OHASHI Akira  <bg66@koka-in.org>
+
 	* mixi.el (mixi-news-content-regexp): Follow the change of mixi.
 
 2008-11-12  OHASHI Akira  <bg66@koka-in.org>

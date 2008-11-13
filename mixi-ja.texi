@@ -598,6 +598,7 @@ ID を返却します。
 
 @defun mixi-message-box message
 種類を返却します。
+
 @table @asis
 @item inbox
 受信箱
@@ -608,12 +609,13 @@ ID を返却します。
 @item thrash
 ごみ箱
 @item noticebox
-mixiからのお知らせ
+mixi からのお知らせ
 @end table
 @end defun
 
 @defun mixi-message-owner message
 作成者を返却します。
+種類が @emph{mixi からのお知らせ}の場合は @code{nil} を返却します。
 @end defun
 
 @defun mixi-message-title message
@@ -1060,6 +1062,7 @@ friend オブジェクトと数値は同時に指定することもできます。
 メッセージ一覧を取得します。
 @var{box-or-range} はメッセージの種類を表す以下のいずれかまたは数値を指
 定することができます。
+
 @table @asis
 @item inbox
 受信箱
@@ -1069,7 +1072,10 @@ friend オブジェクトと数値は同時に指定することもできます。
 下書き保存箱
 @item thrash
 ごみ箱
+@item noticebox
+mixi からのお知らせ
 @end table
+
 メッセージの種類を指定した場合は指定したメッセージ一覧を取得します。メッ
 セージの種類を指定しなかった場合は@emph{受信箱}のメッセージ一覧を取得し
 ます。
@@ -1120,6 +1126,7 @@ friend オブジェクトと数値は同時に指定することもできます。
 @defun mixi-get-news category sort &optional range
 ニュース一覧を取得します。
 @var{category} はカテゴリを表す以下のいずれかを指定してください。
+
 @table @asis
 @item domestic
 国内
@@ -1142,13 +1149,16 @@ IT・テクノロジー
 @item column
 コラム
 @end table
+
 @var{sort} は種類を表す以下のいずれかを指定してください。
+
 @table @asis
 @item newest
 最新のニュース
 @item pickup
 注目のニュース
 @end table
+
 @var{range} は数値を指定することができます。
 @var{range} を指定した場合は最大でこの数のニュースのみを取得します。
 

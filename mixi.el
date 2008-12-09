@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.200 $")
+(defconst mixi-revision "$Revision: 1.201 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1210,7 +1210,7 @@ Increase this value when unexpected error frequently occurs."
 <h2>\\(.+?\\)\\(さん\\)?の日記</h2>")
 (defconst mixi-diary-title-regexp
   "<div class=\"listDiaryTitle\">
-<dl class=\"clearfix\">
+<dl>
 <dt>\\([^<\n]+\\)\\(<span>\\)?")
 (defconst mixi-diary-time-regexp
   "<dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日\\([0-9]+\\):\\([0-9]+\\)</dd>")

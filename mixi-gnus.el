@@ -37,6 +37,11 @@
 (require 'mixi-utils)
 (require 'message)
 
+;; Functions and variables which should be defined in the other module
+;; at run-time.
+(eval-when-compile
+  (defvar message-bogus-addresses))
+
 (defun message-mixi-p ()
   "Say whether the current buffer contains a mixi message."
   (and (not message-this-is-news)

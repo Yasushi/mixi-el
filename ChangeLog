@@ -1,3 +1,9 @@
+2008-12-09  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-gnus.el (toplevel): Avoid warnings when compiling.
+
+	* mixi.el (mixi-diary-title-regexp): Follow the change of mixi.
+
 2008-11-12  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-el: Version 2.1.0 released.

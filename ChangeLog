@@ -1,3 +1,12 @@
+2008-12-26  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-replace-tab-and-space-to-nbsp): New user option.
+	(mixi-replace-tab-and-space-to-nbsp): New function.
+	(mixi-post-diary): Use it.
+	(mixi-post-topic): Ditto.
+	(mixi-post-comment): Ditto.
+	(mixi-post-message): Ditto.
+
 2008-12-09  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-gnus.el (toplevel): Avoid warnings when compiling.

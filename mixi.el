@@ -138,7 +138,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.201 $")
+(defconst mixi-revision "$Revision: 1.202 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -219,6 +219,11 @@
   "*Time interval between each mixi access.
 Increase this value when unexpected error frequently occurs."
   :type 'number
+  :group 'mixi)
+
+(defcustom mixi-replace-tab-and-space-to-nbsp t
+  "*If non-nil, replace tab and space to &nbsp; for keeping formatted."
+  :type 'boolean
   :group 'mixi)
 
 (defcustom mixi-cache-expires nil
@@ -564,6 +569,18 @@ Increase this value when unexpected error frequently occurs."
       (setq string (replace-match "%%" nil nil string))
       (setq pos (+ (match-end 0) 1)))
     string))
+
+(defun mixi-replace-tab-and-space-to-nbsp (string)
+  (when mixi-replace-tab-and-space-to-nbsp
+    (let ((pos 0))
+      (while (or (string-match "\t" string pos)
+		 (string-match " " string pos))
+	(if (string= (match-string 0 string) "\t")
+	    (setq string (replace-match (make-string tab-width ?\ )
+					nil nil string))
+	  (setq string (replace-match "&nbsp;" nil nil string))
+	  (setq pos (+ (match-end 0) 1))))
+      string)))
 
 ;; Object.
 (defconst mixi-object-prefix "mixi-")
@@ -1455,7 +1472,8 @@ Increase this value when unexpected error frequently occurs."
     (setq fields `(("post_key" . ,post-key)
 		   ("id" . ,(mixi-friend-id (mixi-make-me)))
 		   ("diary_title" . ,title)
-		   ("diary_body" . ,content)
+		   ("diary_body" . ,(mixi-replace-tab-and-space-to-nbsp
+				     content))
 		   ("submit" . "confirm")))
     (with-mixi-post-form (mixi-post-diary-page) fields
       (unless (re-search-forward mixi-post-succeed-regexp nil t)
@@ -1920,7 +1938,8 @@ Increase this value when unexpected error frequently occurs."
 	(mixi-post-error 'cannot-find-key community)))
     (setq fields `(("post_key" . ,post-key)
 		   ("bbs_title" . ,title)
-		   ("bbs_body" . ,content)
+		   ("bbs_body" . ,(mixi-replace-tab-and-space-to-nbsp
+				   content))
 		   ("submit" . "confirm")))
     (with-mixi-post-form (mixi-post-topic-page community) fields
       (unless (re-search-forward mixi-post-succeed-regexp nil t)
@@ -2519,10 +2538,12 @@ Increase this value when unexpected error frequently occurs."
 	(setq fields
 	      `(("post_key" . ,post-key)
 		("owner_id" . ,(mixi-friend-id (mixi-diary-owner parent)))
-		("comment_body" . ,content)
+		("comment_body" . ,(mixi-replace-tab-and-space-to-nbsp
+				    content))
 		("submit" . "confirm")))
       (setq fields `(("post_key" . ,post-key)
-		     ("comment" . ,content)
+		     ("comment" . ,(mixi-replace-tab-and-space-to-nbsp
+				    content))
 		     ("submit" . "confirm"))))
     (with-mixi-post-form (funcall page parent) fields
       (unless (re-search-forward mixi-post-succeed-regexp nil t)
@@ -2725,7 +2746,7 @@ Increase this value when unexpected error frequently occurs."
 	(mixi-post-error 'cannot-find-key friend)))
     (setq fields `(("post_key" . ,post-key)
 		   ("subject" . ,title)
-		   ("body" . ,content)
+		   ("body" . ,(mixi-replace-tab-and-space-to-nbsp content))
 		   ("yes" . "　送　信　")
 		   ("submit" . "confirm")))
     (with-mixi-post-form (mixi-post-message-page friend) fields

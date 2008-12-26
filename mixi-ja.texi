@@ -1437,6 +1437,11 @@ mixi のサイトは自動ツールなどで短時間に連続してアクセスした場合、その接
 接続を拒否された場合に待機する@emph{秒数}を指定します。
 @end defopt
 
+@defopt mixi-replace-tab-and-space-to-nbsp
+主に mixi への投稿時、整形された状態を保つためにタブとスペースを文字実体
+参照である @code{&nbsp;} へ置換するかどうかを指定します。
+@end defopt
+
 @defopt mixi-cache-expires
 mixi オブジェクトのキャッシュの有効期限を指定します。
 

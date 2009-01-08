@@ -14,7 +14,7 @@
 @end direntry
 
 @copying
-Copyright @copyright{} 2007, 2008 @w{OHASHI Akira}.
+Copyright @copyright{} 2007, 2008, 2009 @w{OHASHI Akira}.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -811,6 +811,22 @@ friend オブジェクトと数値は同時に指定することもできます。
 
 (mixi-get-logs 5)
     @result{} 足あと最大で 5 件分のみ
+@end example
+@end cartouche
+@end defun
+
+@defun mixi-get-self-logs &optional range
+自分の足あと一覧を取得します。
+@var{range} は数値を指定することができます。
+@var{range} を指定した場合は最大でこの数の自分の足あとのみを取得します。
+
+@cartouche
+@example
+(mixi-get-self-logs)
+    @result{} 自分の足あとすべて
+
+(mixi-get-self-logs 5)
+    @result{} 自分の足あと最大で 5 件分のみ
 @end example
 @end cartouche
 @end defun

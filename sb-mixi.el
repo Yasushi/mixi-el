@@ -1,6 +1,6 @@
 ;;; sb-mixi.el --- shimbun backend for mixi
 
-;; Copyright (C) 2006, 2007, 2008 OHASHI Akira
+;; Copyright (C) 2006, 2007, 2008, 2009 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: news
@@ -33,7 +33,7 @@
 (require 'mixi-utils)
 (require 'shimbun)
 
-(defconst shimbun-mixi-revision "$Revision: 1.65 $")
+(defconst shimbun-mixi-revision "$Revision: 1.66 $")
 
 (eval-and-compile
   (luna-define-class shimbun-mixi (shimbun) (comment-cache release-cache))
@@ -53,6 +53,7 @@
      (lambda (range)
        (mixi-get-messages 'noticebox range)))
     ("logs" . mixi-get-logs)
+    ("logs.self" . mixi-get-self-logs)
     ("my-diaries" . "/home.pl")
     ("mixi-el" . "/view_community.pl?id=1596390")
     ("news.newest.domestic" .

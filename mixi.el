@@ -1,6 +1,6 @@
 ;; mixi.el --- API libraries for accessing to mixi -*- coding: euc-jp -*-
 
-;; Copyright (C) 2005, 2006, 2007, 2008 OHASHI Akira
+;; Copyright (C) 2005, 2006, 2007, 2008, 2009 OHASHI Akira
 
 ;; Author: OHASHI Akira <bg66@koka-in.org>
 ;; Keywords: hypermedia
@@ -29,6 +29,7 @@
 ;;  * mixi-get-friends
 ;;  * mixi-get-favorites
 ;;  * mixi-get-logs
+;;  * mixi-get-self-logs
 ;;  * mixi-get-recommended-friends (indies)
 ;;  * mixi-get-diaries
 ;;  * mixi-get-new-diaries
@@ -138,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.202 $")
+(defconst mixi-revision "$Revision: 1.203 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -1153,27 +1154,41 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-log-p log)))
   (aref (cdr log) 1))
 
-(defmacro mixi-log-list-page ()
-  `(concat "/show_log.pl"))
+(defconst mixi-log-list-page "/show_log.pl")
 
 (defconst mixi-log-list-regexp
-  "\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\) <a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)</a>")
+  "\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\):\\([0-9]+\\)</span><span class=\"name\"><a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*?\\)</a>")
+
+(defun mixi-get-logs-internal (list-page &optional range)
+  (let ((items (mixi-get-matched-items list-page
+				       mixi-log-list-regexp
+				       range))
+	(year (nth 5 (decode-time (current-time))))
+	(month (nth 4 (decode-time (current-time)))))
+    (mapcar (lambda (item)
+	      (let ((month-of-item (string-to-number (nth 0 item))))
+		(when (> month-of-item month)
+		  (decf year))
+		(setq month month-of-item)
+		(mixi-make-log (mixi-make-friend (nth 4 item) (nth 5 item))
+			       (encode-time 0
+					    (string-to-number (nth 3 item))
+					    (string-to-number (nth 2 item))
+					    (string-to-number (nth 1 item))
+					    month year))))
+	    items)))
 
 ;;;###autoload
 (defun mixi-get-logs (&optional range)
   "Get logs."
-  (let ((items (mixi-get-matched-items (mixi-log-list-page)
-				       mixi-log-list-regexp
-				       range)))
-    (mapcar (lambda (item)
-	      (mixi-make-log (mixi-make-friend (nth 5 item) (nth 6 item))
-			     (encode-time 0
-					  (string-to-number (nth 4 item))
-					  (string-to-number (nth 3 item))
-					  (string-to-number (nth 2 item))
-					  (string-to-number (nth 1 item))
-					  (string-to-number (nth 0 item)))))
-	    items)))
+  (mixi-get-logs-internal mixi-log-list-page range))
+
+(defconst mixi-log-self-list-page "/show_self_log.pl")
+
+;;;###autoload
+(defun mixi-get-self-logs (&optional range)
+  "Get self logs."
+  (mixi-get-logs-internal mixi-log-self-list-page range))
 
 ;; Recommended friend.
 (defmacro mixi-recommended-friend-list-page ()

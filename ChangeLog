@@ -1,3 +1,13 @@
+2009-01-08  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-log-list-regexp): Follow the change of mixi.
+	(mixi-log-list-page): Change to the constant from macro.
+	(mixi-get-logs-internal): New function.
+	(mixi-get-logs): Follow the change above.
+	(mixi-log-self-list-page): New constant.
+	(mixi-get-self-logs): New function.
+	* sb-mixi.el (shimbun-mixi-default-group-alist): Add `logs.self'.
+
 2008-12-26  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-replace-tab-and-space-to-nbsp): New user option.

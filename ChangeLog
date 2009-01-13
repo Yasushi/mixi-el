@@ -1,3 +1,8 @@
+2009-01-13  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi-el: Version 2.2.0 released.
+	* configure.ac: Bump up version.
+
 2009-01-08  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi.el (mixi-log-list-regexp): Follow the change of mixi.

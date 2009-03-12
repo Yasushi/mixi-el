@@ -11,6 +11,7 @@ Features
     - Friends
     - Favorites
     - Logs
+    - Self logs
     - Diaries
     - Communities
     - BBSes
@@ -19,6 +20,7 @@ Features
     - Introductions
     - News
     - Releases
+    - Echoes
 
   * You can post the following data to mixi:
 
@@ -26,6 +28,7 @@ Features
     - Topic
     - Comment
     - Message
+    - Echo
 
 Working Environments
 --------------------

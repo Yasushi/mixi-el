@@ -1,3 +1,8 @@
+2009-03-12  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-message-list-regexp):  Follow the change of mixi.
+	(mixi-message-owner-regexp): Ditto.
+
 2009-01-13  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-el: Version 2.2.0 released.

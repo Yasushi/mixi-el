@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.203 $")
+(defconst mixi-revision "$Revision: 1.204 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2610,8 +2610,7 @@ Increase this value when unexpected error frequently occurs."
 <dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日 \\([0-9]+\\)時\\([0-9]+\\)分</dd>")
 (defconst mixi-message-owner-regexp
   "<dt>差出人</dt>
-<dd>\\(
-<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>\\|mixi</dd>\\)")
+<dd>\\(<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>\\|mixi</dd>\\)")
 (defconst mixi-message-content-regexp
   "<div id=\"message_body\" class=\"messageDetailBody\">\\(\\(.\\|\r?\n\\)*?\\)</div>")
 
@@ -2710,7 +2709,7 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,box (concat "&box=" ,box))))
 
 (defconst mixi-message-list-regexp
-  "<a href=\"view_message\\.pl\\?id=\\(.+\\)&box=\\(.+\\)\">")
+  "<a href=\"view_message\\.pl\\?id=\\(.+\\)&box=\\([^&\"]+\\)")
 
 ;;;###autoload
 (defun mixi-get-messages (&rest box-or-range)

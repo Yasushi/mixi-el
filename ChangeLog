@@ -1,3 +1,7 @@
+2009-03-18  OHASHI Akira  <bg66@koka-in.org>
+
+	* mixi.el (mixi-post-echo): Follow the change of mixi.
+
 2009-03-13  OHASHI Akira  <bg66@koka-in.org>
 
 	* mixi-el: Version 2.2.1 released.

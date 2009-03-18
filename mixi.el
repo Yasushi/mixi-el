@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.204 $")
+(defconst mixi-revision "$Revision: 1.205 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -3254,7 +3254,7 @@ Increase this value when unexpected error frequently occurs."
   (unless (or (null parent) (mixi-echo-p parent))
     (signal 'wrong-type-argument (list 'mixi-echo-p parent)))
   (let (fields post-key)
-    (with-mixi-retrieve (mixi-post-echo-page)
+    (with-mixi-retrieve (format (mixi-new-echo-list-page) 1)
       (if (re-search-forward mixi-post-key-regexp nil t)
 	  (setq post-key (match-string 1))
 	(mixi-post-error 'cannot-find-key)))

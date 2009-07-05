@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.205 $")
+(defconst mixi-revision "$Revision: 1.206 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -3154,9 +3154,9 @@ Increase this value when unexpected error frequently occurs."
 	   "&post_time=" (mixi-echo-post-time ,echo)))
 
 (defconst mixi-echo-owner-nick-regexp
-  "<div id=\"echo_nickname_[0-9]+\"  style=\"display: none;\">\\(.*\\)</div>")
+  "<div class=\"echo_nickname\" id=\"echo_nickname_[0-9]+\"  style=\"display: none;\">\\(.*\\)</div>")
 (defconst mixi-echo-content-regexp
-  "<div id=\"echo_body_[0-9]+\"      style=\"display: none;\">\\(.+\\)</div>")
+  "<div class=\"echo_body\" id=\"echo_body_[0-9]+\"      style=\"display: none;\">\\(.+\\)</div>")
 
 (defun mixi-realize-echo (echo)
   "Realize an ECHO."

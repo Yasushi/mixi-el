@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.206 $")
+(defconst mixi-revision "$Revision: 1.207 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2612,7 +2612,7 @@ Increase this value when unexpected error frequently occurs."
   "<dt>º¹½Ð¿Í</dt>
 <dd>\\(<a href=\"show_friend\\.pl\\?id=\\([0-9]+\\)\">\\(.*\\)</a>\\|mixi</dd>\\)")
 (defconst mixi-message-content-regexp
-  "<div id=\"message_body\" class=\"messageDetailBody\">\\(\\(.\\|\r?\n\\)*?\\)</div>")
+"<div id=\"message_body\" class=\"messageDetailBody[^\"]*\">\\(\\(.\\|\r?\n\\)*?\\)</div>")
 
 (defun mixi-realize-message (message)
   "Realize a MESSAGE."

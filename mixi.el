@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.207 $")
+(defconst mixi-revision "$Revision: 1.208 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -2732,14 +2732,16 @@ Increase this value when unexpected error frequently occurs."
 		(mixi-make-message (nth 0 item) (nth 1 item)))
 	      items))))
 
-(defmacro mixi-post-message-page (friend)
-  `(concat "/send_message.pl?id=" (mixi-friend-id friend)))
+(defmacro mixi-post-message-page (&optional friend)
+  `(concat "/send_message.pl"
+	   (when ,friend
+	     (concat "?id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-post-message-key-regexp
-  "<input name=post_key type=hidden value=\\([a-z0-9]+\\)>")
+  "<input name=\"?post_key\"? type=\"?hidden\"? value=\"?\\([a-z0-9]+\\)\"? ")
 
 (defconst mixi-post-message-succeed-regexp
-  "<b>送信完了</b>しました。")
+  "送信が完了しました。")
 
 ;;;###autoload
 (defun mixi-post-message (friend title content)
@@ -2758,12 +2760,16 @@ Increase this value when unexpected error frequently occurs."
       (if (re-search-forward mixi-post-message-key-regexp nil t)
 	  (setq post-key (match-string 1))
 	(mixi-post-error 'cannot-find-key friend)))
-    (setq fields `(("post_key" . ,post-key)
+    (setq fields `(("from_show_friend" . "")
+		   ("mode" . "commit_or_edit")
 		   ("subject" . ,title)
 		   ("body" . ,(mixi-replace-tab-and-space-to-nbsp content))
-		   ("yes" . "　送　信　")
-		   ("submit" . "confirm")))
-    (with-mixi-post-form (mixi-post-message-page friend) fields
+		   ("post_key" . ,post-key)
+		   ("id" . ,(mixi-friend-id friend))
+		   ("original_message_id" . "")
+		   ("reply_message_id" . "")
+		   ("yes" . "送信する")))
+    (with-mixi-post-form (mixi-post-message-page) fields
       (unless (re-search-forward mixi-post-message-succeed-regexp nil t)
 	(mixi-post-error 'cannot-find-succeed friend)))))
 

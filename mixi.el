@@ -1343,6 +1343,12 @@ Increase this value when unexpected error frequently occurs."
     (signal 'wrong-type-argument (list 'mixi-diary-p diary)))
   (aset (cdr diary) 6 content))
 
+(defun mixi-diary-year (month)
+  (let ((time (decode-time)))
+    (if (> (string-to-number month) (nth 4 time))
+        (1- (nth 5 time))
+      (nth 5 time))))
+
 (defmacro mixi-diary-list-page (&optional friend)
   `(concat "/list_diary.pl?page=%d"
 	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
@@ -1383,8 +1389,9 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/new_friend_diary.pl?page=%d"))
 
 (defconst mixi-new-diary-list-regexp
-  "<dt>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</dt>
+  "<dt>\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</dt>
 <dd><a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\">\\(.+\\)</a> (\\(.*\\))<div ")
+
 (defconst mixi-new-diary-list-title-regexp
   "\\(.+\\) (\\([0-9]+\\))")
 
@@ -1396,24 +1403,24 @@ Increase this value when unexpected error frequently occurs."
 				       range)))
     (delq nil
 	  (mapcar (lambda (item)
-		    (let ((title (nth 7 item))
+		    (let ((title (nth 6 item))
 			  count)
 		      (when (string-match mixi-new-diary-list-title-regexp
 					  title)
 			(setq count (string-to-number (match-string 2 title)))
 			(setq title (match-string 1 title)))
 		      (let* ((diary (mixi-make-diary
-				     (mixi-make-friend (nth 6 item)
-						       (nth 8 item))
-				     (nth 5 item)))
+				     (mixi-make-friend (nth 5 item)
+						       (nth 7 item))
+				     (nth 4 item)))
 			     (comment-count (mixi-diary-comment-count diary)))
 			(mixi-diary-set-time diary
 					     (encode-time
-					      0 (string-to-number (nth 4 item))
-					      (string-to-number (nth 3 item))
+					      0 (string-to-number (nth 3 item))
 					      (string-to-number (nth 2 item))
 					      (string-to-number (nth 1 item))
-					      (string-to-number (nth 0 item))))
+					      (string-to-number (nth 0 item))
+                                              (mixi-diary-year (nth 0 item))))
 			(mixi-diary-set-title diary title)
 			(when (or (null comment-count)
 				  (< comment-count count))

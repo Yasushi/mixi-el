@@ -844,10 +844,10 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,friend) 'mixi-friend))
 
 (defmacro mixi-friend-page (friend)
-  `(concat "/show_profile.pl?id=" (mixi-friend-id ,friend)))
+  `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<h3>\\(.*\\)さん([0-9]+)</h3>")
+  "<title>\\[mixi\\] \\(.*\\)さん</title>")
 (defconst mixi-friend-name-regexp
   "<dt>名前</dt>\n?<dd>\\(.+?\\)\\(<img\\|</dd>\\)")
 (defconst mixi-friend-sex-regexp

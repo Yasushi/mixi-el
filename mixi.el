@@ -413,7 +413,7 @@ Increase this value when unexpected error frequently occurs."
     (mixi-curl-retrieve url nil (reverse form-data))))
 
 (defconst mixi-my-id-regexp
-  "<a href=\"show_profile\\.pl\\?id=\\([0-9]+\\)")
+  "<a href=\"http://mixi\.jp/show_profile\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-login (&optional email password)
   "Login to mixi."

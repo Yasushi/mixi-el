@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.208 $")
+(defconst mixi-revision "$Revision: 1.209 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -413,7 +413,7 @@ Increase this value when unexpected error frequently occurs."
     (mixi-curl-retrieve url nil (reverse form-data))))
 
 (defconst mixi-my-id-regexp
-  "<a href=\"show_profile\\.pl\\?id=\\([0-9]+\\)")
+  "<a href=\"http://mixi.jp/show_profile\\.pl\\?id=\\([0-9]+\\)")
 
 (defun mixi-login (&optional email password)
   "Login to mixi."
@@ -844,32 +844,32 @@ Increase this value when unexpected error frequently occurs."
   `(eq (mixi-object-class ,friend) 'mixi-friend))
 
 (defmacro mixi-friend-page (friend)
-  `(concat "/show_profile.pl?id=" (mixi-friend-id ,friend)))
+  `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<h3>\\(.*\\)¤µ¤ó([0-9]+)</h3>")
+  "<p class=\"name\">\\(.*\\)¤µ¤ó([0-9]+)\n")
 (defconst mixi-friend-name-regexp
-  "<dt>Ì¾Á°</dt>\n?<dd>\\(.+?\\)\\(<img\\|</dd>\\)")
+  "<th>Ì¾Á°</th>\n+?<td>\\(.+?\\)\\(<img\\|</td>\\)")
 (defconst mixi-friend-sex-regexp
-  "<dt>À­ÊÌ</dt>\n?<dd>\\([ÃË½÷]\\)À­\\(<img\\|</dd>\\)")
+  "<th>À­ÊÌ</th>\n+?<td>\\([ÃË½÷]\\)À­\\(<img\\|</td>\\)")
 (defconst mixi-friend-address-regexp
-  "<dt>¸½½»½ê</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
+  "<th>¸½½»½ê</th>\n+?<td>\\(.+?\\)\\(<img \\|</td>\\)")
 (defconst mixi-friend-age-regexp
-  "<dt>Ç¯Îð</dt>\n?<dd>\\([0-9]+\\)ºÐ\\( <img\\|</dd>\\)")
+  "<th>Ç¯Îð</th>\n+?<td>\\([0-9]+\\)ºÐ\\( <img\\|</td>\\)")
 (defconst mixi-friend-birthday-regexp
-  "<dt>ÃÂÀ¸Æü</dt>\n?<dd>\\([0-9]+\\)·î\\([0-9]+\\)Æü\\(<img \\|</dd>\\)")
+  "<th>ÃÂÀ¸Æü</th>\n+?<td>\\([0-9]+\\)·î\\([0-9]+\\)Æü\\(<img \\|</td>\\)")
 (defconst mixi-friend-blood-type-regexp
-  "<dt>·ì±Õ·¿</dt>\n?<dd>\\([ABO]B?\\)·¿\\(<img \\|</dd>\\)")
+  "<th>·ì±Õ·¿</th>\n+?<td>\\([ABO]B?\\)·¿\\(<img \\|</td>\\)")
 (defconst mixi-friend-birthplace-regexp
-  "<dt>½Ð¿ÈÃÏ</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
+  "<th>½Ð¿ÈÃÏ</th>\n+?<td>\\(.+?\\)\\(<img \\|</td>\\)")
 (defconst mixi-friend-hobby-regexp
-  "<dt>¼ñÌ£</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
+  "<th>¼ñÌ£</th>\n+?<td>\\(.+?\\)\\(<img \\|</td>\\)")
 (defconst mixi-friend-job-regexp
-  "<dt>¿¦¶È</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
+  "<th>¿¦¶È</th>\n+?<td>\\(.+?\\)\\(<img \\|</td>\\)")
 (defconst mixi-friend-organization-regexp
-  "<dt>½êÂ°</dt>\n?<dd>\\(.+?\\)\\(<img \\|</dd>\\)")
+  "<th>½êÂ°</th>\n+?<td>\\(.+?\\)\\(<img \\|</td>\\)")
 (defconst mixi-friend-profile-regexp
-  "<dt>¼«¸Ê¾Ò²ð</dt>\n?<dd class=\"userInput\">\\(.+?\\)</dd>")
+  "<th>¼«¸Ê¾Ò²ð</th>\n+?<td>\\(.+?\\)</td>")
 
 (defun mixi-realize-friend (friend)
   "Realize a FRIEND."

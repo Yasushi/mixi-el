@@ -139,7 +139,7 @@
   (autoload 'w3m-retrieve "w3m")
   (autoload 'url-retrieve-synchronously "url"))
 
-(defconst mixi-revision "$Revision: 1.209 $")
+(defconst mixi-revision "$Revision: 1.210 $")
 
 (defgroup mixi nil
   "API library for accessing to mixi."
@@ -847,7 +847,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/show_friend.pl?id=" (mixi-friend-id ,friend)))
 
 (defconst mixi-friend-nick-regexp
-  "<p class=\"name\">\\(.*\\)さん([0-9]+)\n")
+  "<p class=\"name\">\\(<span>\\|\\)\\(.*\\)さん([0-9]+)\\(</span>\\|\n\\)")
 (defconst mixi-friend-name-regexp
   "<th>名前</th>\n+?<td>\\(.+?\\)\\(<img\\|</td>\\)")
 (defconst mixi-friend-sex-regexp
@@ -875,10 +875,12 @@ Increase this value when unexpected error frequently occurs."
   "Realize a FRIEND."
   ;; FIXME: Check an expiration of cache?
   (unless (mixi-object-realized-p friend)
-    (with-mixi-retrieve (mixi-friend-page friend)
+    (with-mixi-retrieve (if (equal friend mixi-me)
+			    "/home.pl"
+			  (mixi-friend-page friend))
       (let ((case-fold-search t))
 	(if (re-search-forward mixi-friend-nick-regexp nil t)
-	    (mixi-friend-set-nick friend (match-string 1))
+	    (mixi-friend-set-nick friend (match-string 2))
 	  (mixi-realization-error 'cannot-find-nick friend))
 	(when (re-search-forward mixi-friend-name-regexp nil t)
 	  (mixi-friend-set-name friend (match-string 1)))
@@ -1348,7 +1350,7 @@ Increase this value when unexpected error frequently occurs."
 	   (when ,friend (concat "&id=" (mixi-friend-id ,friend)))))
 
 (defconst mixi-diary-list-regexp
-  "<dt>\\(<input name=\"diary_id\" type=\"checkbox\" value=\"[0-9]+\"  />\\|\\)<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a>\\(<span><a href=\"edit_diary\\.pl\\?id=[0-9]+\">編集する</a></span>\\|\\)</dt>
+  "<dt>\\(<input name=\"diary_id\" type=\"checkbox\" value=\"[0-9]+\"  />\\|\\)<a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=[0-9]+\">\\(.*\\)</a>\\(<span><a href=\"edit_diary\\.pl\\?id=[0-9]+\">編集する</a></span>\\|\\).*</dt>
 <dd>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日\n?\\([0-9]+\\):\\([0-9]+\\)</dd>
 </dl>")
 

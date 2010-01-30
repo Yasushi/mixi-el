@@ -1,3 +1,9 @@
+2010-01-29 KAMO Tomoyuki  <kto2038@yahoo.co.jp>
+
+	* mixi.el (mixi-friend-nick-regexp): Follow the change of mixi.
+	(mixi-realize-friend): Ditto.
+	(mixi-diary-list-regexp): Ditto.
+
 2010-01-12 KAMO Tomoyuki  <kto2038@yahoo.co.jp>
 
 	* mixi.el (mixi-my-id-regexp): Follow the change of mixi.

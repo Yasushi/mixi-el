@@ -1385,7 +1385,7 @@ Increase this value when unexpected error frequently occurs."
   `(concat "/new_friend_diary.pl?page=%d"))
 
 (defconst mixi-new-diary-list-regexp
-  "<dt>\\([0-9]+\\)年\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</dt>
+  "<dt>\\([0-9]+\\)月\\([0-9]+\\)日&nbsp;\\([0-9]+\\):\\([0-9]+\\)</dt>
 <dd><a href=\"view_diary\\.pl\\?id=\\([0-9]+\\)&owner_id=\\([0-9]+\\)\">\\(.+\\)</a> (\\(.*\\))<div ")
 (defconst mixi-new-diary-list-title-regexp
   "\\(.+\\) (\\([0-9]+\\))")
@@ -1397,8 +1397,10 @@ Increase this value when unexpected error frequently occurs."
 				       mixi-new-diary-list-regexp
 				       range)))
     (delq nil
-	  (mapcar (lambda (item)
-		    (let ((title (nth 7 item))
+	  (mapcar (lambda (i)
+		    (let* ((year (int-to-string (nth 5 (decode-time (current-time)))))
+                           (item (cons year i))
+                           (title (nth 7 item))
 			  count)
 		      (when (string-match mixi-new-diary-list-title-regexp
 					  title)
